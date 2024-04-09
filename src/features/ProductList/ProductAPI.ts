@@ -1,24 +1,6 @@
 import axios from "axios";
 
 const API = 'http://localhost:5050'
-// create product
-// export const createProduct = async(product: FormData) => {
-// try {
-//   const option = {
-//     method: 'POST',
-//     headers: {
-//       'Accept': 'application/json'
-//     },
-//     body: product
-//   }
-//   const response = await fetch(API+ '/product/create', option);
-//   const data = await response.json();
-//   console.log(data)
-//   return data;
-// } catch (error) {
-//   console.log(error)
-// }
-// }
 
 export const createProduct = async(product: any) => {
 try {
@@ -47,7 +29,7 @@ try {
     },
   }
     const res = await axios.get(API+ '/products');
-  console.log(res)
+  console.log('all products: ',res)
   return res;
   
 } catch (error) {
@@ -154,6 +136,50 @@ export const sortProductInRated = async() => {
   try {
      const res = await axios.get(API+ '/sort/product/rating');
     console.log(res)
+    return res;
+    
+  } catch (error) {
+    console.log(error)
+  }
+  }
+
+export const getAllCategories = async() => {
+  try {
+     const res = await axios.get(API+ '/categories');
+    console.log('categories fetch' ,res)
+    return res;
+    
+  } catch (error) {
+    console.log(error)
+  }
+  }
+
+export const getACategory = async(name: any) => {
+  try {
+     const res = await axios.get(API+ `/category/${name}`);
+    console.log(res)
+    return res;
+    
+  } catch (error) {
+    console.log(error)
+  }
+  }
+
+export const getAllBrands = async() => {
+  try {
+     const res = await axios.get(API+ '/brands');
+    console.log(res)
+    return res;
+    
+  } catch (error) {
+    console.log(error)
+  }
+  }
+
+export const getABrand = async(name: any) => {
+  try {
+     const res = await axios.get(API+ `/brand/${name}`);
+    console.log('brand api ',res)
     return res;
     
   } catch (error) {

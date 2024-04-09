@@ -15,11 +15,19 @@ import * as api from './ProductAPI';
 //     images: any;
 // }
 
+interface NameType {
+  name: string;
+}
+
 export interface ProductState {
   value: number;
   status: 'success' | 'loading' | 'failed' | 'idle';
   products: any,
   product: any,
+  brands: any,
+  brand: any,
+  categories: any,
+  category: any,
   message: any;
 }
 
@@ -28,6 +36,10 @@ const initialState: ProductState = {
   status: 'idle',
   products: [],
   product: [],
+  brands: [],
+  brand: [],
+  categories: [],
+  category: [],
   message: ''
 };
 
@@ -121,6 +133,46 @@ export const sortproductNewest = createAsyncThunk('product/getsortProductnewest'
 export const sortproductRated = createAsyncThunk('product/getsortProductrated', async(_, thunkAPI) => {
   try {
     const res = await api.sortProductInRated();
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
+export const fetchAllCategories = createAsyncThunk('product/getAllCategories', async(_, thunkAPI) => {
+  try {
+    const res = await api.getAllCategories();
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
+export const getACategory = createAsyncThunk('product/getACategory', async(name: string, thunkAPI) => {
+  try {
+    const res = await api.getACategory(name);
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
+export const fetchAllBrands = createAsyncThunk('product/getAllBrands', async(_, thunkAPI) => {
+  try {
+    const res = await api.getAllBrands();
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
+export const fetchABrand = createAsyncThunk('product/getABrand', async(name: string, thunkAPI) => {
+  try {
+    const res = await api.getABrand(name);
     return res?.data;
   } catch (error) {
     const message = thunkAPI.rejectWithValue(error);
@@ -256,6 +308,64 @@ export const productSlice = createSlice({
     })
     .
     addCase(sortproductRated.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(fetchAllCategories.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(fetchAllCategories.fulfilled, (state, action) => {
+      state.status = 'success'
+      state.categories = action.payload
+      console.log('fetch categories: ', state.categories )
+    })
+    .
+    addCase(fetchAllCategories.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(getACategory.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(getACategory.fulfilled, (state, action) => {
+      state.status = 'success'
+      state.category = action.payload;
+      state.products = action.payload.products;
+      console.log('fetch category: ', state.category )
+    })
+    .
+    addCase(getACategory.rejected, (state, action) => {
+       state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(fetchAllBrands.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(fetchAllBrands.fulfilled, (state, action) => {
+      state.status = 'success'
+      state.brands = action.payload;
+      console.log('fetch brands: ', state.brands )
+    })
+    .
+    addCase(fetchAllBrands.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(fetchABrand.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(fetchABrand.fulfilled, (state, action) => {
+      state.status = 'success'
+      state.brand = action.payload
+      state.products = action.payload.products
+      console.log('fetch brand: ', state.brand )
+    })
+    .
+    addCase(fetchABrand.rejected, (state, action) => {
       state.status = 'failed'
       state.message = action.payload
     })

@@ -1,6 +1,26 @@
-// A mock function to mimic making an async request for data
-export function fetchCount(amount = 1) {
-  return new Promise<{ data: number }>((resolve) =>
-    setTimeout(() => resolve({ data: amount }), 500)
-  );
+import axios from "axios";
+const API = 'http://localhost:5050'
+
+export const signup = async(users: any) => {
+  try {
+    const addToast = users.addToast;
+    const user = users.data
+  const option = {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  };
+
+  if(user){
+    const res = await axios.post(API+ '/user/create', user, option);
+  console.log(res)
+  addToast("Registration Successfull", {
+    appearance: "success",
+    autoDismiss: true,
+  });
+  return res;
+  }
+  } catch (error) {
+    
+  }
 }

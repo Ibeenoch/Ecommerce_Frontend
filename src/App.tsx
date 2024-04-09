@@ -14,6 +14,8 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CheckOutPage from "./pages/CheckOutPage";
 import ProductFormPage from "./pages/ProductFormPage";
 import Products from "./features/ProductList/components/Products";
+import RegisterPage from "./pages/RegisterPage";
+import Verification from "./features/auth/Verification";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +25,18 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage/>,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage/>,
+  },
+  {
+    path: "/verify/email",
+    element: <Verification/>,
+  },
+  {
+    path: "/verify/email/:id",
+    element: <Verification/>,
   },
   {
     path: "/cart",

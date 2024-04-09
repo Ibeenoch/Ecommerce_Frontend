@@ -1,6 +1,6 @@
-import React, { useState, Fragment, useEffect } from "react";
+import React, { useState, Fragment, useEffect, ChangeEvent } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
-import { deleteproduct, getAllproduct, getAproduct, selectProduct, sortproductAsc, sortproductDesc, sortproductNewest, sortproductRated } from "../ProductSlice";
+import { deleteproduct, fetchABrand, fetchAllBrands, fetchAllCategories, getACategory, getAllproduct, getAproduct, selectProduct, sortproductAsc, sortproductDesc, sortproductNewest, sortproductRated } from "../ProductSlice";
 import ReactImageMagnify from "react-image-magnify";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import pics from "../../../images/Apple 2022 MacBook Air Laptop 1.jpg";
@@ -32,10 +32,10 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { addToast } = useToasts()
-  const [incrementAmount, setIncrementAmount] = useState<string>("2");
+  const [getCategoryName, setGetCategoryName] = useState<string>("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const [theAdmin, setTheAdmin] = useState<boolean>(false);
-  const { status, products, product } = useAppSelector(selectProduct);
+  const { status, products, product, categories, category, brands, brand } = useAppSelector(selectProduct);
 
   
   const imageProps = {
@@ -100,7 +100,18 @@ const handleDelete = (productId: any) => {
   }
 }
 
-  const incrementValue = Number(incrementAmount) || 0;
+const handleCategoryOrBrand = (filter: string, name: string) => {
+  console.log('we have this category: ', filter, ' & ', name)
+  
+   if(filter === 'Category'){
+    dispatch(getACategory(name)) 
+   }
+   
+   if(filter === 'Brand'){
+    dispatch(fetchABrand(name)) 
+   }
+}
+
   const sortOptions = [
   //  { name: "Most Popular", current: true },
     { name: "Best Rating", current: false },
@@ -109,41 +120,43 @@ const handleDelete = (productId: any) => {
     { name: "Price: High to Low",  current: false },
   ];
 
-  const filters = [
-    {
-      id: "product",
-      name: "Product",
-      options: [
-        { value: "white", label: "White", checked: false },
-        { value: "beige", label: "Beige", checked: false },
-        { value: "blue", label: "Blue", checked: true },
-        { value: "brown", label: "Brown", checked: false },
-        { value: "green", label: "Green", checked: false },
-        { value: "purple", label: "Purple", checked: false },
-      ],
-    },
+  
+  const fetchCategories = (name: string) =>{
+    console.log('fetched categories name is: ', name)
+    //options is an array of objects
+    if(name === 'Product'){
+      console.log('aahh')
+    }else if(name === 'Category'){
+      dispatch(fetchAllCategories()).then((res) => {
+        console.log('response: ', res.payload)
+      })
+
+    }else{
+      dispatch(fetchAllBrands()).then((res) => {
+            console.log('response: ', res.payload)
+          })
+    }
+   
+  }
+
+  const filters = [    
     {
       id: "category",
       name: "Category",
-      options: [
-        { value: "new-arrivals", label: "New Arrivals", checked: false },
-        { value: "sale", label: "Sale", checked: false },
-        { value: "travel", label: "Travel", checked: true },
-        { value: "organization", label: "Organization", checked: false },
-        { value: "accessories", label: "Accessories", checked: false },
-      ],
+      options: categories && Array.isArray(categories) && categories,
+
+      // options: [
+      //   { value: "new-arrivals", label: "New Arrivals", checked: false },
+      //   { value: "sale", label: "Sale", checked: false },
+      //   { value: "travel", label: "Travel", checked: true },
+      //   { value: "organization", label: "Organization", checked: false },
+      //   { value: "accessories", label: "Accessories", checked: false },
+      // ],
     },
     {
       id: "brand",
       name: "Brand",
-      options: [
-        { value: "2l", label: "2L", checked: false },
-        { value: "6l", label: "6L", checked: false },
-        { value: "12l", label: "12L", checked: false },
-        { value: "18l", label: "18L", checked: false },
-        { value: "20l", label: "20L", checked: false },
-        { value: "40l", label: "40L", checked: true },
-      ],
+      options: brands && Array.isArray(brands) && brands,   
     },
   ];
 
@@ -213,10 +226,10 @@ const handleDelete = (productId: any) => {
                               <>
                                 <h3 className="-mx-2 -my-3 flow-root">
                                   <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                                    <span className="font-medium text-gray-900">
+                                    <span onClick={()=>fetchCategories(section.name)} className="font-medium text-gray-900">
                                       {section.name}
                                     </span>
-                                    <span className="ml-6 flex items-center">
+                                    <span  className="ml-6 flex items-center">
                                       {open ? (
                                         <MinusIcon
                                           className="h-5 w-5"
@@ -226,6 +239,7 @@ const handleDelete = (productId: any) => {
                                         <PlusIcon
                                           className="h-5 w-5"
                                           aria-hidden="true"
+                                          onClick={() =>fetchCategories(section.name)}
                                         />
                                       )}
                                     </span>
@@ -234,7 +248,7 @@ const handleDelete = (productId: any) => {
                                 <Disclosure.Panel className="pt-6">
                                   <div className="space-y-6">
                                     {section.options.map(
-                                      (option, optionIdx) => (
+                                      (option: any, optionIdx: any) => (
                                         <div
                                           key={option.value}
                                           className="flex items-center"
@@ -242,16 +256,17 @@ const handleDelete = (productId: any) => {
                                           <input
                                             id={`filter-mobile-${section.id}-${optionIdx}`}
                                             name={`${section.id}[]`}
-                                            defaultValue={option.value}
+                                            defaultValue={option.name}
                                             type="checkbox"
-                                            defaultChecked={option.checked}
+                                            // defaultChecked={option.checked}
+                                            onChange={() =>handleCategoryOrBrand(section.name, option.name)}
                                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                           />
                                           <label
                                             htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
                                             className="ml-3 min-w-0 flex-1 text-gray-500"
                                           >
-                                            {option.label}
+                                            {option.name}
                                           </label>
                                         </div>
                                       )
@@ -272,7 +287,7 @@ const handleDelete = (productId: any) => {
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                  Top Selling
+                 Filter
                 </h1>
 
                 <div className="flex items-center">
@@ -361,7 +376,7 @@ const handleDelete = (productId: any) => {
                           <>
                             <h3 className="-my-3 flow-root">
                               <Disclosure.Button className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                                <span className="font-medium text-gray-900">
+                                <span className="font-medium text-gray-900" onClick={() => fetchCategories(section.name)}>
                                   {section.name}
                                 </span>
                                 <span className="ml-6 flex items-center">
@@ -373,6 +388,7 @@ const handleDelete = (productId: any) => {
                                   ) : (
                                     <PlusIcon
                                       className="h-5 w-5"
+                                      onClick={() => fetchCategories(section.name)}
                                       aria-hidden="true"
                                     />
                                   )}
@@ -381,24 +397,25 @@ const handleDelete = (productId: any) => {
                             </h3>
                             <Disclosure.Panel className="pt-6">
                               <div className="space-y-4">
-                                {section.options.map((option, optionIdx) => (
+                                {section.options.map((option: any, optionIdx: any) => (
                                   <div
-                                    key={option.value}
+                                    key={option.id}
                                     className="flex items-center"
                                   >
                                     <input
                                       id={`filter-${section.id}-${optionIdx}`}
                                       name={`${section.id}[]`}
-                                      defaultValue={option.value}
+                                      defaultValue={option.name}
                                       type="checkbox"
-                                      defaultChecked={option.checked}
+                                      // defaultChecked={option.checked}
+                                      onChange={() =>handleCategoryOrBrand(section.name, option.name)}
                                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <label
                                       htmlFor={`filter-${section.id}-${optionIdx}`}
                                       className="ml-3 text-sm text-gray-600"
                                     >
-                                      {option.label}
+                                      {option.name}
                                     </label>
                                   </div>
                                 ))}
