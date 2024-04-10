@@ -1,9 +1,16 @@
-import React from 'react'
+import { useState } from 'react';
 import Login from '../features/auth/Login'
+import NavBar from './NavBar/NavBar';
 
 const LoginPage = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
-    <Login />
+    <>
+    <NavBar isOpen={isOpen} >
+      <Login />
+    </NavBar>
+    </>
+    
   )
 }
 

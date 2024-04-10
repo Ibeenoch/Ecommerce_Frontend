@@ -5,10 +5,12 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchAllUsersCartAsync, selectAllCart } from "./cartSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
+import { selectUser } from "../auth/authSlice";
 
 const Cart = () => {
   const [open, setOpen] = useState(true);
   const { carts } = useAppSelector(selectAllCart);
+  const { user } = useAppSelector(selectUser);
   const { addToast } = useToasts();
   const products = [
     {
@@ -104,6 +106,7 @@ const Cart = () => {
     }
   };
 
+  
   return (
     <>
       <div>
@@ -184,7 +187,7 @@ const Cart = () => {
               Shipping and taxes calculated at checkout.
             </p>
             <div className="mt-6">
-              <Link to="/checkout">
+              <Link to={user && user[0] && user[0].id ? `/checkout/${user[0].id}`: '/login'}>
                 <div className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
                   Checkout
                 </div>

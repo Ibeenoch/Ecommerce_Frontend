@@ -23,6 +23,7 @@ import "./product.css";
 import { addtocart } from "../../cart/cartSlice";
 import { useToasts } from 'react-toast-notifications'
 import ProductReview from "./ProductReview";
+import { selectUser } from "../../auth/authSlice";
 
 interface ItogglePopup {
     isOpen: boolean;
@@ -36,7 +37,10 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const [theAdmin, setTheAdmin] = useState<boolean>(false);
   const { status, products, product, categories, category, brands, brand } = useAppSelector(selectProduct);
+  const { user } = useAppSelector(selectUser)
 
+  const token = user && user[0] && user[0].token;
+  console.log('token user product: ', token, user)
   
   const imageProps = {
     width: "100%",
@@ -122,10 +126,9 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
 
   
   const fetchCategories = (name: string) =>{
-    console.log('fetched categories name is: ', name)
     //options is an array of objects
     if(name === 'Product'){
-      console.log('aahh')
+
     }else if(name === 'Category'){
       dispatch(fetchAllCategories()).then((res) => {
         console.log('response: ', res.payload)
@@ -436,7 +439,7 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                           Top Selling
                         </h2>
 
-                        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 px-4  py-5 lg:grid-cols-3 xl:gap-x-8">
+                        <div className="mt-1 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 px-4  py-5 lg:grid-cols-3 xl:gap-x-8">
                           {products.map((product: any) => (
                             <div
                               key={product.id}
@@ -448,7 +451,7 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                               }}
                             >
                               <div className="w-full md:w-64 h-64 contain">
-                                {theAdmin ? ( 
+                                { user && user[0] && user[0].role && user[0].role === 'ADMIN' ? ( 
                                   // edit product
                                 <div className="flex justify-between">
                                   <div onClick={() => handleEdit(product.id)} className="icon1 z-30 cursor-pointer">

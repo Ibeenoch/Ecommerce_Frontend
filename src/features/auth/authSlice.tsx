@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store'; 
 import * as api from './authAPI'
+import { act } from '@testing-library/react';
 
 export interface userState {
   user: any;
@@ -16,6 +17,45 @@ export const registerUser = createAsyncThunk('/user/new', async(user: any) => {
   try {
 
     const res =  await api.signup(user);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+export const loginUser = createAsyncThunk('/user/login', async(user: any) => {
+  try {
+
+    const res =  await api.login(user);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+export const userVerification = createAsyncThunk('/user/verify', async(data: any) => {
+  try {
+
+    const res =  await api.verifyUser(data);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+export const emailLink = createAsyncThunk('/user/emaillink', async(data: any) => {
+  try {
+    const res =  await api.sendEmailLink(data);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+export const passwordChange = createAsyncThunk('/user/changepassword', async(data: any) => {
+  try {
+
+    const res =  await api.passwordReset(data);
     return res?.data
   } catch (error) {
     console.log(error)
@@ -39,9 +79,50 @@ export const authSlice = createSlice({
     })
     .addCase(registerUser.fulfilled, (state, action) => {
       state.status = 'success'
-      state.user = action.payload;
+      state.user = [action.payload];
     })
     .addCase(registerUser.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(loginUser.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(loginUser.fulfilled, (state, action) => {
+      state.status = 'success'
+      state.user = [action.payload];
+    })
+    .addCase(loginUser.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(userVerification.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(userVerification.fulfilled, (state, action) => {
+      state.status = 'success'
+      console.log('verified user data: ', action.payload)
+      state.user = action.payload;
+    })
+    .addCase(userVerification.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(emailLink.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(emailLink.fulfilled, (state, action) => {
+      state.status = 'success'
+      console.log('email link data: ', action.payload)
+    })
+    .addCase(emailLink.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(passwordChange.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(passwordChange.fulfilled, (state, action) => {
+      state.status = 'success'
+      console.log('changed user password: ', action.payload)
+    })
+    .addCase(passwordChange.rejected, (state, action) => {
       state.status = 'failed'
     })
   }

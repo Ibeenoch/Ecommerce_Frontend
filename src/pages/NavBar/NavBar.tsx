@@ -98,7 +98,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                       </div>
                     </div>
                   </div>
-                  <div onClick={handleCart} className="hidden md:block">
+                  <div className="hidden md:block">
                     
                     <div className="ml-4 flex items-center md:ml-6">
                       <button

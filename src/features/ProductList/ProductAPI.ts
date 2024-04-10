@@ -1,6 +1,10 @@
 import axios from "axios";
+import { useAppSelector } from "../../app/hooks";
+import { selectUser } from "../auth/authSlice";
 
 const API = 'http://localhost:5050'
+
+
 
 export const createProduct = async(product: any) => {
 try {

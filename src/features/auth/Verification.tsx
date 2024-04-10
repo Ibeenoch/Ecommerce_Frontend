@@ -1,10 +1,18 @@
 import { Link, useParams } from "react-router-dom";
 import companylogo from "../../images/Untitled.jpg";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useAppDispatch } from "../../app/hooks";
+import { userVerification } from "./authSlice";
 
 const Verification = () => {
-    const { id } = useParams()
+    const { id } = useParams();
+    const dispatch = useAppDispatch()
+
+    useEffect(()=> {
+      dispatch(userVerification(id))
+    }, [])
+
   return (
     <div>
         {id ? (<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -38,7 +46,7 @@ const Verification = () => {
             Your Account is Successfully Created
           </h2>
           <p className="mt-5 text-center text-xl font-semibold leading-9 tracking-tight text-gray-900">
-            Please Verify Your Email Address To Continue
+            A message has been send to your email,  please verify your email address to continue
           </p>
         </div>
 

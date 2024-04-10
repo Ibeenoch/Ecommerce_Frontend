@@ -2,25 +2,13 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store'; 
 import * as api from './ProductAPI';
 
-// interface IProduct {
-//     title: string;
-//     description: string;
-//     price: number;
-//     discountPercentage: number;
-//     stock: number;
-//     brand: string;
-//     category: string;
-//     keywords: string;
-//     thumbnail: any;
-//     images: any;
-// }
+
 
 interface NameType {
   name: string;
 }
 
 export interface ProductState {
-  value: number;
   status: 'success' | 'loading' | 'failed' | 'idle';
   products: any,
   product: any,
@@ -32,7 +20,6 @@ export interface ProductState {
 }
 
 const initialState: ProductState = {
-  value: 0,
   status: 'idle',
   products: [],
   product: [],

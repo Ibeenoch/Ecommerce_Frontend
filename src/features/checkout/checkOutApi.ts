@@ -1,10 +1,16 @@
-const API = 'http://localhost:8080/cart'
+import axios from "axios";
 
-export const fetchAllUsersCart = async() => {
+const API = 'http://localhost:5050'
+
+export const addAddress = async(data: any) => {
     try {
-        const response = await fetch(API);
-        const data = await response.json();
-        return data
+        const option = {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          };
+        const response = await axios.post(API+'/checkout/info', data);        
+        return response
     } catch (error) {
         console.log(error);
     }
