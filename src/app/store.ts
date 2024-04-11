@@ -5,12 +5,12 @@ import thunk from 'redux-thunk';
 import  productReducer  from '../features/ProductList/ProductSlice';
 import cartReducer from '../features/cart/cartSlice'
 import authReducer from '../features/auth/authSlice'
-import checkoutReducer from '../features/checkout/checkoutSlice'
+import checkoutReducer from '../features/checkout/checkoutSlice';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth']
+  whitelist: ['auth', 'checkout']
 }
 
 const reducers = combineReducers({

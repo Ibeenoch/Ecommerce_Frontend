@@ -6,12 +6,15 @@ const API = 'http://localhost:5050'
 
 
 
-export const createProduct = async(product: any) => {
+export const createProduct = async(products: any) => {
 try {
-  console.log(product)
+  const token = products.token;
+  const product = products.product;
+  console.log(product, token)
   const option = {
     headers: {
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': 'multipart/form-data',
+      'Authorization': `Bearer ${token}`,
     },
   };
 
@@ -33,7 +36,7 @@ try {
     },
   }
     const res = await axios.get(API+ '/products');
-  console.log('all products: ',res)
+  // console.log('all products: ',res)
   return res;
   
 } catch (error) {
@@ -55,11 +58,21 @@ try {
 }
 }
 
-export const deleteProduct = async(productId: any) => {
+export const deleteProduct = async(product: any) => {
   try {
-    console.log(productId)
+    const productId = product.productId;
+    const token = product.token;
+    
     if(productId){
-      const res = await axios.delete(`${API}/product/delete/${productId}`);
+      console.log('api delete ', product)
+      const option = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+        },
+      };
+
+      const res = await axios.delete(`${API}/product/delete/${productId}`, option);
     console.log(res)
     return res;
     }
@@ -69,24 +82,35 @@ export const deleteProduct = async(productId: any) => {
   }
   }
 
-export const updateProduct = async(productId: any, product: any) => {
+export const updateProduct = async(products: any) => {
   try {
-    if(product && product.fileupload){
-        const option = {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-        };
+    
+    const productId = products.id;
+    const product = products.product;
+    const  images= products.images
+    const token = products.token;
+
+    console.log('product sending; ', product, product.images)
+    if(product && images){
+      console.log('with img: ', productId, product, token);
+      const option = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+        },
+      };
       
-        if(productId && product){
+        if(productId && product && token){
           const res = await axios.put(`${API}/product/update/${productId}`, product, option);
-        console.log(res)
+        console.log('server res: ',  res)
         return res;
         }
     }else{
+      console.log('no img: ', productId, product, token)
         const option = {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       };
     

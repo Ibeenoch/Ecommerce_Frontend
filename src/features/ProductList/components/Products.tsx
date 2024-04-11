@@ -1,6 +1,19 @@
 import React, { useState, Fragment, useEffect, ChangeEvent } from "react";
 import { useAppSelector, useAppDispatch } from "../../../app/hooks";
-import { deleteproduct, fetchABrand, fetchAllBrands, fetchAllCategories, getACategory, getAllproduct, getAproduct, selectProduct, sortproductAsc, sortproductDesc, sortproductNewest, sortproductRated } from "../ProductSlice";
+import {
+  deleteproduct,
+  fetchABrand,
+  fetchAllBrands,
+  fetchAllCategories,
+  getACategory,
+  getAllproduct,
+  getAproduct,
+  selectProduct,
+  sortproductAsc,
+  sortproductDesc,
+  sortproductNewest,
+  sortproductRated,
+} from "../ProductSlice";
 import ReactImageMagnify from "react-image-magnify";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import pics from "../../../images/Apple 2022 MacBook Air Laptop 1.jpg";
@@ -13,35 +26,37 @@ import {
   Squares2X2Icon,
   HeartIcon,
   ShoppingBagIcon,
-  StarIcon, 
+  StarIcon,
   PencilIcon,
-  TrashIcon
+  TrashIcon,
 } from "@heroicons/react/20/solid";
 import Pagination from "./Pagination";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./product.css";
-import { addtocart } from "../../cart/cartSlice";
-import { useToasts } from 'react-toast-notifications'
+import { addtocart, fetchAllUsersCartAsync } from "../../cart/cartSlice";
+import { useToasts } from "react-toast-notifications";
 import ProductReview from "./ProductReview";
 import { selectUser } from "../../auth/authSlice";
+import Loading from "../../../Loading";
+import LoadingPage from "../../../pages/LoadingPage";
 
 interface ItogglePopup {
-    isOpen: boolean;
-    togglePopup: () => void
-  }
+  isOpen: boolean;
+  togglePopup: () => void;
+}
 const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { addToast } = useToasts()
+  const { addToast } = useToasts();
   const [getCategoryName, setGetCategoryName] = useState<string>("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const [theAdmin, setTheAdmin] = useState<boolean>(false);
-  const { status, products, product, categories, category, brands, brand } = useAppSelector(selectProduct);
-  const { user } = useAppSelector(selectUser)
+  const { status, products, product, categories, category, brands, brand } =
+    useAppSelector(selectProduct);
+  const { user } = useAppSelector(selectUser);
 
   const token = user && user[0] && user[0].token;
-  console.log('token user product: ', token, user)
-  
+
   const imageProps = {
     width: "100%",
     height: "100%",
@@ -51,122 +66,144 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const handleAddToCart = (productId: any) => {
     const quantity = 1;
     dispatch(getAproduct(productId)).then((res) => {
-      console.log('response product ', res.payload)
-      const receive = res.payload
-      const data = {...receive, quantity};
-      console.log('cart added: ', data)
-      const dataitem = {data, addToast}
-      dispatch(addtocart(dataitem))
-    })
-   
-  }
+      console.log("response product ", res.payload);
+      const receive = res.payload;
+      const data = { ...receive, quantity };
+      console.log("cart added: ", data);
+      const dataitem = { data, addToast };
+      dispatch(addtocart(dataitem));
+    });
+  };
 
   const handleSort = (option: any) => {
-    if(option === 'Price: Low to High'){
-      console.log('price asc')
-      dispatch(sortproductAsc())
-    }else if(option === 'Price: High to Low'){
-      console.log('price desc')
-      dispatch(sortproductDesc())
-    }else if(option === 'Newest'){
-      dispatch(sortproductNewest())
-    }else if(option === 'Best Rating'){
-      dispatch(sortproductRated())
+    if (option === "Price: Low to High") {
+      console.log("price asc");
+      dispatch(sortproductAsc());
+    } else if (option === "Price: High to Low") {
+      console.log("price desc");
+      dispatch(sortproductDesc());
+    } else if (option === "Newest") {
+      dispatch(sortproductNewest());
+    } else if (option === "Best Rating") {
+      dispatch(sortproductRated());
     }
-  }
+  };
   useEffect(() => {
     dispatch(getAllproduct());
   }, [dispatch, navigate]);
 
-const handleProductDetails = (productId: any) => {
-dispatch(getAproduct(productId)).then((res) => {
-  console.log('product res: ', res)
-  if(res && res.payload && res.payload.images && res.payload.images.set){
-    console.log('product resent: ', res.payload.images.set, res.payload.images.set[0])
-    navigate(`/product/details/${productId}`)
-  }
-})
-}
+  const handleProductDetails = (productId: any) => {
+    dispatch(getAproduct(productId)).then((res) => {
+      console.log("product res: ", res);
+      if (res && res.payload && res.payload.images && res.payload.images.set) {
+        console.log(
+          "product resent: ",
+          res.payload.images.set,
+          res.payload.images.set[0]
+        );
+        navigate(`/product/details/${productId}`);
+      }
+    });
+  };
 
-const handleEdit = (productId: any) => {
-  dispatch(getAproduct(productId)).then((res) => {
-    if(res && res.payload){
-      navigate(`/product/create/${productId}`)
+  const handleEdit = (productId: any) => {
+    dispatch(getAproduct(productId)).then((res) => {
+      if (res && res.payload) {
+        navigate(`/product/update/${productId}`);
+      }
+    });
+  };
+
+  const handleDelete = (productId: any) => {
+    const getConfirmation = window.confirm(
+      "Are you sure you want to delete this product"
+    );
+    if (getConfirmation) {
+      const product = {productId, token}
+      dispatch(deleteproduct(product)).then((res) => {
+        if(res && res.payload && res.payload.id){
+          var checkItem = JSON.parse(localStorage.getItem("cart") as any);
+          if (checkItem && Array.isArray(checkItem)) {
+            const index = checkItem.findIndex((item) => item.id === res.payload.id);
+            checkItem.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(checkItem));
+            dispatch(fetchAllUsersCartAsync()).then(() => {
+              dispatch(getAllproduct()).then(() => {
+                addToast('Product Succesfully deleted', {
+                  appearance: 'success',
+                  autoDismiss: true,
+                })
+              })
+            })
+          } else {
+            checkItem = {};
+            localStorage.setItem("cart", JSON.stringify(checkItem));
+            dispatch(fetchAllUsersCartAsync()).then(() => {
+              dispatch(getAllproduct()).then(() => {
+                addToast('Product Succesfully deleted', {
+                  appearance: 'success',
+                  autoDismiss: true,
+                })
+              })
+            });
+          }
+         
+        }
+      })
     }
-  })
+  };
 
-};
+  const handleCategoryOrBrand = (filter: string, name: string) => {
+    console.log("we have this category: ", filter, " & ", name);
 
-const handleDelete = (productId: any) => {
- const getConfirmation = window.confirm('Are you sure you want to delete this product')
-  if(getConfirmation){
-    dispatch(deleteproduct(productId))
-  }
-}
+    if (filter === "Category") {
+      dispatch(getACategory(name));
+    }
 
-const handleCategoryOrBrand = (filter: string, name: string) => {
-  console.log('we have this category: ', filter, ' & ', name)
-  
-   if(filter === 'Category'){
-    dispatch(getACategory(name)) 
-   }
-   
-   if(filter === 'Brand'){
-    dispatch(fetchABrand(name)) 
-   }
-}
+    if (filter === "Brand") {
+      dispatch(fetchABrand(name));
+    }
+  };
 
   const sortOptions = [
-  //  { name: "Most Popular", current: true },
+    //  { name: "Most Popular", current: true },
     { name: "Best Rating", current: false },
     { name: "Newest", current: false },
     { name: "Price: Low to High", current: false },
-    { name: "Price: High to Low",  current: false },
+    { name: "Price: High to Low", current: false },
   ];
 
-  
-  const fetchCategories = (name: string) =>{
+  const fetchCategories = (name: string) => {
     //options is an array of objects
-    if(name === 'Product'){
-
-    }else if(name === 'Category'){
+    if (name === "Product") {
+      console.log('none')
+    } else if (name === "Category") {
       dispatch(fetchAllCategories()).then((res) => {
-        console.log('response: ', res.payload)
-      })
-
-    }else{
+        console.log("response: ", res.payload);
+      });
+    } else {
       dispatch(fetchAllBrands()).then((res) => {
-            console.log('response: ', res.payload)
-          })
+        console.log("response: ", res.payload);
+      });
     }
-   
-  }
+  };
 
-  const filters = [    
+  const filters = [
     {
       id: "category",
       name: "Category",
       options: categories && Array.isArray(categories) && categories,
-
-      // options: [
-      //   { value: "new-arrivals", label: "New Arrivals", checked: false },
-      //   { value: "sale", label: "Sale", checked: false },
-      //   { value: "travel", label: "Travel", checked: true },
-      //   { value: "organization", label: "Organization", checked: false },
-      //   { value: "accessories", label: "Accessories", checked: false },
-      // ],
     },
     {
       id: "brand",
       name: "Brand",
-      options: brands && Array.isArray(brands) && brands,   
+      options: brands && Array.isArray(brands) && brands,
     },
   ];
 
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
   }
-
 
   return (
     <div>
@@ -229,10 +266,15 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                               <>
                                 <h3 className="-mx-2 -my-3 flow-root">
                                   <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                                    <span onClick={()=>fetchCategories(section.name)} className="font-medium text-gray-900">
+                                    <span
+                                      onClick={() =>
+                                        fetchCategories(section.name)
+                                      }
+                                      className="font-medium text-gray-900"
+                                    >
                                       {section.name}
                                     </span>
-                                    <span  className="ml-6 flex items-center">
+                                    <span className="ml-6 flex items-center">
                                       {open ? (
                                         <MinusIcon
                                           className="h-5 w-5"
@@ -242,7 +284,9 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                                         <PlusIcon
                                           className="h-5 w-5"
                                           aria-hidden="true"
-                                          onClick={() =>fetchCategories(section.name)}
+                                          onClick={() =>
+                                            fetchCategories(section.name)
+                                          }
                                         />
                                       )}
                                     </span>
@@ -259,10 +303,13 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                                           <input
                                             id={`filter-mobile-${section.id}-${optionIdx}`}
                                             name={`${section.id}[]`}
-                                            defaultValue={option.name}
                                             type="checkbox"
-                                            // defaultChecked={option.checked}
-                                            onChange={() =>handleCategoryOrBrand(section.name, option.name)}
+                                            onChange={() =>
+                                              handleCategoryOrBrand(
+                                                section.name,
+                                                option.name
+                                              )
+                                            }
                                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                           />
                                           <label
@@ -290,7 +337,7 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                 Filter
+                  Filter By
                 </h1>
 
                 <div className="flex items-center">
@@ -320,8 +367,8 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                             <Menu.Item key={option.name}>
                               {({ active }) => (
                                 <div
-                                style={{cursor: 'pointer'}}
-                                onClick={() => handleSort(option.name)}
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleSort(option.name)}
                                   className={classNames(
                                     option.current
                                       ? "font-medium text-gray-900"
@@ -352,7 +399,7 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                     className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
                     onClick={() => setMobileFiltersOpen(true)}
                   >
-                    <span className="sr-only">Filters</span>
+                    <span className="sr-only">Filters By</span>
                     <FunnelIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
@@ -379,7 +426,10 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                           <>
                             <h3 className="-my-3 flow-root">
                               <Disclosure.Button className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                                <span className="font-medium text-gray-900" onClick={() => fetchCategories(section.name)}>
+                                <span
+                                  className="font-medium text-gray-900"
+                                  onClick={() => fetchCategories(section.name)}
+                                >
                                   {section.name}
                                 </span>
                                 <span className="ml-6 flex items-center">
@@ -391,7 +441,9 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                                   ) : (
                                     <PlusIcon
                                       className="h-5 w-5"
-                                      onClick={() => fetchCategories(section.name)}
+                                      onClick={() =>
+                                        fetchCategories(section.name)
+                                      }
                                       aria-hidden="true"
                                     />
                                   )}
@@ -400,28 +452,35 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                             </h3>
                             <Disclosure.Panel className="pt-6">
                               <div className="space-y-4">
-                                {section.options.map((option: any, optionIdx: any) => (
-                                  <div
-                                    key={option.id}
-                                    className="flex items-center"
-                                  >
-                                    <input
-                                      id={`filter-${section.id}-${optionIdx}`}
-                                      name={`${section.id}[]`}
-                                      defaultValue={option.name}
-                                      type="checkbox"
-                                      // defaultChecked={option.checked}
-                                      onChange={() =>handleCategoryOrBrand(section.name, option.name)}
-                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <label
-                                      htmlFor={`filter-${section.id}-${optionIdx}`}
-                                      className="ml-3 text-sm text-gray-600"
+                                {section.options.map(
+                                  (option: any, optionIdx: any) => (
+                                    <div
+                                      key={option.id}
+                                      className="flex items-center"
                                     >
-                                      {option.name}
-                                    </label>
-                                  </div>
-                                ))}
+                                      <input
+                                        id={`filter-${section.id}-${optionIdx}`}
+                                        name={`${section.id}[]`}
+                                        defaultValue={option.name}
+                                        type="checkbox"
+                                        // defaultChecked={option.checked}
+                                        onChange={() =>
+                                          handleCategoryOrBrand(
+                                            section.name,
+                                            option.name
+                                          )
+                                        }
+                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                      />
+                                      <label
+                                        htmlFor={`filter-${section.id}-${optionIdx}`}
+                                        className="ml-3 text-sm text-gray-600"
+                                      >
+                                        {option.name}
+                                      </label>
+                                    </div>
+                                  )
+                                )}
                               </div>
                             </Disclosure.Panel>
                           </>
@@ -439,154 +498,167 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                           Top Selling
                         </h2>
 
-                        <div className="mt-1 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 px-4  py-5 lg:grid-cols-3 xl:gap-x-8">
+                        <div className="mt-1 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2 px-4  py-5 lg:grid-cols-3 xl:gap-x-8">
                           {products.map((product: any) => (
                             <div
                               key={product.id}
                               className="group relative"
                               style={{
                                 border: "1px white solid",
-                                padding: "4px",
+                                padding: "5px",
                                 background: "white",
                               }}
                             >
                               <div className="w-full md:w-64 h-64 contain">
-                                { user && user[0] && user[0].role && user[0].role === 'ADMIN' ? ( 
+                                {user &&
+                                user[0] &&
+                                user[0].role &&
+                                user[0].role === "ADMIN" ? (
                                   // edit product
-                                <div className="flex justify-between">
-                                  <div onClick={() => handleEdit(product.id)} className="icon1 z-30 cursor-pointer">
-                                    <PencilIcon 
-                                    className="h-4 w-4 z-30 cursor-pointer"
+                                  <div className="flex justify-between">
+                                    <div
+                                      onClick={() => handleEdit(product.id)}
+                                      className="icon1 z-30 cursor-pointer"
+                                    >
+                                      <PencilIcon
+                                        className="h-4 w-4 z-30 cursor-pointer"
                                         aria-hidden="true"
-                                        color="blue"/>
-                                  </div>
-                                  {/* update product */}
+                                        color="blue"
+                                      />
+                                    </div>
+                                    {/* update product */}
 
-                                <div onClick={() => handleDelete(product.id)} className="icon2 z-30 cursor-pointer">
-                                    <TrashIcon 
-                                    className="h-4 w-4 z-30 cursor-pointer"
-                                    aria-hidden="true"
-                                    color="red"
-                                    />
+                                    <div
+                                      onClick={() => handleDelete(product.id)}
+                                      className="icon2 z-30 cursor-pointer"
+                                    >
+                                      <TrashIcon
+                                        className="h-4 w-4 z-30 cursor-pointer"
+                                        aria-hidden="true"
+                                        color="red"
+                                      />
+                                    </div>
                                   </div>
-                                </div> ) : (
+                                ) : (
                                   <div
-                                  className="parent-img-div"
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    borderRadius: "0.7px",
-                                  }}
-                                >
-                                  <button
-                                    type="button"
-                                    className="relative border-none rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                                  >  
-                                   <button
-                                      id="popup-trigger"
-                                      className="text-gray-500 hover:text-gray-900"
-                                      onClick={togglePopup}
-                                    >                                  
-                                    <div className="flex border-none" style={{ opacity: (isOpen ? '0.99' : '1')}}>
-                                      <StarIcon
-                                        className="h-4 w-4 z-30 cursor-pointer"
-                                        aria-hidden="true"
-                                        color="yellow"
-                                      />
-                                      <StarIcon
-                                        className="h-4 w-4 z-30 cursor-pointer"
-                                        aria-hidden="true"
-                                        color="yellow"
-                                      />
-                                      <StarIcon
-                                        className="h-4 w-4 z-30 cursor-pointer"
-                                        aria-hidden="true"
-                                        color="yellow"
-                                      />
-                                      <StarIcon
-                                        className="h-4 w-4 z-30 cursor-pointer"
-                                        aria-hidden="true"
-                                        color="yellow"
-                                      />
-                                      <StarIcon
-                                        className="h-4 w-4 z-30 cursor-pointer opacity-40"
-                                        aria-hidden="true"
-                                        color="gray"
-                                      />
-                                    </div>
-                                    </button> 
-                                  {/* Popup */}
-                                  {isOpen && (
-                                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                      {/* Popup content */}
-                                      <div className="bg-white p-8 max-w-md rounded shadow-lg">
-                                        {/* Add your popup content here */}
-                                        <ProductReview />
-                                        {/* Close button */}
-                                        <button
-                                          id="popup-close"
-                                          className="mt-4 text-gray-500 hover:text-gray-900"
-                                          onClick={togglePopup}
-                                        >
-                                          Close
-                                        </button>
-                                      </div>
-                                    </div>
-                                  )}
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    style={{ opacity: (isOpen ? '0.2' : '1')}}
-                                    className="relative border-none rounded-full z-30 cursor-pointer bg-white-800 p-1 text-gray-400 hover:text-cyan focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                    className="parent-img-div"
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      borderRadius: "0.7px",
+                                    }}
                                   >
-                                    <HeartIcon
-                                      className="h-4 w-4 border-none"
-                                      aria-hidden="true"
-                                      color="red"
-                                    />
-                                  </button>
-                                </div>
+                                    <button
+                                      type="button"
+                                      className="relative border-none rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                    >
+                                      <button
+                                        id="popup-trigger"
+                                        className="text-gray-500 hover:text-gray-900"
+                                        onClick={togglePopup}
+                                      >
+                                        <div
+                                          className="flex border-none"
+                                          style={{
+                                            opacity: isOpen ? "0.99" : "1",
+                                          }}
+                                        >
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color="yellow"
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color="yellow"
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color="yellow"
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color="yellow"
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer opacity-40"
+                                            aria-hidden="true"
+                                            color="gray"
+                                          />
+                                        </div>
+                                      </button>
+                                      {/* Popup */}
+                                      {isOpen && (
+                                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                          {/* Popup content */}
+                                          <div className="bg-white p-8 max-w-md rounded shadow-lg">
+                                            {/* Add your popup content here */}
+                                            <ProductReview />
+                                            {/* Close button */}
+                                            <button
+                                              id="popup-close"
+                                              className="mt-4 text-gray-500 hover:text-gray-900"
+                                              onClick={togglePopup}
+                                            >
+                                              Close
+                                            </button>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      style={{ opacity: isOpen ? "0.2" : "1" }}
+                                      className="relative border-none rounded-full z-30 cursor-pointer bg-white-800 p-1 text-gray-400 hover:text-cyan focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                    >
+                                      <HeartIcon
+                                        className="h-4 w-4 border-none"
+                                        aria-hidden="true"
+                                        color="red"
+                                      />
+                                    </button>
+                                  </div>
                                 )}
 
-                                <div  onClick={ () => handleProductDetails(product.id)}>
-                                  <ReactImageMagnify
-                                    {...{
-                                      smallImage: {
-                                        alt: "Wristwatch by Ted Baker London",
-                                        isFluidWidth: true,
-                                        src: product.thumbnail.url
-                                          ? product.thumbnail.url
-                                          : pics,
-                                        width: 100,
-                                        height: 100,
-                                      },
-                                      largeImage: {
-                                        src: product.thumbnail.url
-                                          ? product.thumbnail.url
-                                          : pics,
-                                        width: 220,
-                                        height: 340,
-                                      },
-                                      enlargedImagePosition: "over",
-                                      imageStyle: {
-                                        background: "red",
-                                      },
-                                      lensStyle: {
-                                        backgroundColor: "rgba(0,0,0,.4",
-                                      },
-                                    }}
-                                    className="h-full w-full object-contain lg:h-full lg:w-full product-img"
-                                    style={{ zIndex: 30, opacity: ( isOpen ? '0.1' : '1')}}
-                                  />
-                                </div>
                                 <div
-                                  className="mt-4 flex justify-between"
+                                  className="py-1"
+                                  style={{
+                                    width: "300px",
+                                    height: "200px",
+                                    overflow: "hidden",
+                                  }}
+                                  onClick={() =>
+                                    handleProductDetails(product.id)
+                                  }
+                                >
+                                  <img
+                                    src={product.thumbnail.url
+                                      ? product.thumbnail.url
+                                      : pics}
+                                    alt=""
+                                    // style={{ width: '50%', height: '100%', marginLeft: '10%'}}
+                                    // className="w-48 md:w-32 lg:w-48 object-contain"
+                                    style={{ objectPosition: 'center'}}
+                                    className="object-contain object-center w-[70%] h-full"
+                                  />
+                                 
+                                </div>
+                      
+                                <div
+                                  className="mt-4 flex justify-between elem"
                                   style={{
                                     borderTop: "0.5px midnightblue solid",
                                   }}
                                 >
-                                <div onClick={ () => handleProductDetails(product.id)}>
+                                  <div
+                                    onClick={() =>
+                                      handleProductDetails(product.id)
+                                    }
+                                  >
                                     <div>
                                       <h3 className="text-sm text-gray-700">
                                         <div>
@@ -596,7 +668,8 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                                           />
                                           <strong>{product.title}</strong>
                                           <p className="text-sm font-medium text-gray-900">
-                                            ${product.price}      %{product.discount} discount
+                                            ${product.price} %{product.discount}{" "}
+                                            discount
                                           </p>
                                         </div>
                                       </h3>
@@ -604,7 +677,7 @@ const handleCategoryOrBrand = (filter: string, name: string) => {
                                   </div>
 
                                   <button
-                                  onClick={() => handleAddToCart(product.id)}
+                                    onClick={() => handleAddToCart(product.id)}
                                     type="button"
                                     className="relative rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                                   >

@@ -1,7 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import companylogo from "../../images/Untitled.jpg";
-
-import React, { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { emailLink, selectUser, userVerification } from "./authSlice";
 import { CircularProgress } from "@material-ui/core";

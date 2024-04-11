@@ -176,13 +176,13 @@ const ProductDetail = () => {
             </div>
           </div>
             {/* 4th img div */}
-            { product && product.images && product.images.set && product.images.set[4] ?
+            { product && product.images && product.images.set && product.images.set[3] ?
 
           <div className="aspect-h-5 aspect-w-4 lg:aspect-h-4 lg:aspect-w-3 sm:overflow-hidden sm:rounded-lg">
-          { product && product.images && product.images.set && product.images.set[4] &&
+          { product && product.images && product.images.set && product.images.set[3] &&
           <img  
               alt='product image'                
-              src={product && product.images && product.images.set && product.images.set[4].url}
+              src={product && product.images && product.images.set && product.images.set[3].url}
               className="h-full w-full object-contain lg:h-full lg:w-full"
               style={{ zIndex: 30 }}
             />

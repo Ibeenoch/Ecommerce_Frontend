@@ -7,11 +7,14 @@ import { createproduct, getAllproduct, getAproduct, selectProduct, updateproduct
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import Loading from "../../../Loading";
+import { selectUser } from "../../auth/authSlice";
+import LoadingPage from "../../../pages/LoadingPage";
 
 const ProductForm = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { product, status } = useAppSelector(selectProduct);
+  const { user } = useAppSelector(selectUser);
   const { id } = useParams();
   const { addToast } = useToasts();
   
@@ -37,7 +40,7 @@ const ProductForm = () => {
     title: id ? product.title : "",
     description: id ? product.description : "",
     price: id ? parseInt(product.price) : 0,
-    discountPercentage: id ? parseInt(product.price) : 0,
+    discountPercentage: id ? parseInt(product.discountPercentage) : 0,
     stock: id ? parseInt(product.stock) : 0,
     brand: "",
     category: "",
@@ -78,31 +81,63 @@ const ProductForm = () => {
     e.preventDefault();
 
   if(id){
-    if(!title || !description || !price || !discountPercentage || !stock  || !keywords){
-      // setTimeout(() => {
-      //   setErrorform("Please add all fields");
-      //   setTimeout(() => {
-      //     setErrorform("");
-      //   }, 5000);
-      // }, 100);
-      addToast('Please Ensure to add all fields', {
-        appearance: 'error',
-        autoDismiss: true,
-      })
-      return;
-    }
-    const product = {
-      title,
-      description,
-      price,
-      discountPercentage,
-      stock,
-      keywords,
-    }
+      
+    const token = user && user[0] && user[0].token;
+
+    if(images){
+      if(images.length < 4){
+        addToast('To Update the Product images, Please Ensure to Add a Minimum of 4 photos of the Product!!!', {
+          appearance: 'error',
+          autoDismiss: true,
+          
+        })
+        return;
+      }else{
+      const product = new FormData();
+      product.append("title", title);
+      product.append("description", description);
+      product.append("price", price.toString());
+      product.append("discountPercentage", discountPercentage.toString());
+      product.append("stock", stock.toString());
+      product.append("brand", brand);
+      product.append("category", category);
+      product.append("keywords", keywords);
   
+  
+      images.map((image) => {
+        product.append("fileupload", image);
+      });
+
+      const products = {
+        id,
+        product,
+        token,
+        images
+      }
+        
+          dispatch(updateproduct(products)).then((res: any) => {
+           if(res && res.payload && res.payload.id){
+            dispatch(getAllproduct()).then(() => {
+              navigate('/')
+            })
+           }
+          })
+
+        }
+
+    }else{
+      const product = {
+        title,
+        description,
+        price,
+        discountPercentage,
+        stock,
+        keywords,
+      }
     const products = {
       id,
-      product
+      product,
+      token
     }
              
         dispatch(updateproduct(products)).then(() => {
@@ -110,6 +145,10 @@ const ProductForm = () => {
             navigate('/')
           })
         });
+
+    }
+
+   
 
   }else{
     
@@ -143,9 +182,14 @@ const ProductForm = () => {
         product.append("fileupload", image);
       });
   
-      console.log("product dispatched: ", Array.from(product));
+      const token = user && user[0] && user[0].token;
+
+      const products = {
+        product,
+        token
+      }
       
-      dispatch(createproduct(product)).then((res) => {
+      dispatch(createproduct(products)).then((res) => {
         if(res.payload && res.payload.response && res.payload.response.data && res.payload.response.data.error){
           addToast('Something went wrong', {
             appearance: 'error',
@@ -171,7 +215,7 @@ const ProductForm = () => {
   };
 
   if(status === 'loading'){
-    return <Loading />
+    return <LoadingPage />
   }
 
   return (

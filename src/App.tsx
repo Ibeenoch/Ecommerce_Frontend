@@ -18,6 +18,9 @@ import RegisterPage from "./pages/RegisterPage";
 import Verification from "./features/auth/Verification";
 import PasswordRecovery from "./features/auth/PasswordRecovery";
 import ChangePassword from "./features/auth/ChangePassword";
+import ProfilePage from "./pages/ProfilePage";
+import PaymentPage from "./pages/PaymentPage";
+import SuccessOrderPage from "./pages/SuccessOrderPage";
 
 const router = createBrowserRouter([
   {
@@ -61,7 +64,7 @@ const router = createBrowserRouter([
     element: <ProductFormPage/>,
   },
   {
-    path: "/product/create/:id",
+    path: "/product/update/:id",
     element: <ProductFormPage/>,
   },
   {
@@ -73,6 +76,22 @@ const router = createBrowserRouter([
   {
     path: "/checkout/:id",
     element: <CheckOutPage/>,
+  },
+  {
+    path: "/payment/:id",
+    element: <PaymentPage/>,
+  },
+  {
+    path: "/order/success",
+    element: <SuccessOrderPage/>,
+  },
+  {
+    path: "/payment",
+    element: <PaymentPage/>,
+  },
+  {
+    path: "/profile/:id",
+    element: <ProfilePage/>,
   },
   
 ]);

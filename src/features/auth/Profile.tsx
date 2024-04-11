@@ -7,7 +7,7 @@ import { useToasts } from "react-toast-notifications";
 import { Link, useNavigate } from "react-router-dom";
 import { MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-const CheckOut = () => {
+const Profile = () => {
   const [open, setOpen] = useState(true);
   const { carts } = useAppSelector(selectAllCart);
   const { addToast } = useToasts();
@@ -535,112 +535,9 @@ const CheckOut = () => {
         </form>
         </div>
 
-        <div className="lg:col-span-2">
-          {/* cart */}
-          <div className="mx-auto bg-wwhite-500 max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-            <div className="mt-8">
-              <div className="flow-root">
-                <ul role="list" className="-my-6 divide-y divide-gray-200">
-                  {carts &&
-                    carts.map((cart: any) => (
-                      <li key={cart.id} className="flex py-6">
-                        <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                          <img
-                            src={cart && cart.thumbnail && cart.thumbnail.url}
-                            alt=""
-                            className="h-full w-full object-cover object-center"
-                          />
-                        </div>
-
-                        <div className="ml-4 flex flex-1 flex-col">
-                          <div>
-                            <div className="flex justify-between text-base font-medium text-gray-900">
-                              <h3>
-                                <div>{cart.title}</div>
-                              </h3>
-                              <p className="ml-4">${cart.price}</p>
-                            </div>
-                            <p className="mt-1 text-sm text-gray-500"></p>
-                          </div>
-                          <div className="flex flex-1 items-end justify-between text-sm">
-                            <p className="text-gray-500">
-                              Qty {cart.quantity}
-                              {/* add or minus qty */}
-                              <div className="width-full flex justify-between px-1 py-1 bg-white-600 ">
-                                <div
-                                  onClick={() => handleAdd(cart.id)}
-                                  className="cursor-pointer bg-indigo-500 border border-indigo-500 rounded-md"
-                                >
-                                  <PlusIcon
-                                    className="h-4 w-4 z-20 cursor-pointer"
-                                    color="white"
-                                  />
-                                </div>
-                                <div
-                                  onClick={() => handleMinus(cart.id)}
-                                  className="cursor-pointer bg-indigo-500 border border-indigo-500 rounded-md ml-5"
-                                >
-                                  <MinusIcon
-                                    className="z-20 h-4 w-4"
-                                    color="white"
-                                  />
-                                </div>
-                              </div>
-                            </p>
-
-                            <div className="flex">
-                              <button
-                                type="button"
-                                onClick={() => handleRemove(cart.id)}
-                                className="font-medium text-indigo-600 hover:text-indigo-500"
-                              >
-                                <TrashIcon color="indigo" className="h-6 w-5" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-              <div className="flex justify-between text-base font-medium text-gray-900">
-                <p>Subtotal</p>
-                <p>${carts && subTotal && subTotal()} </p>
-              </div>
-              <p className="mt-0.5 text-sm text-gray-500">
-                Shipping and taxes calculated at checkout.
-              </p>
-              <div className="mt-6">
-                <Link to="/checkout">
-                  <div className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
-                    Checkout
-                  </div>
-                </Link>
-              </div>
-              <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
-                <p>
-                  or{" "}
-                  <Link to="/">
-                    <button
-                      type="button"
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                      onClick={() => setOpen(false)}
-                    >
-                      Continue Shopping
-                      <span aria-hidden="true"> &rarr;</span>
-                    </button>
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
      
     </div>
   );
 };
 
-export default CheckOut;
+export default Profile;

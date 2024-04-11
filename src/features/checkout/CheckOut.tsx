@@ -2,11 +2,15 @@ import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { fetchAllUsersCartAsync, selectAllCart } from "../cart/cartSlice";
-import Cart from "../cart/Cart";
+import pics from "../../images/Untitled.jpg";
 import { useToasts } from "react-toast-notifications";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { createAddress } from "./checkoutSlice";
+import { createAddress, selectCheckout, transactionmade } from "./checkoutSlice";
+import { useFlutterwave, closePaymentModal, FlutterWaveButton } from 'flutterwave-react-v3'
+import { selectUser } from "../auth/authSlice";
+
+
 
 interface Chechkout{
   fullName: string
@@ -15,8 +19,8 @@ interface Chechkout{
   country: string
   state: string
   city: string
-  street: string
-  zipCode: number
+  address: string
+  zipcode: number
 }
 
 const CheckOut = () => {
@@ -27,47 +31,34 @@ const CheckOut = () => {
     country: '',
     state: '',
     city: '',
-    street: '',
-    zipCode: 0
+    address: '',
+    zipcode: 0
   })
-  
   const [open, setOpen] = useState(true);
+  const [selectedOption, setSelectedOption] = useState<string>('');
+  const [addressSelected, setAddressSelected] = useState<number>(0);
+  const [selectedOption2, setSelectedOption2] = useState<string>('');
   const { carts } = useAppSelector(selectAllCart);
   const { addToast } = useToasts();
-  const products = [
-    {
-      id: 1,
-      name: "Throwback Hip Bag",
-      href: "#",
-      color: "Salmon",
-      price: "$90.00",
-      quantity: 1,
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg",
-      imageAlt:
-        "Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt.",
-    },
-    {
-      id: 2,
-      name: "Medium Stuff Satchel",
-      href: "#",
-      color: "Blue",
-      price: "$32.00",
-      quantity: 1,
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg",
-      imageAlt:
-        "Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch.",
-    },
-    // More products...
-  ];
+  const { checkoutInfo } = useAppSelector(selectCheckout)
+  const { user } = useAppSelector(selectUser)
+  
+const handleSelectedAddress = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+  setSelectedOption(e.target.value)
+ setAddressSelected(index)
+}
+ 
 
+const handleSelectedPayment = (e: ChangeEvent<HTMLInputElement>) => {
+  setSelectedOption2(e.target.value)
+ // console.log(e.target.value, selectedOption2)
+}
+console.log('addressof him ', selectedOption2, checkoutInfo[addressSelected])
   const navigate = useNavigate();
   const { id } = useParams()
 
   const handleChange = (e : ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log(e.target.value)
     setCheckOutForm({...checkOutForm, [name]:value})
   }
 
@@ -135,12 +126,11 @@ const CheckOut = () => {
     }
   };
 
-  const { fullName, phone, email, street, state, city, country, zipCode } = checkOutForm;
+  const { fullName, phone, email, address, state, city, country, zipcode } = checkOutForm;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const data = {...checkOutForm, id}
-    console.log(data);
     if(data){
       dispatch(createAddress(data)).then((res: any) => {
         console.log('added address: ' ,res, res.payload)
@@ -149,26 +139,39 @@ const CheckOut = () => {
 
   }
 
-  const addresses = [
-    {
-      name: "Leslie Alexander",
-      street: "44, adejones street",
-      city: "ikoyi",
-      state: 'Lagos',
-      zipcode: "180678",
-      phone: "2067568945",
+  
+
+const amount = carts && subTotal && subTotal();
+const emailAddress = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].email;
+const phoneNo = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].phone;
+const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
+
+  const config = {
+    public_key: "FLWPUBK_TEST-802764ac81ba56b562f679249112ef7c-X",
+    tx_ref: 'mx-' + Date.now(),
+    amount: amount,
+    currency: "NGN",
+    payment_options: "card,mobilemoney,ussd",
+    customer: {
+      email: emailAddress,
+      phone_number: phoneNo,
+      name: name,
     },
-    {
-      name: "Michael Foster",
-      street: "18, markson avenue",
-      city: "Ikeja",
-      state: 'Lagos',
-      zipcode: "562346",
-      phone: "202340945",
-    },
-   
-  ];
- 
+    customizations: {
+      title: "Payment for items",
+      description: "Payment for items in cart",
+      logo: pics,
+     },
+  };
+
+  const handleFlutterPayment = useFlutterwave(config);
+
+  const informUser = () => {
+    addToast('Please Select an existing address and online payment method to pay online', {
+      appearance: 'error',
+      autoDismiss: true,
+    })
+  }
 
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5 px-4">
@@ -215,11 +218,11 @@ const CheckOut = () => {
                   </label>
                   <div className="mt-2">
                     <input
-                      type="number"
+                      type="telephone"
                       name="phone"
                       id="phone"
                       value={checkOutForm.phone}
-                      placeholder="  Phone number"
+                      placeholder=" Phone number"
                       required
                       onChange={handleChange}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -271,7 +274,7 @@ const CheckOut = () => {
 
                 <div className="col-span-full">
                   <label
-                    htmlFor="street"
+                    htmlFor="address"
                     className="block text-sm font-medium leading-6 text-gray-900"
                   >
                     Street address
@@ -279,9 +282,9 @@ const CheckOut = () => {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="street"
-                      id="street"
-                      value={checkOutForm.street}
+                      name="address"
+                      id="address"
+                      value={checkOutForm.address}
                       onChange={handleChange}
                       placeholder="Street Address"
                       required
@@ -333,7 +336,7 @@ const CheckOut = () => {
 
                 <div className="sm:col-span-2">
                   <label
-                    htmlFor="zipCode"
+                    htmlFor="zipcode"
                     className="block text-sm font-medium leading-6 text-gray-900"
                   >
                     ZIP / Postal code
@@ -341,12 +344,12 @@ const CheckOut = () => {
                   <div className="mt-2">
                     <input
                       type="number"
-                      name="zipCode"
-                      id="zipCode"
-                      autoComplete="zipCode"
+                      name="zipcode"
+                      id="zipcode"
+                      autoComplete="zipcode"
                       placeholder="Zip Code"
                       required
-                      value={checkOutForm.zipCode}
+                      value={checkOutForm.zipcode}
                       onChange={handleChange}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
@@ -356,12 +359,7 @@ const CheckOut = () => {
             </div>
 
             <div className="mt-1 flex items-center justify-end gap-x-6">
-              <button
-                type="button"
-                className="text-sm font-semibold leading-6 text-gray-900"
-              >
-                Cancel
-              </button>
+             
               <button
                 type="submit"
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -380,27 +378,31 @@ const CheckOut = () => {
 
               <div className="mt-1 space-y-10">
                 <ul role="list" className="">
-                  {addresses.map((address) => (
+                  {checkoutInfo && checkoutInfo.map((address: Chechkout, index: number) => (
                     <li
-                      key={address.name}
+                      key={address.fullName}
                       className="flex justify-between gap-x-6 px-4 py-5 border-solid border-2 border-gray-300"
                     >
                       <div className="flex min-w-0 gap-x-4">
                       <input
-                      name="address"
+                      name={`address${index}`}
                         type="radio"
+                        value={`address${index}`}
+                        defaultChecked
+                        checked={selectedOption === `address${index}`}
+                        onChange={(e) => handleSelectedAddress(e, index)}
                         className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       />
                         
                         <div className="min-w-0 flex-auto">
                           <p className="text-sm font-semibold leading-6 text-gray-900">
-                           {address.name}
+                           {address.fullName}
                           </p>
                           <p className="mt-1 truncate text-xs leading-5 text-gray-500">
                            Phone: {address.phone}
                           </p>
                           <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                           Address: {address.street}
+                           Address: {address.address}
                           </p>
                         </div>
                       </div>
@@ -415,7 +417,7 @@ const CheckOut = () => {
                              {address.city}
                           </p>
                           <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                            ZipCode: {address.zipcode}
+                            zipcode: {address.zipcode}
                           </p>
                         </div>
                       </div>
@@ -429,14 +431,16 @@ const CheckOut = () => {
                     Payment Method
                   </legend>
                   <p className="mt-1 text-sm leading-6 text-gray-600">
-                    Choose the payment method that is okay to you.
+                    Choose the payment method that is okay with you.
                   </p>
                   <div className="mt-6 space-y-6">
                     <div className="flex items-center gap-x-3">
                       <input
-                        id="push-everything"
                         name="push-notifications"
                         type="radio"
+                        value="cash"
+                        checked={selectedOption === "cash"}
+                        onChange={handleSelectedPayment}
                         className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       />
                       <label
@@ -448,9 +452,11 @@ const CheckOut = () => {
                     </div>
                     <div className="flex items-center gap-x-3">
                       <input
-                        id="push-everything"
-                        name="push-notifications"
+                        name="onlinepayment"
                         type="radio"
+                        value="onlinepayment"
+                        checked={selectedOption === "onlinepayment"}
+                        onChange={handleSelectedPayment}
                         className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       />
                       <label
@@ -481,7 +487,7 @@ const CheckOut = () => {
                         <img
                           src={cart && cart.thumbnail && cart.thumbnail.url}
                           alt=""
-                          className="h-full w-full object-cover object-center"
+                          className="h-full w-full object-contain"
                         />
                       </div>
 
@@ -537,7 +543,7 @@ const CheckOut = () => {
               </ul>
             </div>
           </div>
-
+{/* when a order is successful we save to database */}
           <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
             <div className="flex justify-between text-base font-medium text-gray-900">
               <p>Subtotal</p>
@@ -546,13 +552,47 @@ const CheckOut = () => {
             <p className="mt-0.5 text-sm text-gray-500">
               Shipping and taxes calculated at checkout.
             </p>
-            <div className="mt-6">
-              <Link to="/checkout">
+           { addressSelected  > -1 && selectedOption2 === 'onlinepayment' ? (
+             <div onClick={() => {
+              handleFlutterPayment({
+                callback: (response) => {
+                  console.log(response);
+                  if(response.status === "successful"){
+                    const shippingDetails = checkoutInfo[addressSelected]
+                    const details = {
+                    user,
+                    shippingDetails,
+                    carts,
+                    response
+                  }
+                  dispatch(transactionmade(details)).then((res) => {
+                    console.log('payment response: ', res)
+                    if(res && res.payload && res.payload.status && res.payload.status==="SUCCESSFUL"){
+                      localStorage.removeItem('cart')
+                      navigate('/order/success')
+                    }
+                  })
+                  closePaymentModal()
+                  }
+                  
+                },
+                onClose: () => {
+          
+                }
+              })
+            }} className="mt-6 cursor-pointer">
                 <div className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
-                  Checkout
+                  Pay Now
                 </div>
-              </Link>
             </div>
+           ) : (
+             <div onClick={informUser} className="mt-6 cursor-pointer">
+                <div className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
+                  Pay Now
+                </div>
+            </div>
+           )}
+           
             <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
               <p>
                 or{" "}

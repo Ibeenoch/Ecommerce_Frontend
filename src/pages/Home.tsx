@@ -3,6 +3,7 @@ import NavBar from './NavBar/NavBar'
 import Products from '../features/ProductList/components/Products'
 import { useAppDispatch } from '../app/hooks';
 import { getAllproduct } from '../features/ProductList/ProductSlice';
+import Footer from './Footer';
 
 const Home = () => {
   const dispatch = useAppDispatch();
@@ -18,6 +19,7 @@ const Home = () => {
      <NavBar isOpen={isOpen} >
      <Products isOpen={isOpen} togglePopup={togglePopup} />
      </NavBar>
+     <Footer />
     </>
    
     

@@ -9,6 +9,7 @@ import {
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchAllUsersCartAsync, selectAllCart } from "../../features/cart/cartSlice";
+import { selectUser } from "../../features/auth/authSlice";
 
 interface Child {
   children: ReactElement;
@@ -21,14 +22,9 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
   const navigate = useNavigate();
   const location = useLocation()
   const { carts } = useAppSelector(selectAllCart);
+  const { user } = useAppSelector(selectUser);
 
-  const user = {
-    name: "Tom Cook",
-    email: "tom@example.com",
-    imageUrl:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  };
-
+  
   useEffect(() => {
     dispatch(fetchAllUsersCartAsync())
   }, [navigate])
@@ -50,7 +46,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
     { name: "Team", href: "#", current: false },
   ];
   const userNavigation = [
-    { name: "Your Profile", href: "#" },
+    { name: "Your Profile", href: `/profile/${user && user[0] && user[0].id}` },
     { name: "Settings", href: "#" },
     { name: "Sign out", href: "#" },
   ];
@@ -210,7 +206,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                     <div className="flex-shrink-0">
                       <img
                         className="h-10 w-10 rounded-full"
-                        src={user.imageUrl}
+                        src={user && user.imageUrl}
                         alt=""
                       />
                     </div>
