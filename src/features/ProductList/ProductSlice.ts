@@ -3,11 +3,6 @@ import { RootState, AppThunk } from '../../app/store';
 import * as api from './ProductAPI';
 
 
-
-interface NameType {
-  name: string;
-}
-
 export interface ProductState {
   status: 'success' | 'loading' | 'failed' | 'idle';
   products: any,
@@ -115,6 +110,15 @@ export const sortproductNewest = createAsyncThunk('product/getsortProductnewest'
   }
 })
 
+export const getPagination = createAsyncThunk('product/getPagination', async(data: any, thunkAPI) => {
+  try {
+    const res = await api.fetchPagination(data);
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
 export const sortproductRated = createAsyncThunk('product/getsortProductrated', async(_, thunkAPI) => {
   try {
     const res = await api.sortProductInRated();
@@ -197,6 +201,7 @@ export const productSlice = createSlice({
     addCase(getAllproduct.fulfilled, (state, action) => {
       state.status = 'success'
       state.products = action.payload;
+      console.log('state of the product: ', state.products, 'action: ', action.payload)
     })
     .
     addCase(getAllproduct.rejected, (state, action) => {
@@ -353,6 +358,20 @@ export const productSlice = createSlice({
     })
     .
     addCase(fetchABrand.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(getPagination.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(getPagination.fulfilled, (state, action) => {
+      state.status = 'success'
+      state.products = action.payload
+      console.log('fetch pagination: ', state.products )
+    })
+    .
+    addCase(getPagination.rejected, (state, action) => {
       state.status = 'failed'
       state.message = action.payload
     })

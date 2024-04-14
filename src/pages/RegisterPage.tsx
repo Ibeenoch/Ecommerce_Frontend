@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import SignUp from '../features/auth/SignUp'
 import NavBar from './NavBar/NavBar';
+import Footer from './Footer';
 
 const RegisterPage = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -9,6 +10,7 @@ const RegisterPage = () => {
       <NavBar isOpen={isOpen} >
         <SignUp />
         </NavBar>
+        <Footer />
     </>
   )
 }

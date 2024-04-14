@@ -32,7 +32,7 @@ export const login = async(user: any) => {
 
   if(user){
     const res = await axios.post(API+ '/user/login', user, option);
-  console.log(res)
+  console.log( 'login response ; ' ,res)
  
   return res;
   }
@@ -86,7 +86,8 @@ export const sendEmailLink = async(data: any) => {
 
 export const passwordReset = async(data: any) => {
   try {
-   const passwordData = data.changePassword
+   const passwordData = data.formData;
+   const id = data.id;
   const option = {
     headers: {
       'Content-Type': 'application/json'
@@ -95,7 +96,7 @@ export const passwordReset = async(data: any) => {
   console.log('data password: ', passwordData)
 
   if(passwordData){
-    const res = await axios.post(API+ `/user/change/password`, passwordData, option);
+    const res = await axios.put(API+ `/user/change/password/${id}`, passwordData, option);
   console.log(res)
  
   return res;
@@ -104,3 +105,64 @@ export const passwordReset = async(data: any) => {
     
   }
 }
+
+
+export const fetchAUser = async (data: any) => {
+  try {
+    const id = data.id;
+    const token = data.token;
+    console.log('data single: ', token, id)
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    };
+
+    const res = await axios.get(API + `/user/${id}`);
+    console.log("single user api ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const fetchAllUser = async () => {
+  try {
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+        // Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await axios.get(API + `/users`);
+    console.log("all user api ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const uploadProfilePics = async (data: any) => {
+  try {
+    const id = data.id;
+    const imagefile = data.imageForm;
+    const token = data.token;
+    console.log('data sending: ', id, imagefile, token)
+    const option = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      }
+    };
+
+    const res = await axios.put(API + `/user/image/${id}`, imagefile, option);
+    console.log("user image api ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+

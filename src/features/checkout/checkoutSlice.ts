@@ -6,6 +6,10 @@ interface CheckOut{
     checkoutInfo: any;
     latestTransaction: any
     allTransactions: any
+    aUserTransactions: any
+    aUserOrderedProducts: any
+    aUserPayment: any
+    aUserShippingAddress: any
     status: 'success' | 'loading' | 'failed' | 'idle';
 }
 
@@ -13,6 +17,10 @@ const initialState: CheckOut = {
     checkoutInfo: [],
     latestTransaction: [],
     allTransactions: [],
+    aUserTransactions: [],
+    aUserOrderedProducts: [],
+    aUserShippingAddress: [],
+    aUserPayment: {},
     status: 'idle',
 }
 
@@ -33,6 +41,17 @@ export const transactionmade = createAsyncThunk('checkout/transaction', async(da
         
     }
 })
+
+
+export const getAUserTransaction = createAsyncThunk('/user/getAUserTransactions', async(id: any) => {
+    try {
+  
+      const res =  await api.fetchAUserTransactions(id);
+      return res?.data
+    } catch (error) {
+      console.log(error)
+    }
+  })
 
 export const checkoutSlice = createSlice({
     name: 'checkOut',
@@ -69,6 +88,23 @@ export const checkoutSlice = createSlice({
         .addCase(transactionmade.rejected, (state, action) => {
             state.status = 'failed'
         })
+        .addCase(getAUserTransaction.pending, (state, action) => {
+            state.status = 'loading'
+          })
+          .addCase(getAUserTransaction.fulfilled, (state, action) => {
+            state.status = 'success'
+            console.log('a user transact: ', action.payload)
+            state.aUserTransactions = action.payload
+            action.payload && Array.isArray(action.payload) && action.payload.forEach((elem) => {
+               state.aUserOrderedProducts = elem && elem.order && elem.order.productDetails;
+               state.aUserShippingAddress = elem && elem.order && elem.order.shippingDetails;
+            })
+
+            console.log('all good: ', state.aUserOrderedProducts, state.aUserShippingAddress)
+          })
+          .addCase(getAUserTransaction.rejected, (state, action) => {
+            state.status = 'failed'
+          })
         
     }
 })

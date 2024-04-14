@@ -1,20 +1,18 @@
 import React, { useState } from 'react'
 import NavBar from './NavBar/NavBar';
-import Payment from '../features/payment/Payment';
-import Footer from './Footer';
+import Admin from '../features/auth/Admin';
 
-const PaymentPage = () => {
+const AdminPanel = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     return (
       <>
        <NavBar isOpen={isOpen} >
-        <Payment/>
+        <Admin />
        </NavBar>
-       <Footer />
       </>
       
     )
 }
 
-export default PaymentPage
+export default AdminPanel

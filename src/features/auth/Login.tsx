@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useToasts } from "react-toast-notifications";
 import Switch from "react-switch";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
-import { loginUser, registerUser, selectUser } from "./authSlice";
+import { getAUser, loginUser, registerUser, selectUser } from "./authSlice";
 import { CircularProgress } from "@material-ui/core";
 
 interface Login {
@@ -37,45 +37,67 @@ const Login = () => {
     setFormData({ ...formData, [name]: value });
   };
   const { email, password } = formData;
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    if (passwordRegex.test(password)) {
-      //continue
+    if(password) {
 
       const login = { ...formData, passcode };
-      console.log("logindata: ", login);
       dispatch(loginUser(login)).then((res: any) => {
         console.log('login res ', res, res.payload)
-        if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN'){
-          
-        addToast("Successfully Login As Admin", {
-          appearance: "success",
-          autoDismiss: true,
-        });
-        navigate("/");
+        if(res && res.payload && res.payload === undefined){        
+          return;
+        }else if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN') {
+          console.log('getting token: ', res && res.payload && res.payload.id)
+          const data = {
+            id: res && res.payload && res.payload.id,
+            token: res && res.payload && res.payload.token,
+          }
+          dispatch(getAUser(data)).then((res)=> {
+               if(res && res.payload && res.payload.id){
+                addToast("Successfully Login As Admin", {
+                  appearance: "success",
+                  autoDismiss: true,
+                });
+                navigate("/");
+               }
+          })  
 
-        }else{
-         
-            addToast("Login Successful", {
-              appearance: "success",
-              autoDismiss: true,
-            });
-            navigate("/"); 
+        }else if(res && res.payload && res.payload.role && res.payload.role === 'USER') {
+          console.log('getting token: ', res && res.payload && res.payload.id)
+          const data = {
+            id: res && res.payload && res.payload.id,
+            token: res && res.payload && res.payload.token,
+          }
+          dispatch(getAUser(data)).then((res)=> {
+               if(res && res.payload && res.payload.id){
+                addToast("Successfully Login As User", {
+                  appearance: "success",
+                  autoDismiss: true,
+                });
+                navigate("/");
+               }
+          })  
+
+        } else if( res && res.payload && res.payload === 'user does not exist'){
+          addToast("user does not exist", {
+            appearance: "error",
+            autoDismiss: true,
+          });
+        }else if( res && res.payload && res.payload === 'password does not match!'){
+          addToast("password does not match!", {
+            appearance: "error",
+            autoDismiss: true,
+          });
+        }
+        else{
+          return;
         }
         
 
       });
     } else {
-      addToast(
-        "the password must be at least 8 character, the password should contain a upper case letter, the password should contain a lower case letter, the password should contain a number, the password should contain a special character e.g Password1!",
-        {
-          appearance: "warning",
-          autoDismiss: true,
-        }
-      );
+      return;
     }
   };
 
@@ -91,7 +113,8 @@ const Login = () => {
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-1 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="shadow-lg">
+      <div className="sm:mx-auto sm:w-1/2 px-4 sm:max-w-sm">
        <Link to='/'> 
        <img
           className="mx-auto h-10 w-auto"
@@ -99,12 +122,12 @@ const Login = () => {
           alt="Your Company"
         />
         </Link>
-        <h2 className="mt-10 text-center text-2xl font-bold leading-4 tracking-tight text-gray-900">
+        <h2 className="mt-5 text-center text-lg font-bold leading-4 tracking-tight text-gray-900">
           Login to Maven Store Account
         </h2>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-10 sm:mx-auto sm:w-1/2 px-4 sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleRegister}>
           <div>
             <label
@@ -229,6 +252,7 @@ const Login = () => {
             </div>
           </p>
         </Link>
+      </div>
       </div>
     </div>
   );

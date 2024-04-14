@@ -1,12 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import './App.css';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import "./App.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-import { ToastProvider } from 'react-toast-notifications'
+import { ToastProvider } from "react-toast-notifications";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import CartPage from "./pages/CartPage";
@@ -21,84 +18,97 @@ import ChangePassword from "./features/auth/ChangePassword";
 import ProfilePage from "./pages/ProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 import SuccessOrderPage from "./pages/SuccessOrderPage";
+import ProtectedRoute from "./features/auth/ProtectedRoute";
+import AdminPanel from "./pages/AdminPanel";
+import AdminProtectedRoute from "./features/auth/AdminProtectedRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home/>,
+    element: <Home />,
   },
   {
     path: "/login",
-    element: <LoginPage/>,
+    element: <LoginPage />,
   },
   {
     path: "/register",
-    element: <RegisterPage/>,
+    element: <RegisterPage />,
   },
   {
     path: "/verify/email",
-    element: <Verification/>,
+    element: <Verification />,
   },
   {
     path: "/verify/email/:id",
-    element: <Verification/>,
+    element: <Verification />,
   },
   {
     path: "/password/link",
-    element: <PasswordRecovery/>,
+    element: <PasswordRecovery />,
   },
   {
-    path: "/password/change/:email",
-    element: <ChangePassword/>,
+    path: "/password/change/:id",
+    element: <ChangePassword />,
   },
   {
     path: "/cart",
-    element: <CartPage/>,
+    element: <CartPage />,
   },
   {
     path: "/product/details/:id",
-    element: <ProductDetailPage/>,
+    element: <ProductDetailPage />,
   },
   {
     path: "/product/create",
-    element: <ProductFormPage/>,
+    element: (<ProtectedRoute child={<ProductFormPage />}/>),
   },
   {
     path: "/product/update/:id",
-    element: <ProductFormPage/>,
+    element: (<ProtectedRoute child={<ProductFormPage />}/>),
   },
   {
     path: "/products",
-    element: <Products isOpen={false} togglePopup={function (): void {
-      throw new Error("Function not implemented.");
-    } }/>,
+    element: (
+      <Products
+        isOpen={false}
+        togglePopup={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
+    ),
   },
   {
     path: "/checkout/:id",
-    element: <CheckOutPage/>,
+    element: (<ProtectedRoute child={<CheckOutPage />}/>),
   },
   {
     path: "/payment/:id",
-    element: <PaymentPage/>,
+    element: (<ProtectedRoute child={<PaymentPage />}/>) ,
   },
   {
     path: "/order/success",
-    element: <SuccessOrderPage/>,
+    element: (<ProtectedRoute child={<SuccessOrderPage />}/>),
   },
   {
     path: "/payment",
-    element: <PaymentPage/>,
+    element: (<ProtectedRoute child={<PaymentPage />}/>),
   },
   {
     path: "/profile/:id",
-    element: <ProfilePage/>,
+    element: (
+      <ProtectedRoute child={<ProfilePage />} />
+    ),
   },
-  
+  {
+    path: "/admin/:id",
+    element: (
+      <AdminProtectedRoute child={<AdminPanel />} />
+    ),
+  },
 ]);
 
-
 function App() {
-  
   return (
     <ToastProvider>
       <div className="App">

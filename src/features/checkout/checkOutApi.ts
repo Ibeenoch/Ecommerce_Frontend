@@ -31,3 +31,19 @@ export const sendTransaction = async(data: any) => {
     }
 }
 
+export const fetchAUserTransactions = async (id: any) => {
+  try {
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+        // Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await axios.get(API + `/transactions/${id}`);
+    console.log("a user transactions ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};

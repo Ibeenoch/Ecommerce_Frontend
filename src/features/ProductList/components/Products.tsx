@@ -51,11 +51,12 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const [getCategoryName, setGetCategoryName] = useState<string>("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const [theAdmin, setTheAdmin] = useState<boolean>(false);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const { status, products, product, categories, category, brands, brand } =
     useAppSelector(selectProduct);
   const { user } = useAppSelector(selectUser);
 
-  const token = user && user[0] && user[0].token;
+  const token = user && user && user.token;
 
   const imageProps = {
     width: "100%",
@@ -89,8 +90,11 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
     }
   };
   useEffect(() => {
-    dispatch(getAllproduct());
+    dispatch(getAllproduct()).then((res) => {
+        setTotalCount(res.payload.length)
+    })
   }, [dispatch, navigate]);
+  console.log('this is the total count: ' ,totalCount)
 
   const handleProductDetails = (productId: any) => {
     dispatch(getAproduct(productId)).then((res) => {
@@ -413,7 +417,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                   Products
                 </h2>
 
-                <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-x-3 gap-y-4 lg:grid-cols-4">
                   {/* Filters */}
                   <form className="hidden lg:block">
                     {filters.map((section) => (
@@ -490,7 +494,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                   </form>
 
                   {/* Product grid */}
-                  <div className="lg:col-span-3">
+                  <div className="lg:col-span-3 bg-white rounded-lg">
                     {/* this is product list Content */}
                     <div className="">
                       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -498,22 +502,23 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                           Top Selling
                         </h2>
 
-                        <div className="mt-1 grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2 px-4  py-5 lg:grid-cols-3 xl:gap-x-8">
+                        <div className="mt-1 grid grid-cols-1 gap-x-1 gap-y-3 sm:grid-cols-3 px-1  py-2 lg:grid-cols-3 xl:gap-x-4">
                           {products.map((product: any) => (
                             <div
                               key={product.id}
-                              className="group relative"
+                              className="group relative shadow-xl"
                               style={{
                                 border: "1px white solid",
                                 padding: "5px",
                                 background: "white",
+                                
                               }}
                             >
                               <div className="w-full md:w-64 h-64 contain">
                                 {user &&
-                                user[0] &&
-                                user[0].role &&
-                                user[0].role === "ADMIN" ? (
+                                user &&
+                                user.role &&
+                                user.role === "ADMIN" ? (
                                   // edit product
                                   <div className="flex justify-between">
                                     <div
@@ -701,7 +706,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
           </div>
         </div>
 
-        <Pagination />
+        <Pagination totalCount={totalCount}/>
       </div>
     </div>
   );

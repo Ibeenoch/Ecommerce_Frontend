@@ -41,8 +41,7 @@ const SignUp: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
   const { fullname, email, password, confirmPassword } = formData;
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/;
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
     console.log(formData);
@@ -57,8 +56,13 @@ const SignUp: React.FC = () => {
       const register = { ...formData, passcode };
       console.log("registeration: ", register);
       dispatch(registerUser(register)).then((res) => {
-        console.log('admin signup: ', res, res.payload)
-        if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN'){
+        console.log('admin signup: ', res, res.payload, 'user already exist')
+        if(res && res.payload && res.payload === 'user already exist'){
+          addToast("user already exist", {
+            appearance: "warning",
+            autoDismiss: true,
+          });
+        }else if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN'){
           addToast("Registered As Admin Successful", {
             appearance: "success",
             autoDismiss: true,
@@ -99,8 +103,9 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-0 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-1 lg:px-8">
+      <div className="shadow-lg">
+      <div className="sm:mx-auto sm:w-1/2 px-4 sm:max-w-sm">
         <Link to="/">
           <img
             className="mx-auto h-10 w-auto"
@@ -108,12 +113,12 @@ const SignUp: React.FC = () => {
             alt="Your Company"
           />
         </Link>
-        <h2 className="mt-10 text-center text-2xl font-bold leading-4 tracking-tight text-gray-900">
+        <h2 className="mt-5 text-center text-lg font-bold leading-4 tracking-tight text-gray-900">
           Sign Up to Maven Store
         </h2>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-10 sm:mx-auto sm:w-1/2 px-4 sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleRegister}>
           <div>
             <label
@@ -284,6 +289,7 @@ const SignUp: React.FC = () => {
             </div>
           </p>
         </Link>
+      </div>
       </div>
     </div>
   );

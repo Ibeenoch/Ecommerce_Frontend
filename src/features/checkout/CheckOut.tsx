@@ -586,8 +586,8 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                 </div>
             </div>
            ) : (
-             <div onClick={informUser} className="mt-6 cursor-pointer">
-                <div className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
+             <div onClick={informUser} className="mt-6 cursor-pointer bg-gray-500">
+                <div className="flex items-center justify-center rounded-md border border-transparent bg-gray-500 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
                   Pay Now
                 </div>
             </div>

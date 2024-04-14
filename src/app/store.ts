@@ -6,6 +6,7 @@ import  productReducer  from '../features/ProductList/ProductSlice';
 import cartReducer from '../features/cart/cartSlice'
 import authReducer from '../features/auth/authSlice'
 import checkoutReducer from '../features/checkout/checkoutSlice';
+import orderReducer from '../features/order/orderSlice';
 
 const persistConfig = {
   key: 'root',
@@ -18,6 +19,7 @@ const reducers = combineReducers({
   cart: cartReducer,
   auth: authReducer,
   checkout: checkoutReducer,
+  order: orderReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, reducers)

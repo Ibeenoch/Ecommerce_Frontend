@@ -1,6 +1,7 @@
 import { Fragment, ReactElement, useEffect } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import icon from '../../images/Untitled.jpg'
+import pics from '../../images/Apple 2022 MacBook Air Laptop__4.jpg'
 import {
   Bars3Icon,
   ShoppingCartIcon,
@@ -41,12 +42,16 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
     })
   }
 
+  const handleProfile = () => {
+    navigate(`/profile/${user && user && user.id}`)
+  }
+
   const navigation = [
     { name: "Marven Store", href: "#", current: true },
     { name: "Team", href: "#", current: false },
   ];
   const userNavigation = [
-    { name: "Your Profile", href: `/profile/${user && user[0] && user[0].id}` },
+    { name: "Your Profile", href: `/profile/${user && user && user.id}` },
     { name: "Settings", href: "#" },
     { name: "Sign out", href: "#" },
   ];
@@ -125,7 +130,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                             <span className="sr-only">Open user menu</span>
                             <img
                               className="h-8 w-8 rounded-full"
-                              src={user.imageUrl}
+                              src={user && user && user.image && user.image.url ? user.image.url : pics}
                               alt=""
                             />
                           </Menu.Button>
@@ -203,19 +208,19 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                 </div>
                 <div className="border-t border-gray-700 pb-3 pt-4">
                   <div className="flex items-center px-5">
-                    <div className="flex-shrink-0">
+                    <div onClick={handleProfile}  className="flex-shrink-0">
                       <img
                         className="h-10 w-10 rounded-full"
-                        src={user && user.imageUrl}
+                        src={user && user && user.image && user.image.url ? user.image.url : pics}
                         alt=""
                       />
                     </div>
                     <div className="ml-3">
                       <div className="text-base font-medium leading-none text-white">
-                        {user.name}
+                        {user && user && user.name ? user.name : 'name'}
                       </div>
                       <div className="text-sm font-medium leading-none text-gray-400">
-                        {user.email}
+                        {user && user && user.email ? user.email : 'email'}
                       </div>
                     </div>
                     <button

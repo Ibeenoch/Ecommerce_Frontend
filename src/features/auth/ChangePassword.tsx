@@ -10,29 +10,26 @@ import { CircularProgress } from "@material-ui/core";
 import PasswordRecovery from "./PasswordRecovery";
 
 interface Login {
-  oldpassword: string;
   newpassword1: string;
   newpassword2: string;
 }
 
 const ChangePassword: React.FC = () => {
     const [formData, setFormData] = useState<Login>({
-        oldpassword: "",
         newpassword1: "",
         newpassword2: "",
       });
       const dispatch = useAppDispatch();
       const navigate = useNavigate();
       const [ischecked, setIsChecked] = useState(false);
-      const [isShowPassword, setIsShowPassword] = useState(false);
       const [isShowPassword2, setIsShowPassword2] = useState(false);
       const [isShowPassword3, setIsShowPassword3] = useState(false);
       const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
       const { addToast } = useToasts();
-      const { email } = useParams();
+      const { id } = useParams();
       const { status, user } = useAppSelector(selectUser);
     
-      console.log('email is: ', email)
+      console.log('id is: ', id)
       const handleSwitchElem = (checked: boolean) => {
         setIsChecked(checked);
       };
@@ -42,28 +39,25 @@ const ChangePassword: React.FC = () => {
         setFormData({ ...formData, [name]: value });
       };
 
-      const { oldpassword, newpassword1, newpassword2 } = formData;
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      const { newpassword1, newpassword2 } = formData;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/;
       const handlePasswordRecovery = (e: FormEvent) => {
         e.preventDefault();
         console.log(formData);
         if (passwordRegex.test(newpassword1)) {
     
-          const changePassword = { ...formData, email };
-          const passwordData = { changePassword, addToast };
-          console.log('password data: ' ,passwordData)
+          const changePassword = { formData, id };
+          console.log('password data: ' , changePassword)
 
-          dispatch(passwordChange(passwordData)).then((res: any) => {
-            
-            
-            console.log('reset payload ', res.payload)
+          dispatch(passwordChange(changePassword)).then((res: any) => {
+                        
+            console.log('reset payload ', res, res.payload)
             if(res && res.payload && res.payload.id){
-                addToast("Password Changed Successfully", {
+                addToast("Password Changed Successfully, Please Login with the new password to continue", {
                 appearance: "success",
                 autoDismiss: true,
               });
-              navigate("/");
+              navigate("/login");
             }
             
           });
@@ -79,9 +73,7 @@ const ChangePassword: React.FC = () => {
         }
       };
     
-      const changeVisibilty = () => {
-        setIsShowPassword(!isShowPassword);
-      };
+      
       const changeVisibilty2 = () => {
         setIsShowPassword2(!isShowPassword2);
       };
@@ -112,39 +104,7 @@ const ChangePassword: React.FC = () => {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handlePasswordRecovery}>
           
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="oldpassword"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-               Old Password
-              </label>
-            </div>
-            <div className="mt-2 relative">
-              <input
-                id="oldpassword"
-                name="oldpassword"
-                type={isShowPassword ? "text" : "password"}
-                value={formData.oldpassword}
-                onChange={handleChange}
-                required
-                placeholder="Old Password"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-              <div
-                onClick={changeVisibilty}
-                className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer z-30"
-              >
-                {isShowPassword ? (
-                  <EyeIcon color="indigo" className="w-4 h-4 z-30" />
-                ) : (
-                  <EyeSlashIcon color="indigo" className="w-4 h-4 z-30" />
-                )}
-              </div>
-            </div>
-          </div>
-          
+         
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <label

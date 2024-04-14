@@ -82,7 +82,7 @@ const ProductForm = () => {
 
   if(id){
       
-    const token = user && user[0] && user[0].token;
+    const token = user && user && user.token;
 
     if(images){
       if(images.length < 4){
@@ -182,7 +182,7 @@ const ProductForm = () => {
         product.append("fileupload", image);
       });
   
-      const token = user && user[0] && user[0].token;
+      const token = user && user && user.token;
 
       const products = {
         product,
