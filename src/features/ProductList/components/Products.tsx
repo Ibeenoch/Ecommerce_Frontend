@@ -39,6 +39,7 @@ import ProductReview from "./ProductReview";
 import { selectUser } from "../../auth/authSlice";
 import Loading from "../../../Loading";
 import LoadingPage from "../../../pages/LoadingPage";
+import { addToWishlist } from "../../wishlist/wishListSlice";
 
 interface ItogglePopup {
   isOpen: boolean;
@@ -51,6 +52,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const [getCategoryName, setGetCategoryName] = useState<string>("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const [theAdmin, setTheAdmin] = useState<boolean>(false);
+  const [wishlistUpdate, setWishlistUpdate] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
   const { status, products, product, categories, category, brands, brand } =
     useAppSelector(selectProduct);
@@ -73,6 +75,25 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
       console.log("cart added: ", data);
       const dataitem = { data, addToast };
       dispatch(addtocart(dataitem));
+    });
+  };
+  const handleAddToWishlist = (productId: any, index: any) => {
+
+    setWishlistUpdate(index)
+    const quantity = 1;
+    dispatch(getAproduct(productId)).then((res) => {
+      console.log("response product ", res.payload);
+      const receive = res.payload;
+      const data = { ...receive, quantity };
+      console.log("wishlist added: ", data);
+      const dataitem = { data, addToast };
+      dispatch(addToWishlist(dataitem)).then((res: any) => {
+        dispatch(getAllproduct()).then((res) => {
+          console.log('res all pro ', res.payload)
+          const getIndex = products.find((it: any) => it.id === productId);
+          // products[getIndex] =
+        })
+      })
     });
   };
 
@@ -192,6 +213,16 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
     }
   };
 
+  const handleProductReview = (id: any) => {
+    dispatch(getAproduct(id)).then((res) => {
+      console.log("product  res: ", res);
+      if (res && res.payload && res.payload.id) {
+       
+        navigate(`/product/review/${id}`);
+      }
+    });
+  }
+
   const filters = [
     {
       id: "category",
@@ -210,7 +241,13 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   }
 
   return (
-    <div>
+     <>
+      {/* <div style={{ width: '100%', height: '80vh', background: 'orange', zIndex: 40}}>
+the carosel
+      </div> */}
+
+      <div>
+     
       <div>
         <div className="">
           <div>
@@ -341,7 +378,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                  Filter By
+                  Filter
                 </h1>
 
                 <div className="flex items-center">
@@ -429,7 +466,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                         {({ open }) => (
                           <>
                             <h3 className="-my-3 flow-root">
-                              <Disclosure.Button className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
+                              <Disclosure.Button className="flex w-full px-3 hover:bg-indigo-300 items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
                                 <span
                                   className="font-medium text-gray-900"
                                   onClick={() => fetchCategories(section.name)}
@@ -454,7 +491,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                 </span>
                               </Disclosure.Button>
                             </h3>
-                            <Disclosure.Panel className="pt-6">
+                            <Disclosure.Panel className="pt-6 hover:bg-indigo-300">
                               <div className="space-y-4">
                                 {section.options.map(
                                   (option: any, optionIdx: any) => (
@@ -503,7 +540,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                         </h2>
 
                         <div className="mt-1 grid grid-cols-1 gap-x-1 gap-y-3 sm:grid-cols-3 px-1  py-2 lg:grid-cols-3 xl:gap-x-4">
-                          {products.map((product: any) => (
+                          {products.map((product: any, index: number) => (
                             <div
                               key={product.id}
                               className="group relative shadow-xl"
@@ -518,7 +555,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                 {user &&
                                 user &&
                                 user.role &&
-                                user.role === "ADMIN" ? (
+                                user.role !== "ADMIN" ? (
                                   // edit product
                                   <div className="flex justify-between">
                                     <div
@@ -560,12 +597,13 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                       <button
                                         id="popup-trigger"
                                         className="text-gray-500 hover:text-gray-900"
-                                        onClick={togglePopup}
+                                        
                                       >
                                         <div
-                                          className="flex border-none"
+                                        onClick={() => handleProductReview(product.id)}
+                                          className="flex border-none cursor-pointer"
                                           style={{
-                                            opacity: isOpen ? "0.99" : "1",
+                                            opacity: isOpen ? "0.99" : "1", cursor: 'pointer'
                                           }}
                                         >
                                           <StarIcon
@@ -596,36 +634,20 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                         </div>
                                       </button>
                                       {/* Popup */}
-                                      {isOpen && (
-                                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                          {/* Popup content */}
-                                          <div className="bg-white p-8 max-w-md rounded shadow-lg">
-                                            {/* Add your popup content here */}
-                                            <ProductReview />
-                                            {/* Close button */}
-                                            <button
-                                              id="popup-close"
-                                              className="mt-4 text-gray-500 hover:text-gray-900"
-                                              onClick={togglePopup}
-                                            >
-                                              Close
-                                            </button>
-                                          </div>
-                                        </div>
-                                      )}
+                                  
                                     </button>
 
-                                    <button
-                                      type="button"
+                                    <div
+                                      onClick={() => handleAddToWishlist(product.id, index)}
                                       style={{ opacity: isOpen ? "0.2" : "1" }}
-                                      className="relative border-none rounded-full z-30 cursor-pointer bg-white-800 p-1 text-gray-400 hover:text-cyan focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                                    >
+                                      className={`relative border-none rounded-full z-30 cursor-pointer bg-white-800 p-1 text-gray-400 hover:text-cyan focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800`}>
+                                      
                                       <HeartIcon
                                         className="h-4 w-4 border-none"
                                         aria-hidden="true"
-                                        color="red"
+                                        color={wishlistUpdate === index ? 'red': 'gray'}
                                       />
-                                    </button>
+                                    </div>
                                   </div>
                                 )}
 
@@ -681,17 +703,16 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                     </div>
                                   </div>
 
-                                  <button
+                                  <div
                                     onClick={() => handleAddToCart(product.id)}
-                                    type="button"
-                                    className="relative rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                    className="relative cursor-pointer rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                                   >
                                     <ShoppingBagIcon
                                       className="h-5 w-5"
                                       aria-hidden="true"
                                       color="midnightblue"
                                     />
-                                  </button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -709,6 +730,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
         <Pagination totalCount={totalCount}/>
       </div>
     </div>
+      </>
   );
 };
 

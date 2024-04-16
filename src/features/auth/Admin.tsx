@@ -1,6 +1,7 @@
 import {
   CameraIcon,
   ChevronDownIcon,
+  EyeIcon,
   FunnelIcon,
   HeartIcon,
   MinusIcon,
@@ -13,44 +14,112 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { getAUser, selectUser } from "./authSlice";
-import { getAUserTransaction, selectCheckout } from "../checkout/checkoutSlice";
+import {
+  deleteUser,
+  getAUser,
+  getAllUser,
+  getUserPagination,
+  selectUser,
+} from "./authSlice";
+import {
+  alltransactions,
+  deleteATransaction,
+  getAUserTransaction,
+  getpaymentPagination,
+  selectCheckout,
+} from "../checkout/checkoutSlice";
 import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import pics from "../../images/HP Newest Pavilion 15.6_ HD Touchscreen Anti-Glare Laptop__4.jpg";
 import { useToasts } from "react-toast-notifications";
+import { format } from "date-fns";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import ShippingDetails from "./ShippingDetails";
 import {
   deleteproduct,
   getAllproduct,
   getAproduct,
+  getPagination,
   selectProduct,
 } from "../ProductList/ProductSlice";
 import { fetchAllUsersCartAsync } from "../cart/cartSlice";
-import { getAllOrders, selectOrder } from "../order/orderSlice";
+import {
+  deleteOrder,
+  getAllOrders,
+  getOrderPagination,
+  orderUpdate,
+  selectOrder,
+} from "../order/orderSlice";
+import ProductPagination from "./AdminPagination/ProductPagination";
+import OrdersPagination from "./AdminPagination/OrdersPagination";
+import UsersPagination from "./AdminPagination/UsersPagination";
+import PaymentPagination from "./AdminPagination/PaymentPagination";
 
 const Admin = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [selected1, setSelected1] = useState(true);
   const [selected2, setSelected2] = useState(false);
   const [isproduct, setIsProduct] = useState(true);
   const [isOrder, setIsOrder] = useState(false);
   const [isUser, setIsUser] = useState(false);
+  const [totalProductCount, setTotalProductCount] = useState<number>(0);
+  const [totalOrderCount, setTotalOrderCount] = useState<number>(0);
+  const [totalUserCount, setTotalUserCount] = useState<number>(0);
+  const [totalPaymentCount, setTotalPaymentCount] = useState<number>(0);
   const [isPayment, setIsPayment] = useState(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [theStatus, setThestatus] = useState<string[]>([]);
-
+  const [orderIndex, setOrderIndex] = useState<number>(0);
   const { id } = useParams();
-  const { checkoutInfo, aUserTransactions, aUserOrderedProducts } =
-    useAppSelector(selectCheckout);
-  const { user } = useAppSelector(selectUser);
+  const { allTransactions } = useAppSelector(selectCheckout);
+  const { user, users } = useAppSelector(selectUser);
   const { products } = useAppSelector(selectProduct);
   const { orders } = useAppSelector(selectOrder);
 
   const togglePopup = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    dispatch(getAllproduct()).then((res: any) => {
+      setTotalProductCount(res.payload.length);
+
+      const handlePages = () => {
+        const limit = 3;
+        const currentPage = 1;
+        const data = { limit, currentPage };
+        console.log("data counted: ", data);
+        dispatch(getPagination(data) as any).then(() => {
+          console.log("finish");
+        });
+      };
+
+      handlePages();
+    });
+  }, [dispatch, navigate]);
+  console.log("this is the total product count: ", totalProductCount);
+
+  useEffect(() => {
+    dispatch(getAllOrders(token)).then((res: any) => {
+      setTotalOrderCount(res.payload.length);
+    });
+  }, [dispatch, navigate]);
+  console.log("this is the total order count: ", totalOrderCount);
+
+  useEffect(() => {
+    dispatch(getAllUser(token)).then((res: any) => {
+      setTotalUserCount(res.payload.length);
+    });
+  }, [dispatch, navigate]);
+  console.log("this is the total user count: ", totalUserCount);
+
+  useEffect(() => {
+    dispatch(alltransactions(token)).then((res: any) => {
+      setTotalPaymentCount(res.payload.length);
+    });
+  }, [dispatch, navigate]);
+  console.log("this is the total payment count: ", totalPaymentCount);
 
   useEffect(() => {
     const data = {
@@ -65,7 +134,14 @@ const Admin = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(getAllproduct()).then((res: any) => {});
+    dispatch(getAllproduct()).then((res: any) => {
+      dispatch(
+        getAllOrders((res: any) => {
+          if (res && res.payload && Array.isArray(res.payload)) {
+          }
+        })
+      );
+    });
   }, []);
   console.log("get products result: ", products);
 
@@ -84,11 +160,11 @@ const Admin = () => {
   const handleStatus = (e: ChangeEvent<HTMLSelectElement>, index: number) => {
     const allSelectOption = [...theStatus];
     allSelectOption[index] = e.target.value;
-    setThestatus(allSelectOption)
-  }
+    setThestatus(allSelectOption);
+    setOrderIndex(index);
+  };
 
-  console.log('status selected: ', theStatus)
-  const token = user && user.token;
+  const token = user && user.role === 'ADMIN' && user.token;
 
   const handleDelete = (productId: any) => {
     const getConfirmation = window.confirm(
@@ -130,6 +206,67 @@ const Admin = () => {
     }
   };
 
+  const handleOrderDelete = (id: any) => {
+    const getConfirmation = window.confirm(
+      "Are you sure you want to delete this Order"
+    );
+    if (getConfirmation) {
+      const data = { id, token };
+      dispatch(deleteOrder(data)).then((res: any) => {
+        if (res && res.payload && res.payload.id) {
+          dispatch(getAllOrders(token)).then((res: any) => {
+            if (res && res.payload) {
+              addToast("Order successfully deleted", {
+                appearance: "success",
+                autoDismiss: true,
+              });
+            }
+          });
+        }
+      });
+    }
+  };
+
+  const handlePaymentDelete = (id: any) => {
+    const getConfirmation = window.confirm(
+      "Are you sure you want to delete this transaction"
+    );
+    if (getConfirmation) {
+      const data = { id, token };
+      dispatch(deleteATransaction(data)).then((res: any) => {
+        if (res && res.payload && res.payload.id) {
+          console.log("delete res ", res);
+          addToast("Order successfully deleted", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+        }
+      });
+    }
+  };
+
+  const handleDeleteUser = (id: any, name:string) => {
+   const getConfirmation = window.confirm(`Are you sure you want to delete ${name} account?`);
+
+    if(getConfirmation){
+      const data = {
+      token,
+      id,
+    }
+
+    dispatch(deleteUser(data)).then((res: any) => {
+      console.log('deleted user: ', res.payload)
+      if(res && res.payload && res.payload.id){
+        addToast(`${name} account is successfully deleted`, {
+          appearance: "info",
+          autoDismiss: true,
+        });
+      }
+    })
+    }
+    
+  }
+
   const handleProductDetails = (productId: any) => {
     dispatch(getAproduct(productId)).then((res) => {
       console.log("product res: ", res);
@@ -144,7 +281,6 @@ const Admin = () => {
     });
   };
 
-  const navigate = useNavigate();
   const { addToast } = useToasts();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -152,49 +288,92 @@ const Admin = () => {
   const fetchCategories = (name: string) => {
     //options is an array of objects
     if (name === "All Product") {
-      console.log("all product");
       setIsProduct(true);
       setIsUser(false);
       setIsOrder(false);
       setIsPayment(false);
-      dispatch(getAllproduct()).then((res: any) => {
-        console.log("product res: ", res);
-      });
+
+      const handlePages = () => {
+        const limit = 3;
+        const currentPage = 1;
+        const item = { limit, currentPage };
+        dispatch(getPagination(item) as any).then(() => {
+          console.log("finish");
+        });
+      };
+
+      handlePages();
     } else if (name === "All Orders") {
       setIsProduct(false);
       setIsUser(false);
       setIsOrder(true);
       setIsPayment(false);
-      dispatch(getAllOrders(token)).then((res: any) => {
-        console.log("all orders: ", res);
-      });
+
+      const handlePages = () => {
+        const limit = 1;
+        const currentPage = 1;
+        const data = { limit, currentPage };
+        const item = { token, data };
+        dispatch(getOrderPagination(item) as any).then(() => {
+          console.log("finish");
+        });
+      };
+
+      handlePages();
     } else if (name === "All Payment") {
       setIsProduct(false);
       setIsUser(false);
       setIsOrder(false);
       setIsPayment(true);
-      console.log("all payment");
+
+      const handlePages = () => {
+        const limit = 1;
+        const currentPage = 1;
+        const item = { limit, currentPage };
+        const data = { token, item };
+        dispatch(getpaymentPagination(item) as any).then(() => {
+          console.log("finish");
+        });
+      };
+
+      handlePages();
     } else if (name === "All Users") {
       setIsProduct(false);
       setIsUser(true);
       setIsOrder(false);
       setIsPayment(false);
-      console.log("all user");
+
+      const handlePages = () => {
+        const limit = 2;
+        const currentPage = 1;
+        const item = { limit, currentPage };
+        const data = { token, item };
+        dispatch(getUserPagination(data) as any).then(() => {
+          console.log("finish");
+        });
+      };
+
+      handlePages();
     } else {
       console.log("none");
     }
   };
 
-  console.log(
-    "product: ",
-    isproduct,
-    "user: ",
-    isUser,
-    "order: ",
-    isOrder,
-    "payment: ",
-    isPayment
-  );
+  const sendUpdate = (id: any) => {
+    const status = theStatus[theStatus.length - 1];
+    const data = {
+      id,
+      status,
+      token,
+    };
+
+    dispatch(orderUpdate(data)).then((res: any) => {
+      if (res.payload.id) {
+        console.log("res status update: ", res.payload);
+        dispatch(getAllOrders(token));
+      }
+    });
+  };
 
   const filters = [
     {
@@ -214,10 +393,15 @@ const Admin = () => {
       name: "All Users",
     },
   ];
+  function viewUser(id: any): void {
+    navigate(`/profile/${id}`);
+    // throw new Error("Function not implemented.");
+  }
+
   return (
     <div>
       <div>
-        <div className="">
+        <div className="mt-14">
           <div>
             {/* Mobile filter dialog */}
             <Transition.Root show={mobileFiltersOpen} as={Fragment}>
@@ -250,7 +434,7 @@ const Admin = () => {
                   >
                     <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white shadow-xl">
                       <div className="flex items-center justify-between px-4">
-                        <h2 className="text-lg font-medium text-gray-900">
+                        <h2 className="text-base font-semibold leading-10 text-gray-900">
                           Welcome To Admin Panel
                         </h2>
                         <button
@@ -270,17 +454,13 @@ const Admin = () => {
                             as="div"
                             key={section.id}
                             className="border-t border-gray-200 px-4 py-6"
+                            onClick={() => fetchCategories(section.name)}
                           >
                             {({ open }) => (
                               <>
                                 <h3 className="-mx-2 flow-root">
-                                  <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                                    <span
-                                      onClick={() =>
-                                        fetchCategories(section.name)
-                                      }
-                                      className="font-medium text-gray-900"
-                                    >
+                                  <Disclosure.Button className="flex w-full hover:bg-indigo-300 items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                                    <span className="font-medium text-gray-900">
                                       {section.name}
                                     </span>
                                     <span className="ml-6 flex items-center"></span>
@@ -299,7 +479,7 @@ const Admin = () => {
 
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-baseline justify-between border-b border-gray-200">
-                <h1 className="text-xl font-bold tracking-tight text-gray-900">
+                <h1 className="text-base font-semibold text-bold leading-7 text-gray-900">
                   Welcome To Admin Panel
                 </h1>
 
@@ -338,15 +518,13 @@ const Admin = () => {
                         as="div"
                         key={section.id}
                         className="border-b border-gray-200 py-6"
+                        onClick={() => fetchCategories(section.name)}
                       >
                         {({ open }) => (
                           <>
                             <h3 className="-my-3 flow-root">
-                              <Disclosure.Button className="flex w-full items-center px-4 justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                                <span
-                                  className="font-medium text-gray-900"
-                                  onClick={() => fetchCategories(section.name)}
-                                >
+                              <Disclosure.Button className="flex w-full hover:bg-indigo-300 items-center px-4 justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
+                                <span className="font-medium text-gray-900">
                                   {section.name}
                                 </span>
                                 <span className="ml-6 flex items-center"></span>
@@ -362,7 +540,7 @@ const Admin = () => {
                   <div className="lg:col-span-3 bg-white rounded-lg">
                     {/* this is product list Content */}
                     <div className="">
-                      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-6 lg:max-w-7xl lg:px-8">
+                      <div className="lg:col-span-3 bg-white rounded-lg">
                         {/* head  */}
 
                         <div className="h-screen dark:bg-white-700 bg-white-200 pt-0">
@@ -372,14 +550,14 @@ const Admin = () => {
                             {isproduct ? (
                               <>
                                 <div className="flex justify-between pb-4">
-                                  <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                                  <h2 className="text-base px-2 py-2 font-semibold leading-7 text-gray-900">
                                     Lists of All Product
                                   </h2>
                                   <div
                                     onClick={handleCreateProduct}
-                                    className="text-xl text-bold text-sky-800 cursor-pointer bg-indigo px-6 rounded-full border border-blue-300"
+                                    className="text-sm text-center text-bold text-sky-800 cursor-pointer bg-indigo hover:bg-indigo-500 hover:text-white px-3 pt-3 rounded-full border border-blue-300"
                                   >
-                                    <strong>Add Product</strong>{" "}
+                                    <strong>Add Product </strong>
                                   </div>
                                 </div>
 
@@ -390,35 +568,34 @@ const Admin = () => {
                                         onClick={() =>
                                           handleProductDetails(item.id)
                                         }
-                                        className="flex justify-between px-4 py-2 w-full cursor-pointer"
+                                        className="flex flex-col lg:flex-row justify-between px-4 py-2 w-full hover:bg-indigo-200 cursor-pointer"
                                       >
                                         <div className="first">
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg font-poppins text-center">
-                                              {" "}
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               <strong> title:</strong>{" "}
                                               {item.title}
                                             </div>
                                           </div>
 
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg font-poppins text-center">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               {" "}
                                               <strong>description:</strong>{" "}
                                               {item.description.slice(0, 40)}
                                             </div>
                                           </div>
 
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg font-poppins text-center">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               {" "}
                                               <strong>price:</strong>{" "}
                                               {item.price}
                                             </div>
                                           </div>
 
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg font-poppins text-center">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               {" "}
                                               <strong>Keywords:</strong>{" "}
                                               {item.keywords}
@@ -427,8 +604,8 @@ const Admin = () => {
                                         </div>
 
                                         <div className="second">
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg  font-poppins text-center">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               {" "}
                                               <strong>
                                                 discountPercentage:
@@ -437,24 +614,24 @@ const Admin = () => {
                                             </div>
                                           </div>
 
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg font-poppins text-center">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               {" "}
                                               <strong> stock:</strong>{" "}
                                               {item.stock}
                                             </div>
                                           </div>
 
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg font-poppins text-center">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               {" "}
                                               <strong>brand:</strong>{" "}
                                               {item.brand.name}
                                             </div>
                                           </div>
 
-                                          <div className="flex items-center my-1">
-                                            <div className="ml-6 truncate text-lg  font-poppins text-center">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
                                               {" "}
                                               <strong>category:</strong>{" "}
                                               {item.category.name}
@@ -472,27 +649,31 @@ const Admin = () => {
                                           onClick={() => handleEdit(item.id)}
                                         >
                                           <PencilIcon
-                                            width="26px"
-                                            height="26px"
+                                            width="16px"
+                                            height="16px"
                                             color="blue"
                                             className="cursor-pointer"
                                           />{" "}
                                         </div>
                                         <TrashIcon
                                           onClick={() => handleDelete(item.id)}
-                                          width="26px"
-                                          height="26px"
+                                          width="16px"
+                                          height="16px"
                                           color="red"
                                           className="cursor-pointer"
                                         />{" "}
                                       </div>
                                     </div>
                                   ))}
+
+                                <ProductPagination
+                                  totalCount={totalProductCount}
+                                />
                               </>
                             ) : isOrder ? (
                               <>
                                 <div className="flex justify-between pb-4">
-                                  <h2 className="text-2xl font-bold text-center tracking-tight text-gray-900">
+                                  <h2 className="text-base text-center font-bold leading-7 px-2 pt-2 text-gray-900">
                                     Lists of Orders
                                   </h2>
                                 </div>
@@ -501,55 +682,59 @@ const Admin = () => {
                                   orders.map((item: any, index: number) => (
                                     <div className="border border-gray-300 flex flex-col">
                                       <div className="flex flex-col justify-between px-4 py-2 w-full cursor-pointer">
-                                        {item.productDetails.map((it: any, index: number) => (
-                                          <>
-                                            <h3 className="flex text-xl py-2 text-bold justify-center">
-                                              <strong>
-                                              #item {index + 1} 
-                                              </strong>
-                                            </h3>
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg font-poppins text-center">
-                                                <strong>Product Name: </strong>
-                                                {it.title}
+                                        {item.productDetails.map(
+                                          (it: any, index: number) => (
+                                            <>
+                                              <h2 className="text-base border border-bottom-gray-400 font-semibold text-center leading-7 text-gray-900">
+                                                #item {index + 1}
+                                              </h2>
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>
+                                                    Product Name:{" "}
+                                                  </strong>
+                                                  {it.title}
+                                                </div>
                                               </div>
-                                            </div>
 
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg font-poppins text-center">
-                                                <strong>
-                                                  Price Per Item:{" "}
-                                                </strong>{" "}
-                                                $ ${it.price}
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>
+                                                    Price Per Item:{" "}
+                                                  </strong>{" "}
+                                                  $ ${it.price}
+                                                </div>
                                               </div>
-                                            </div>
 
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg font-poppins text-center">
-                                                <strong>
-                                                  Quantity Purchased:
-                                                </strong>{" "}
-                                                {it.quantity}
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>
+                                                    Quantity Purchased:
+                                                  </strong>{" "}
+                                                  {it.quantity}
+                                                </div>
                                               </div>
-                                            </div>
 
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg font-poppins text-center">
-                                                <strong>Product Brand: </strong>{" "}
-                                                {it.brand.name}
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>
+                                                    Product Brand:{" "}
+                                                  </strong>{" "}
+                                                  {it.brand.name}
+                                                </div>
                                               </div>
-                                            </div>
 
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg font-poppins text-center">
-                                                <strong>
-                                                  Product Category:
-                                                </strong>{" "}
-                                                {it.category.name}
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>
+                                                    Product Category:
+                                                  </strong>{" "}
+                                                  {it.category.name}
+                                                </div>
                                               </div>
-                                            </div>
-                                          </>
-                                        ))}
+                                            </>
+                                          )
+                                        )}
 
                                         <div>
                                           <div
@@ -558,80 +743,499 @@ const Admin = () => {
                                               borderBottom: "2px gray solid",
                                             }}
                                           >
-                                            <h3 className="flex text-xl py-2 text-bold justify-center">
-                                              {" "}
-                                              <strong>
-                                                Product Shipping Details
-                                              </strong>{" "}
-                                            </h3>
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg  font-poppins text-center">
+                                            <h2 className="text-base text-center border-b font-semibold leading-7 text-gray-900">
+                                              Product Shipping Details
+                                            </h2>
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
                                                 <strong>Ordered By: </strong>
-                                                {item && item.shippingDetails && item.shippingDetails.fullName}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails.fullName}
                                               </div>
                                             </div>
 
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg  font-poppins text-center">
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
                                                 <strong>Mobile No: </strong>
-                                                {item && item.shippingDetails && item.shippingDetails.phone}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails.phone}
                                               </div>
                                             </div>
 
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg  font-poppins text-center">
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
                                                 <strong>Email: </strong>
-                                                {item && item.shippingDetails && item.shippingDetails.email}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails.email}
                                               </div>
                                             </div>
 
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg font-poppins text-center">
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
                                                 {" "}
                                                 <strong>
                                                   Shipping Address:
                                                 </strong>{" "}
-                                                {item && item.shippingDetails && item.shippingDetails.address},{" "}
-                                                {item && item.shippingDetails && item.shippingDetails.city} ,{" "}
-                                                {item && item.shippingDetails && item.shippingDetails.state} ,{" "}
-                                                {item && item.shippingDetails && item.shippingDetails.country},{" "}
-                                                {item && item.shippingDetails && item.shippingDetails.zipcode}{" "}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails.address}
+                                                ,{" "}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails
+                                                    .city}{" "}
+                                                ,{" "}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails
+                                                    .state}{" "}
+                                                ,{" "}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails.country}
+                                                ,{" "}
+                                                {item &&
+                                                  item.shippingDetails &&
+                                                  item.shippingDetails
+                                                    .zipcode}{" "}
                                               </div>
                                             </div>
-                                            <div className="flex items-center my-1">
-                                              <div className="ml-6 truncate text-lg  font-poppins text-center">
-                                                <strong>Delivery Status: </strong>
-                                                <select value={theStatus[index]} onChange={(e) =>handleStatus(e, index)} >
-                                                  <option value="PENDING">PENDING</option>
-                                                  <option value="SHIPPED">SHIPPED</option>
-                                                  <option value="DECLINED">DECLINED</option>
-                                                  <option value="DELIVERED">DELIVERED</option>
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                <strong>Date Ordered: </strong>
+                                                {format(
+                                                  new Date(item.createdAt),
+                                                  "HH:mm:ss yyyy-MM-dd"
+                                                )}
+                                              </div>
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                              <div className="flex flex-col lg:flex-row justify-between py-4 block text-sm font-medium leading-6 text-gray-900">
+                                                <strong className="text-center lg:text-left">
+                                                  Delivery Status:{" "}
+                                                </strong>
+                                                <select
+                                                  className="w-1/8 lg:w-1/6 p-2 border border-green-300 rounded"
+                                                  value={item.status}
+                                                  onChange={(e) =>
+                                                    handleStatus(e, index)
+                                                  }
+                                                >
+                                                  <option value="PENDING">
+                                                    PENDING
+                                                  </option>
+                                                  <option value="SHIPPED">
+                                                    SHIPPED
+                                                  </option>
+                                                  <option value="DECLINED">
+                                                    DECLINED
+                                                  </option>
+                                                  <option value="DELIVERED">
+                                                    DELIVERED
+                                                  </option>
                                                 </select>
+                                                <button
+                                                  onClick={() =>
+                                                    sendUpdate(item.id)
+                                                  }
+                                                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                                >
+                                                  Update Status
+                                                </button>
                                               </div>
                                             </div>
                                           </div>
                                         </div>
                                       </div>
                                       <div className="flex justify-between px-4 pt-0 pb-2 w-full">
-                                        <div
-                                        >
-                                         
-                                        </div>
+                                        <div></div>
                                         <TrashIcon
-                                          onClick={() => handleDelete(item.id)}
-                                          width="26px"
-                                          height="26px"
+                                          onClick={() =>
+                                            handleOrderDelete(item.id)
+                                          }
+                                          width="16px"
+                                          height="16px"
                                           color="red"
                                           className="cursor-pointer"
                                         />{" "}
                                       </div>
                                     </div>
                                   ))}
+
+                                <OrdersPagination
+                                  totalCount={totalOrderCount}
+                                />
                               </>
                             ) : isUser ? (
-                              <div>user</div>
+                              <>
+                                {/* {users &&
+                                  users.map((item: any, index: number) => (
+                                    <div className="border border-gray-300 flex flex-col">
+                                      <div                                      
+                                        className="flex flex-col lg:flex-row justify-between px-4 py-2 w-full hover:bg-indigo-200 cursor-pointer"
+                                      >
+                                         <h2 className="text-base border border-bottom-gray-400 font-semibold text-center leading-7 text-gray-900">
+                                                  #User {index + 1}
+                                              </h2>
+                                        <div className="first">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              <strong> Name:</strong>{" "}
+                                              {item.fullName}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>Email:</strong>{" "}
+                                              {item.email}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>price:</strong>{" "}
+                                              {item.price}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>Role:</strong>{" "}
+                                              {item.role}
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="second">
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>
+                                                Phone:
+                                              </strong>{" "}
+                                              {item.phone}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong> Address:</strong>{" "}
+                                              {item.address}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>City:</strong>{" "}
+                                              {item.city}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>State:</strong>{" "}
+                                              {item.state}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>Country:</strong>{" "}
+                                              {item.state}
+                                            </div>
+                                          </div>
+
+                                          <div className="sm:col-span-3">
+                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                              {" "}
+                                              <strong>No Of Purchase:</strong>{" "}
+                                              {item.Order.length}
+                                            </div>
+                                          </div>
+
+                                          <div className="flex justify-between">
+                                            {" "}
+                                            <div></div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="flex justify-between px-4 pt-0 pb-2 w-full">
+                                        <div 
+                                        onClick={() =>viewUser(item.id)}
+                                        >
+                                        <EyeIcon
+                                            width="16px"
+                                            height="16px"
+                                            color="blue"
+                                            className="cursor-pointer"
+                                          />
+                                        </div>
+                                        <TrashIcon
+                                          width="16px"
+                                          height="16px"
+                                          color="red"
+                                          className="cursor-pointer"
+                                        />{" "}
+                                      </div>
+                                    </div>
+                                  ))} */}
+
+                                <ul
+                                  role="list"
+                                  className="divide-y divide-gray-100 px-4"
+                                >
+                                  {users &&
+                                    users.map((person: any) => (
+                                      <li
+                                        key={person.id}
+                                        className="flex justify-between gap-x-6 py-5"
+                                      >
+                                        <div className="flex min-w-0 gap-x-4">
+                                          <img
+                                            className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                                            src={
+                                              person &&
+                                              person.image &&
+                                              person.image.url
+                                            }
+                                            alt=""
+                                          />
+                                          <div className="min-w-0 flex-auto">
+                                            <p className="text-sm font-semibold leading-6 text-gray-900">
+                                              {person.fullName}
+                                            </p>
+                                            <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                                              {person.email}
+                                            </p>
+                                          <div
+                                            onClick={() => viewUser(person.id)}
+                                          >
+                                            <EyeIcon
+                                              width="16px"
+                                              height="16px"
+                                              color="blue"
+                                              className="cursor-pointer"
+                                            />
+                                          </div>
+                                          </div>
+                                        </div>
+                                        <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                                          <p className="text-sm leading-6 text-gray-900">
+                                            {person.role}
+                                          </p>
+                                          {person.createdAt ? (
+                                            <p className="mt-1 text-xs leading-5 text-gray-500">
+                                              Joined since{" "}
+                                              <time dateTime={person.createdAt}>
+                                                {" "}
+                                                {format(
+                                                  new Date(person.createdAt),
+                                                  "HH:mm:ss yyyy-MM-dd"
+                                                )}
+                                              </time>
+                                            </p>                                            
+                                            
+                                          ) : (
+                                            <div className="mt-1 flex items-center gap-x-1.5">
+                                              <div className="flex-none rounded-full bg-emerald-500/20 p-1">
+                                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                              </div>
+                                              <p className="text-xs leading-5 text-gray-500">
+                                                Just Joined
+                                              </p>
+                                              
+                                            </div>
+                                          )
+                                          
+                                          }
+                                         <div onClick={() =>handleDeleteUser(person.id, person.fullName)}>
+                                            <TrashIcon
+                                              width="16px"
+                                              height="16px"
+                                              color="red"
+                                              className="cursor-pointer"
+                                            />{" "}
+                                          </div>
+                                          
+                                        </div>
+                                      </li>
+                                    ))}
+                                </ul>
+
+                                <UsersPagination totalCount={totalUserCount} />
+                              </>
                             ) : (
-                              <div>payment</div>
+                              <>
+                                <div className="flex justify-between pb-4">
+                                  <h2 className="text-base text-center font-bold leading-7 px-2 pt-2 text-gray-900">
+                                    Transactions Made
+                                  </h2>
+                                </div>
+
+                                {allTransactions &&
+                                  allTransactions.map(
+                                    (item: any, index: number) => (
+                                      <div className="border border-gray-300 flex flex-col">
+                                        <div className="flex flex-col justify-between px-4 py-2 w-full cursor-pointer">
+                                          <>
+                                            <h2 className="text-base border border-bottom-gray-400 font-semibold text-center leading-7 text-gray-900">
+                                              #Payment details {index + 1}
+                                            </h2>
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                <strong>Amount Paid: </strong>
+                                                {item.paymentDetails.amount}
+                                              </div>
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                <strong>Status: </strong> $
+                                                {item.paymentDetails.status}
+                                              </div>
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                <strong>Tax Ref:</strong>{" "}
+                                                {item.paymentDetails.tx_ref}
+                                              </div>
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                <strong>
+                                                  Transaction id:{" "}
+                                                </strong>{" "}
+                                                {
+                                                  item.paymentDetails
+                                                    .transaction_id
+                                                }
+                                              </div>
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                              <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                <strong>Payment Time:</strong>{" "}
+                                                {format(
+                                                  new Date(
+                                                    item.paymentDetails.created_at
+                                                  ),
+                                                  "HH:mm:ss yyyy-MM-dd"
+                                                )}
+                                              </div>
+                                            </div>
+                                          </>
+                                          <div>
+                                            <div
+                                              className="orders"
+                                              style={{
+                                                borderBottom: "2px gray solid",
+                                              }}
+                                            >
+                                              <h2 className="text-base text-center border-b font-semibold leading-7 text-gray-900">
+                                                Sender Details
+                                              </h2>
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>Full Name: </strong>
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.fullName}
+                                                </div>
+                                              </div>
+
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>Phone: </strong>
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.phone}
+                                                </div>
+                                              </div>
+
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>Email: </strong>
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.email}
+                                                </div>
+                                              </div>
+
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  {" "}
+                                                  <strong>Address:</strong>{" "}
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.address}
+                                                  ,{" "}
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.city}{" "}
+                                                  ,{" "}
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.state}{" "}
+                                                  ,{" "}
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.country}
+                                                  ,{" "}
+                                                  {item &&
+                                                    item.user &&
+                                                    item.user.zipcode}{" "}
+                                                </div>
+                                              </div>
+                                              <div className="sm:col-span-3">
+                                                <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                  <strong>Date Joined: </strong>
+                                                  {format(
+                                                    new Date(
+                                                      item &&
+                                                        item.user &&
+                                                        item.user.createdAt
+                                                    ),
+                                                    "HH:mm:ss yyyy-MM-dd"
+                                                  )}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="flex justify-between px-4 pt-0 pb-2 w-full">
+                                          <div></div>
+                                          <TrashIcon
+                                            onClick={() =>
+                                              handlePaymentDelete(item.id)
+                                            }
+                                            width="16px"
+                                            height="16px"
+                                            color="red"
+                                            className="cursor-pointer"
+                                          />{" "}
+                                        </div>
+                                      </div>
+                                    )
+                                  )}
+
+                                <PaymentPagination
+                                  totalCount={totalPaymentCount}
+                                />
+                              </>
                             )}
                           </div>
                         </div>

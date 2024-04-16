@@ -25,6 +25,7 @@ export const createProduct = async (products: any) => {
     console.log(error);
   }
 };
+
 export const getProducts = async () => {
   try {
     const option = {
@@ -33,7 +34,48 @@ export const getProducts = async () => {
       },
     };
     const res = await axios.get(API + "/products");
-    // console.log('all products: ',res)
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllProductReview = async () => {
+  try {
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const res = await axios.get(API + "/reviews/product");
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addProductReview = async (data: any) => {
+  try {
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const res = await axios.post(API + `/review/product/create`, data, option);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const searchProducts = async (searchKey: any) => {
+  try {
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const res = await axios.get(API + `/search/product?q=${searchKey}`);
     return res;
   } catch (error) {
     console.log(error);

@@ -22,6 +22,7 @@ const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [ischecked, setIsChecked] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
   const { addToast } = useToasts();
@@ -30,15 +31,18 @@ const Login = () => {
   const handleSwitchElem = (checked: boolean) => {
     setIsChecked(checked);
   };
-  console.log("switch: ", ischecked, passcode);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value);
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
   const { email, password } = formData;
+  
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
+    setIsClicked(true)
     console.log(formData);
     if(password) {
 
@@ -49,20 +53,12 @@ const Login = () => {
           return;
         }else if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN') {
           console.log('getting token: ', res && res.payload && res.payload.id)
-          const data = {
-            id: res && res.payload && res.payload.id,
-            token: res && res.payload && res.payload.token,
-          }
-          dispatch(getAUser(data)).then((res)=> {
-               if(res && res.payload && res.payload.id){
-                addToast("Successfully Login As Admin", {
-                  appearance: "success",
-                  autoDismiss: true,
-                });
-                navigate("/");
-               }
-          })  
-
+      
+          addToast("Successfully Login As Admin", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+          navigate(`/admin/${res.payload.id}`);
         }else if(res && res.payload && res.payload.role && res.payload.role === 'USER') {
           console.log('getting token: ', res && res.payload && res.payload.id)
           const data = {
@@ -112,7 +108,7 @@ const Login = () => {
 
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-1 lg:px-8">
+    <div className="flex min-h-full flex-1 flex-col justify-center mt-10 px-6 py-1 lg:px-8">
       <div className="shadow-lg">
       <div className="sm:mx-auto sm:w-1/2 px-4 sm:max-w-sm">
        <Link to='/'> 
@@ -185,10 +181,10 @@ const Login = () => {
 
           <div className="flex justify-between px-4">
             <div>
-              <Switch onChange={handleSwitchElem} checked={ischecked} />
+              <Switch onChange={handleSwitchElem} height={16} handleDiameter={20} offHandleColor="#00FFFF" onHandleColor="#00FFFF" checked={ischecked} />
               <p>
                 {ischecked ? (
-                  <div>
+                  <div className="flex flex-col">
                     <div className="flex items-center justify-between">
                       <label
                         htmlFor="passcode"
@@ -197,7 +193,7 @@ const Login = () => {
                         Enter Admin Passcode
                       </label>
                     </div>
-                    <div className="mt-2">
+                    <div className="mt-2 ">
                       <input
                         id="passcode"
                         name="passcode"
@@ -205,8 +201,8 @@ const Login = () => {
                         value={passcode}
                         onChange={(e) => setPasscode(e.target.value)}
                         placeholder="Enter Passcode"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                        className="block w-full text-sm rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
                     </div>
                   </div>
                 ) : (
@@ -235,7 +231,7 @@ const Login = () => {
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              {status === "loading" ? (
+              {isClicked && status === "loading" ? (
                 <CircularProgress size={25} style={{ color: "white" }} />
               ) : (
                 "Sign in"

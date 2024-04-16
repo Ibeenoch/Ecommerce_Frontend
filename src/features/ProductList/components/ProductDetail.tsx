@@ -94,7 +94,7 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="bg-white">
+    <div className="bg-white mt-8">
       <div className="pt-6">
         <nav aria-label="Breadcrumb">
           <ol

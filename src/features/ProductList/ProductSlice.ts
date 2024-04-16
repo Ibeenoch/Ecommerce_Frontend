@@ -1,12 +1,14 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store'; 
 import * as api from './ProductAPI';
+import { act } from '@testing-library/react';
 
 
 export interface ProductState {
   status: 'success' | 'loading' | 'failed' | 'idle';
   products: any,
   product: any,
+  productReview: any,
   brands: any,
   brand: any,
   categories: any,
@@ -18,6 +20,7 @@ const initialState: ProductState = {
   status: 'idle',
   products: [],
   product: [],
+  productReview: [],
   brands: [],
   brand: [],
   categories: [],
@@ -148,6 +151,15 @@ export const getACategory = createAsyncThunk('product/getACategory', async(name:
     return message;
   }
 })
+export const getProductSearchResult = createAsyncThunk('product/search', async(name: string, thunkAPI) => {
+  try {
+    const res = await api.searchProducts(name);
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
 
 export const fetchAllBrands = createAsyncThunk('product/getAllBrands', async(_, thunkAPI) => {
   try {
@@ -159,9 +171,29 @@ export const fetchAllBrands = createAsyncThunk('product/getAllBrands', async(_, 
   }
 })
 
+export const getallProductReviews = createAsyncThunk('product/getAllProductReviews', async(_, thunkAPI) => {
+  try {
+    const res = await api.getAllProductReview();
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
 export const fetchABrand = createAsyncThunk('product/getABrand', async(name: string, thunkAPI) => {
   try {
     const res = await api.getABrand(name);
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
+export const createAProductReview = createAsyncThunk('product/reviewcreate', async(data: any, thunkAPI) => {
+  try {
+    const res = await api.addProductReview(data);
     return res?.data;
   } catch (error) {
     const message = thunkAPI.rejectWithValue(error);
@@ -317,6 +349,22 @@ export const productSlice = createSlice({
       state.status = 'failed'
       state.message = action.payload
     })
+    .addCase(getProductSearchResult.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(getProductSearchResult.fulfilled, (state, action) => {
+      state.status = 'success'
+      if(action.payload !== undefined || action.payload !== null){
+        state.products = action.payload
+        console.log('search product: ', state.products )
+      }
+    })
+    .
+    addCase(getProductSearchResult.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
     .addCase(getACategory.pending, (state, action) => {
       state.status = 'loading'
     })
@@ -372,6 +420,40 @@ export const productSlice = createSlice({
     })
     .
     addCase(getPagination.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(createAProductReview.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(createAProductReview.fulfilled, (state, action) => {
+      state.status = 'success'
+      if(action.payload !== undefined){
+        state.productReview = action.payload
+      console.log('created review: ', action.payload)
+      }
+      
+    })
+    .
+    addCase(createAProductReview.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(getallProductReviews.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(getallProductReviews.fulfilled, (state, action) => {
+      state.status = 'success'
+      if(action.payload !== undefined){
+        state.productReview = action.payload
+      console.log('created review: ', state.productReview )
+      }
+      
+    })
+    .
+    addCase(getallProductReviews.rejected, (state, action) => {
       state.status = 'failed'
       state.message = action.payload
     })

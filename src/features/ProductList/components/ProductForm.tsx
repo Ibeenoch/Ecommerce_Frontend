@@ -220,7 +220,7 @@ const ProductForm = () => {
 
   return (
     <>
-      <div className="mx-auto z-12 max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto z-12 max-w-7xl px-4 sm:px-6 mt-6 lg:px-8">
         <form onSubmit={handleSubmit}>
           <div
             className="space-y-12"

@@ -21,6 +21,10 @@ import SuccessOrderPage from "./pages/SuccessOrderPage";
 import ProtectedRoute from "./features/auth/ProtectedRoute";
 import AdminPanel from "./pages/AdminPanel";
 import AdminProtectedRoute from "./features/auth/AdminProtectedRoute";
+import VerifyMsgPage from "./pages/VerifyMsgPage";
+import WishListPage from "./pages/WishListPage";
+import ProductReviewPage from "./pages/ProductReviewPage";
+import ProductReviewFormPage from "./pages/ProductReviewFormPage";
 
 const router = createBrowserRouter([
   {
@@ -37,11 +41,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/verify/email",
-    element: <Verification />,
+    element: <VerifyMsgPage />,
   },
   {
     path: "/verify/email/:id",
-    element: <Verification />,
+    element: <VerifyMsgPage />,
   },
   {
     path: "/password/link",
@@ -54,6 +58,18 @@ const router = createBrowserRouter([
   {
     path: "/cart",
     element: <CartPage />,
+  },
+  {
+    path: "/wishlist",
+    element: <WishListPage />,
+  },
+  {
+    path: "/product/review/:id",
+    element: <ProductReviewPage />,
+  },
+  {
+    path: "/product/review/form/:id",
+    element: <ProductReviewFormPage />,
   },
   {
     path: "/product/details/:id",

@@ -33,6 +33,24 @@ export const orderUpdate = createAsyncThunk('/order/update', async(data: any) =>
   }
 })
 
+export const getOrderPagination = createAsyncThunk('/order/paginatate', async(data: any) => {
+  try {
+    const res =  await api.fetchOrderPagination(data);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+export const deleteOrder = createAsyncThunk('/order/delete', async(data: any) => {
+  try {
+    const res =  await api.deleteAnOrder(data);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 
 
 export const orderSlice = createSlice({
@@ -66,6 +84,30 @@ export const orderSlice = createSlice({
       console.log('update order ', action.payload, state.orders)
     })
     .addCase(orderUpdate.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(deleteOrder.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(deleteOrder.fulfilled, (state, action) => {
+      state.status = 'success'
+      const findIndex = state.orders.findIndex((item: any) => item.id === action.payload.id)
+      state.orders.splice(findIndex, 1)
+      console.log('delete order ',)
+    })
+    .addCase(deleteOrder.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(getOrderPagination.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(getOrderPagination.fulfilled, (state, action) => {
+      state.status = 'success'
+      if(action.payload !== undefined){
+        state.orders = action.payload
+      }
+    })
+    .addCase(getOrderPagination.rejected, (state, action) => {
       state.status = 'failed'
     })
     

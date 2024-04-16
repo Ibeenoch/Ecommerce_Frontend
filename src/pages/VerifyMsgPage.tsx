@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import NavBar from './NavBar/NavBar';
-import OrderSuccessPage from '../features/checkout/OrderSuccessPage';
 import Footer from './Footer';
+import Verification from '../features/auth/Verification';
 
-const SuccessOrderPage = () => {
+const VerifyMsgPage = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     return (
       <>
        <NavBar isOpen={isOpen} >
-        <OrderSuccessPage/>
+        <Verification/>
        </NavBar>
        <Footer />
       </>
@@ -17,4 +17,4 @@ const SuccessOrderPage = () => {
     )
 }
 
-export default SuccessOrderPage
+export default VerifyMsgPage

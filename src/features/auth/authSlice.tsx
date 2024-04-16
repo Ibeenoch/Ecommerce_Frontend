@@ -3,6 +3,8 @@ import { RootState, AppThunk } from '../../app/store';
 import * as api from './authAPI'
 import { act } from '@testing-library/react';
 
+const authUser = JSON.parse(localStorage.getItem('user') as any)
+const allUser = JSON.parse(localStorage.getItem('alluser') as any)
 export interface userState {
   user: any;
   users: any;
@@ -10,8 +12,8 @@ export interface userState {
 }
 
 const initialState: userState = {
-  user: {},
-  users: [],
+  user: authUser ? authUser : {},
+  users: allUser ? allUser : [],
   status: 'idle',
 };
 
@@ -73,10 +75,28 @@ export const getAUser = createAsyncThunk('/user/getAUser', async(data: any) => {
   }
 })
 
-export const getAllUser = createAsyncThunk('/user/getAllUser', async() => {
+export const getAllUser = createAsyncThunk('/user/getAllUser', async(token: any) => {
   try {
 
-    const res =  await api.fetchAllUser();
+    const res =  await api.fetchAllUser(token);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+export const deleteUser = createAsyncThunk('/user/delete', async(data: any) => {
+  try {
+
+    const res =  await api.deleteuser(data);
+    return res?.data
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+export const getUserPagination = createAsyncThunk('/user/paginate', async(item: any) => {
+  try {
+    const res =  await api.fetchuserPagination(item);
     return res?.data
   } catch (error) {
     console.log(error)
@@ -111,7 +131,11 @@ export const authSlice = createSlice({
     })
     .addCase(registerUser.fulfilled, (state, action) => {
       state.status = 'success'
+      if(action.payload !== undefined){
+      localStorage.setItem('user', JSON.stringify(action.payload))
       state.user = action.payload;
+      }
+      
     })
     .addCase(registerUser.rejected, (state, action) => {
       state.status = 'failed'
@@ -121,7 +145,10 @@ export const authSlice = createSlice({
     })
     .addCase(loginUser.fulfilled, (state, action) => {
       state.status = 'success'
-      state.user = action.payload;
+      if(action.payload !== undefined){
+        localStorage.setItem('user', JSON.stringify(action.payload))
+        state.user = action.payload;
+        }
     })
     .addCase(loginUser.rejected, (state, action) => {
       state.status = 'failed'
@@ -152,6 +179,10 @@ export const authSlice = createSlice({
     .addCase(passwordChange.fulfilled, (state, action) => {
       state.status = 'success'
       console.log('changed user password: ', action.payload)
+      if(action.payload !== undefined){
+        localStorage.setItem('user', JSON.stringify(action.payload))
+        state.user = action.payload;
+        }
     })
     .addCase(passwordChange.rejected, (state, action) => {
       state.status = 'failed'
@@ -162,9 +193,30 @@ export const authSlice = createSlice({
     .addCase(getAUser.fulfilled, (state, action) => {
       state.status = 'success'
       console.log('get a user: ', action.payload)
-      state.user = action.payload
+      if(action.payload !== undefined){
+        localStorage.setItem('user', JSON.stringify(action.payload))
+        state.user = action.payload;
+        }
     })
     .addCase(getAUser.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(deleteUser.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(deleteUser.fulfilled, (state, action) => {
+      state.status = 'success'
+      console.log('deleted user: ', action.payload)
+      if(action.payload !== undefined){
+        const findAllUser = JSON.parse(localStorage.getItem('alluser') as any);
+        const filterUser = findAllUser.filter((it: any) => it.id !== action.payload.id);
+        localStorage.setItem('alluser', JSON.stringify(filterUser))
+
+        const filterStateuser = state.users.filter((it: any) => it.id !== action.payload.id)
+        console.log('filtered user: ', filterStateuser)
+        }
+    })
+    .addCase(deleteUser.rejected, (state, action) => {
       state.status = 'failed'
     })
     .addCase(getAllUser.pending, (state, action) => {
@@ -172,10 +224,27 @@ export const authSlice = createSlice({
     })
     .addCase(getAllUser.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('all user password: ', action.payload)
-      state.users = action.payload
+      console.log('all users: ', action.payload)
+      if(action.payload !== undefined){
+        localStorage.setItem('alluser', JSON.stringify(action.payload))
+        state.users = action.payload;
+        }
     })
     .addCase(getAllUser.rejected, (state, action) => {
+      state.status = 'failed'
+    })
+    .addCase(getUserPagination.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .addCase(getUserPagination.fulfilled, (state, action) => {
+      state.status = 'success'
+      console.log('all users: ', action.payload)
+      if(action.payload !== undefined){
+        localStorage.setItem('alluser', JSON.stringify(action.payload))
+        state.users = action.payload;
+        }
+    })
+    .addCase(getUserPagination.rejected, (state, action) => {
       state.status = 'failed'
     })
     .addCase(uploadUserPhoto.pending, (state, action) => {
@@ -184,7 +253,10 @@ export const authSlice = createSlice({
     .addCase(uploadUserPhoto.fulfilled, (state, action) => {
       state.status = 'success'
       console.log('all user photo: ', action.payload)
-      state.users = action.payload
+      if(action.payload !== undefined){
+        localStorage.setItem('user', JSON.stringify(action.payload))
+        state.user = action.payload;
+        }
     })
     .addCase(uploadUserPhoto.rejected, (state, action) => {
       state.status = 'failed'

@@ -174,7 +174,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
   }
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5 px-4">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-10 mt-6 lg:grid-cols-5 px-4">
       <div className="lg:col-span-3">
         <form onSubmit={handleSubmit}>
           <div className="space-y-12 bg-white px-6">

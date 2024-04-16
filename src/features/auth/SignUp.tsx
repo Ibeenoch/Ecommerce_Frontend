@@ -26,6 +26,7 @@ const SignUp: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [ischecked, setIsChecked] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
   const { addToast } = useToasts();
@@ -44,6 +45,7 @@ const SignUp: React.FC = () => {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/;
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
+    setIsClicked(true)
     console.log(formData);
     if (passwordRegex.test(password)) {
       //continue
@@ -101,9 +103,8 @@ const SignUp: React.FC = () => {
   const changeConfirmVisibilty = () => {
     setIsShowConfirmPassword(!isShowConfirmPassword);
   };
-
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-1 lg:px-8">
+    <div className="flex min-h-full flex-1 flex-col mt-10 justify-center px-6 py-1 lg:px-8">
       <div className="shadow-lg">
       <div className="sm:mx-auto sm:w-1/2 px-4 sm:max-w-sm">
         <Link to="/">
@@ -230,7 +231,7 @@ const SignUp: React.FC = () => {
           </div>
 
           <div>
-            <Switch onChange={handleSwitchElem} checked={ischecked} />
+            <Switch onChange={handleSwitchElem}  height={16} handleDiameter={20} offHandleColor="#00FFFF" onHandleColor="#00FFFF" checked={ischecked} />
             <p>
               {ischecked ? (
                 <div>
@@ -272,7 +273,7 @@ const SignUp: React.FC = () => {
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              {status === "loading" ? (
+              { isClicked && status === "loading" ? (
                 <CircularProgress size={25} style={{ color: "white" }} />
               ) : (
                 "Sign Up"

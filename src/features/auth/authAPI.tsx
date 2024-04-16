@@ -127,17 +127,59 @@ export const fetchAUser = async (data: any) => {
   }
 };
 
-export const fetchAllUser = async () => {
+export const fetchAllUser = async (token: any) => {
   try {
+    console.log('users token  ', token)
     const option = {
       headers: {
         "Content-Type": "application/json",
-        // Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
       },
     };
 
-    const res = await axios.get(API + `/users`);
+    const res = await axios.get(API + `/users`, option);
     console.log("all user api ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const fetchuserPagination = async (data: any) => {
+  try {
+    const token = data.token;
+    const item = data.item;
+    
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    };
+
+    const res = await axios.post(API + `/user/paginate`, item, option);
+    console.log("pagination api ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteuser = async (data: any) => {
+  try {
+    const token = data.token;
+    const id = data.id;
+    
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    };
+
+    const res = await axios.delete(API + `/user/${id}`, option);
+    console.log("delete user api ", res);
     return res;
   } catch (error) {
     console.log(error);

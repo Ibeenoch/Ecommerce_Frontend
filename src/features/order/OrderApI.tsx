@@ -24,6 +24,9 @@ export const fetchAllOrder = async (token: any) => {
       const token = data.token;
       const id = data.id;
       const status = data.status;
+      const message = {
+        status: status
+      }
       const option = {
         headers: {
           "Content-Type": "application/json",
@@ -31,10 +34,49 @@ export const fetchAllOrder = async (token: any) => {
         },
       };
   
-      const res = await axios.put(API + `/order/${id}`, status, option);
-      console.log("update a user order ", res);
+      const res = await axios.put(API + `/order/${id}`, message, option);
       return res;
     } catch (error) {
       console.log(error);
     }
   };
+  
+  export const deleteAnOrder = async (data: any) => {
+    try {
+      const token = data.token;
+      const id = data.id;
+      console.log({token, id})
+      const option = {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      };
+  
+      const res = await axios.delete(API + `/order/${id}`, option);
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  
+export const fetchOrderPagination = async (item: any) => {
+  try {
+    const token = item.token;
+    const data = item.data;
+    
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    };
+
+    const res = await axios.post(API + `/order/paginate`, data, option);
+    console.log("order api ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
