@@ -1,11 +1,23 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState, useRef, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { selectUser } from '../../auth/authSlice';
-import { createAProductReview, getallProductReviews, selectProduct } from '../ProductSlice';
+import { createAProductReview, getaProductReviews, selectProduct, updatetheProductRating } from '../ProductSlice';
 import { StarIcon } from "@heroicons/react/24/outline";
+import { useToasts } from 'react-toast-notifications'
+import { useNavigate, useParams } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const ProductReviewForm = () => {
+    const { addToast } = useToasts();
+    const { id } = useParams();
+    const navigate = useNavigate()
     const [remark, setRemark] = useState<string>('');
+    const ratingRef1 = useRef<HTMLDivElement>(null);
+    const ratingRef2 = useRef<HTMLDivElement>(null);
+    const ratingRef3 = useRef<HTMLDivElement>(null);
+    const ratingRef4 = useRef<HTMLDivElement>(null);
+    const ratingRef5 = useRef<HTMLDivElement>(null);
+    const [getRatingVal, setGetRatingVal] = useState<any>('');
     const { user } = useAppSelector(selectUser)
     const { product } = useAppSelector(selectProduct)
     const dispatch = useAppDispatch();
@@ -17,10 +29,55 @@ const ProductReviewForm = () => {
    const userId = user && user.id;
    const productId = product && product.id;
 
+   const isTokenExpired = (token: any) => {
+    if(!token){
+      addToast('Session expiry please login to continue',
+        {
+          appearance: 'info',
+          autoDismiss: true,
+        }
+      )
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
+    const decodeToken = jwtDecode(token);
+    const currentTime = Math.floor(Date.now()/1000);
+    const expiryTime = decodeToken?.exp;
+  console.log(currentTime, expiryTime);
+  
+  
+    if(expiryTime){
+     console.log(currentTime > expiryTime);
+       if(currentTime > expiryTime){
+        addToast('Session expiry please login to continue',
+        {
+          appearance: 'info',
+          autoDismiss: true,
+        }
+      ) 
+
+        localStorage.removeItem('user');
+        navigate('/login')
+       }else{
+        return;
+       }
+    }
+      
+  }
+
+  isTokenExpired(token)
+
     const handleReviewremark = (e: FormEvent) => {
         e.preventDefault();
 
-        const rating = 3;
+        const rating = parseInt(getRatingVal);
+        if(!rating){
+            addToast('Please click on the rating icon to rating the product, and add a review about this product', {
+                appearance: 'error',
+                autoDismiss: true
+            })
+            return;
+        }
 
         const data = {
             remark,
@@ -28,16 +85,58 @@ const ProductReviewForm = () => {
             productId,
             rating
         };
-        dispatch(createAProductReview(data)).then((res) => {
+        dispatch(createAProductReview(data)).then((res : any) => {
             if(res && res.payload !== undefined){
-                console.log('created respon', res.payload)
-                dispatch(getallProductReviews()).then((res: any) => {
-                    if(res && res.payload && res.payload.id){
-                        console.log('thank you for your feedback: ', res.payload)
-                    }
-                })
+              
+              const data = {
+                id,
+                updatedRating: rating
+              }
+              
+              dispatch(updatetheProductRating(data)).then((res: any) => {
+                  if(res && res.payload !== undefined){
+                    console.log('update rating ', res.payload);
+                    dispatch(getaProductReviews(productId)).then((res: any) => {
+                      console.log('get rating ', res.payload);
+                                        if(res && res.payload !== undefined ){
+                                            addToast('Thank You For Your Honest Feedback', {
+                                                appearance: 'info',
+                                                autoDismiss: true
+                                            })
+                                            navigate(`/product/review/${productId}`)
+                                        }
+                                    })
+                  }
+              })
+              
+                
             }
         })
+    }
+
+    const handleRatingNumberOne = (e: React.MouseEvent<HTMLDivElement>) => {
+        const dataVal = ratingRef1.current?.getAttribute('data-rating-num');
+        setGetRatingVal(dataVal)
+    }
+    const handleRatingNumberTwo = (e: React.MouseEvent<HTMLDivElement>) => {
+        const dataVal = ratingRef2.current?.getAttribute('data-rating-num');
+        setGetRatingVal(dataVal)
+       
+    }
+    const handleRatingNumberThree = (e: React.MouseEvent<HTMLDivElement>) => {
+        const dataVal = ratingRef3.current?.getAttribute('data-rating-num');
+        setGetRatingVal(dataVal)
+       
+    }
+    const handleRatingNumberFour = (e: React.MouseEvent<HTMLDivElement>) => {
+        const dataVal = ratingRef4.current?.getAttribute('data-rating-num');
+        setGetRatingVal(dataVal)
+       
+    }
+    const handleRatingNumberFive = (e: React.MouseEvent<HTMLDivElement>) => {
+        const dataVal = ratingRef5.current?.getAttribute('data-rating-num');
+        setGetRatingVal(dataVal)
+       
     }
 
   return (
@@ -55,21 +154,26 @@ const ProductReviewForm = () => {
       </h2>
     </div>
 
-        <div className='flex justify-around cursor-pointer mb-4'>
-          <div>
-            <StarIcon width={25} height={25} color='orange' fill='orange' />
+        <div className='flex justify-around mb-4'>
+          <div ref={ratingRef1} className='cursor-pointer' onClick={handleRatingNumberOne} data-rating-num='1' >
+            <h2>1 star</h2>
+            <StarIcon width={25} height={25} color={ getRatingVal >= 1 ? 'orange' : 'gray'} fill={ getRatingVal >= 1 ? 'orange' : 'gray'} />
         </div>  
-          <div>
-            <StarIcon width={25} height={25} color='orange' fill='orange' />
+          <div ref={ratingRef2} className='cursor-pointer'  onClick={handleRatingNumberTwo} data-rating-num='2'>
+            <h2>2 star</h2>
+            <StarIcon width={25} height={25} color={ getRatingVal >= 2 ? 'orange' : 'gray'} fill={ getRatingVal >= 2 ? 'orange' : 'gray'} />
         </div>  
-          <div>
-            <StarIcon width={25} height={25} color='orange' fill='orange' />
+          <div ref={ratingRef3} className='cursor-pointer' onClick={handleRatingNumberThree} data-rating-num='3'>
+             <h2>3 star</h2>
+            <StarIcon width={25} height={25} color={ getRatingVal >= 3 ? 'orange' : 'gray'} fill={ getRatingVal >= 3 ? 'orange' : 'gray'} />
         </div>  
-          <div>
-            <StarIcon width={25} height={25} color='orange' fill='orange' />
+          <div ref={ratingRef4} className='cursor-pointer' onClick={handleRatingNumberFour} data-rating-num='4'>
+            <h2>4 star</h2>
+            <StarIcon width={25} height={25} color={ getRatingVal >= 4 ? 'orange' : 'gray'} fill={ getRatingVal >= 4 ? 'orange' : 'gray'} />
         </div>  
-          <div>
-            <StarIcon width={25} height={25} color='orange' fill='orange' />
+          <div ref={ratingRef5} className='cursor-pointer' onClick={handleRatingNumberFive} data-rating-num='5'>
+            <h2>5 star</h2>
+            <StarIcon width={25} height={25} color={ getRatingVal >= 5 ? 'orange' : 'gray'} fill={ getRatingVal >= 5 ? 'orange' : 'gray'} />
         </div>  
         </div>
         
@@ -82,7 +186,7 @@ const ProductReviewForm = () => {
           rows={6}
           onChange={handleChange}
           className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-          placeholder="Write a remark..."
+          placeholder="what is do you think about this product..."
           required
           defaultValue={""}
         />
@@ -94,398 +198,8 @@ const ProductReviewForm = () => {
         Post remark
       </button>
     </form>
-    <article className="p-6 text-base bg-white rounded-lg dark:bg-gray-900">
-      <footer className="flex justify-between items-center mb-2">
-        <div className="flex items-center">
-          <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-            <img
-              className="mr-2 w-6 h-6 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
-              alt="Michael Gough"
-            />
-            Michael Gough
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <time  dateTime="2022-02-08" title="February 8th, 2022">
-              Feb. 8, 2022
-            </time>
-          </p>
-        </div>
-        <button
-          id="dropdownremark1Button"
-          data-dropdown-toggle="dropdownremark1"
-          className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-400 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          type="button"
-        >
-          <svg
-            className="w-4 h-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 16 3"
-          >
-            <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-          </svg>
-          <span className="sr-only">remark settings</span>
-        </button>
-        {/* Dropdown menu */}
-        <div
-          id="dropdownremark1"
-          className="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-        >
-          <ul
-            className="py-1 text-sm text-gray-700 dark:text-gray-200"
-            aria-labelledby="dropdownMenuIconHorizontalButton"
-          >
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Edit
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Remove
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Report
-              </a>
-            </li>
-          </ul>
-        </div>
-      </footer>
-      <p className="text-gray-500 dark:text-gray-400">
-        Very straight-to-point article. Really worth time reading. Thank you!
-        But tools are just the instruments for the UX designers. The knowledge
-        of the design tools are as important as the creation of the design
-        strategy.
-      </p>
-      <div className="flex items-center mt-4 space-x-4">
-        <button
-          type="button"
-          className="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium"
-        >
-          <svg
-            className="mr-1.5 w-3.5 h-3.5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 20 18"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
-            />
-          </svg>
-          Reply
-        </button>
-      </div>
-    </article>
-    <article className="p-6 mb-3 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
-      <footer className="flex justify-between items-center mb-2">
-        <div className="flex items-center">
-          <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-            <img
-              className="mr-2 w-6 h-6 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-              alt="Jese Leos"
-            />
-            Jese Leos
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <time dateTime="2022-02-12" title="February 12th, 2022">
-              Feb. 12, 2022
-            </time>
-          </p>
-        </div>
-        <button
-          id="dropdownremark2Button"
-          data-dropdown-toggle="dropdownremark2"
-          className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-40 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          type="button"
-        >
-          <svg
-            className="w-4 h-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 16 3"
-          >
-            <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-          </svg>
-          <span className="sr-only">remark settings</span>
-        </button>
-        {/* Dropdown menu */}
-        <div
-          id="dropdownremark2"
-          className="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-        >
-          <ul
-            className="py-1 text-sm text-gray-700 dark:text-gray-200"
-            aria-labelledby="dropdownMenuIconHorizontalButton"
-          >
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Edit
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Remove
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Report
-              </a>
-            </li>
-          </ul>
-        </div>
-      </footer>
-      <p className="text-gray-500 dark:text-gray-400">
-        Much appreciated! Glad you liked it ☺️
-      </p>
-      <div className="flex items-center mt-4 space-x-4">
-        <button
-          type="button"
-          className="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium"
-        >
-          <svg
-            className="mr-1.5 w-3.5 h-3.5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 20 18"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
-            />
-          </svg>
-          Reply
-        </button>
-      </div>
-    </article>
-    <article className="p-6 mb-3 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-      <footer className="flex justify-between items-center mb-2">
-        <div className="flex items-center">
-          <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-            <img
-              className="mr-2 w-6 h-6 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-3.jpg"
-              alt="Bonnie Green"
-            />
-            Bonnie Green
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <time  dateTime="2022-03-12" title="March 12th, 2022">
-              Mar. 12, 2022
-            </time>
-          </p>
-        </div>
-        <button
-          id="dropdownremark3Button"
-          data-dropdown-toggle="dropdownremark3"
-          className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-40 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          type="button"
-        >
-          <svg
-            className="w-4 h-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 16 3"
-          >
-            <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-          </svg>
-          <span className="sr-only">remark settings</span>
-        </button>
-        {/* Dropdown menu */}
-        <div
-          id="dropdownremark3"
-          className="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-        >
-          <ul
-            className="py-1 text-sm text-gray-700 dark:text-gray-200"
-            aria-labelledby="dropdownMenuIconHorizontalButton"
-          >
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Edit
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Remove
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Report
-              </a>
-            </li>
-          </ul>
-        </div>
-      </footer>
-      <p className="text-gray-500 dark:text-gray-400">
-        The article covers the essentials, challenges, myths and stages the UX
-        designer should consider while creating the design strategy.
-      </p>
-      <div className="flex items-center mt-4 space-x-4">
-        <button
-          type="button"
-          className="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium"
-        >
-          <svg
-            className="mr-1.5 w-3.5 h-3.5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 20 18"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
-            />
-          </svg>
-          Reply
-        </button>
-      </div>
-    </article>
-    <article className="p-6 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-      <footer className="flex justify-between items-center mb-2">
-        <div className="flex items-center">
-          <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-            <img
-              className="mr-2 w-6 h-6 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-4.jpg"
-              alt="Helene Engels"
-            />
-            Helene Engels
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <time  dateTime="2022-06-23" title="June 23rd, 2022">
-              Jun. 23, 2022
-            </time>
-          </p>
-        </div>
-        <button
-          id="dropdownremark4Button"
-          data-dropdown-toggle="dropdownremark4"
-          className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 dark:text-gray-40 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          type="button"
-        >
-          <svg
-            className="w-4 h-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 16 3"
-          >
-            <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-          </svg>
-        </button>
-        {/* Dropdown menu */}
-        <div
-          id="dropdownremark4"
-          className="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-        >
-          <ul
-            className="py-1 text-sm text-gray-700 dark:text-gray-200"
-            aria-labelledby="dropdownMenuIconHorizontalButton"
-          >
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Edit
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Remove
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Report
-              </a>
-            </li>
-          </ul>
-        </div>
-      </footer>
-      <p className="text-gray-500 dark:text-gray-400">
-        Thanks for sharing this. I do came from the Backend development and
-        explored some of the tools to design my Side Projects.
-      </p>
-      <div className="flex items-center mt-4 space-x-4">
-        <button
-          type="button"
-          className="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium"
-        >
-          <svg
-            className="mr-1.5 w-3.5 h-3.5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 20 18"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
-            />
-          </svg>
-          Reply
-        </button>
-      </div>
-    </article>
+   
+       
   </div>
 </section>
 

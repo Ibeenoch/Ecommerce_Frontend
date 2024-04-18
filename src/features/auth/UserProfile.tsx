@@ -30,8 +30,8 @@ const UserProfile = () => {
   const { id } = useParams();
   const hiddleFileInput = useRef<HTMLInputElement>(null);
   const clickFile = () => {
-    hiddleFileInput?.current?.click()
-  }
+    hiddleFileInput?.current?.click();
+  };
   const { checkoutInfo, aUserTransactions, aUserOrderedProducts } =
     useAppSelector(selectCheckout);
   const { user } = useAppSelector(selectUser);
@@ -48,13 +48,10 @@ const UserProfile = () => {
     };
     dispatch(getAUser(data)).then((res: any) => {
       if (res && res.payload && res.payload.id) {
-        dispatch(getAUserTransaction(res.payload.id)).then((res: any) => {
-          console.log("response: ", res, res.payload);
-        });
+        dispatch(getAUserTransaction(res.payload.id)).then((res: any) => {});
       }
     });
   }, [dispatch]);
-  console.log("user fetched: ", user);
 
   const handlebtn1 = () => {
     setSelected1(true);
@@ -74,9 +71,7 @@ const UserProfile = () => {
     //options is an array of objects
     if (name === "Personal Information") {
       handlebtn2();
-      console.log("none");
     } else if (name === "Orders") {
-      console.log("orders");
       handlebtn1();
     } else {
       console.log("");
@@ -95,48 +90,40 @@ const UserProfile = () => {
   ];
 
   const handleFiles = (e: ChangeEvent<HTMLInputElement>) => {
-      const img = e.target.files?.[0]
-      setImage(img);
+    const img = e.target.files?.[0];
+    setImage(img);
   };
 
-  console.log('image: ', image)
-
   const submitBtn = () => {
-    if(image){
-        console.log( 'submitbtn',image)
-        const imageForm = new FormData();
-        imageForm.append('fileupload', image);
-        const token = user && user.token
-        const data = {
-            id,
-            token,
-            imageForm
-        }
-        dispatch(uploadUserPhoto(data)).then((res: any) => {
-            console.log('res image: ', res)  
-            if(res && res.payload && res.payload.image && res.payload.image.url){
-                const token = res.payload.token;
-                const id = res.payload.id;
-                const data = { token, id };
-                dispatch(getAUser(data)).then((res: any) => {
-                    console.log('res get a user: ', res)  
-                    if(res && res.payload && res.payload.id){
-                        addToast('photo uploaded successfully',
-                            {
-                                appearance: 'success',
-                                autoDismiss: true
-                            }
-                        )
-                    }
-
-                })
+    if (image) {
+      const imageForm = new FormData();
+      imageForm.append("fileupload", image);
+      const token = user && user.token;
+      const data = {
+        id,
+        token,
+        imageForm,
+      };
+      dispatch(uploadUserPhoto(data)).then((res: any) => {
+        if (res && res.payload && res.payload.image && res.payload.image.url) {
+          const token = res.payload.token;
+          const id = res.payload.id;
+          const data = { token, id };
+          dispatch(getAUser(data)).then((res: any) => {
+            if (res && res.payload && res.payload.id) {
+              addToast("photo uploaded successfully", {
+                appearance: "success",
+                autoDismiss: true,
+              });
             }
-        })
+          });
+        }
+      });
     }
-}
+  };
 
   return (
-    <div>
+    <div className="mt-4">
       <div>
         <div className="">
           <div>
@@ -230,22 +217,18 @@ const UserProfile = () => {
                   {/* Filters */}
                   <form className="hidden lg:block">
                     {filters.map((section) => (
-                      <Disclosure
-                        as="div"
-                        key={section.id}
-                        className="border-b border-gray-200 py-6"
-                      >
+                      <Disclosure as="div" key={section.id} className="">
                         {({ open }) => <></>}
                       </Disclosure>
                     ))}
                   </form>
 
                   {/* Product grid */}
-                  <div className="lg:col-span-3 bg-white rounded-lg">
+                  <div className="lg:col-span-3 bg-white h-1/2 rounded-lg pt-10">
                     {/* this is product list Content */}
                     <div className="">
-                      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <h2 className="text-2xl font-bold text-center text-indigo-900 tracking-tight text-gray-900 flex justify-center item-center">
+                      <div className="">
+                        <h2 className="text-2xl font-bold text-center text-gray-900 tracking-tight text-gray-900 flex justify-center item-center">
                           <CheckBadgeIcon
                             width="30px"
                             height="30px"
@@ -254,7 +237,7 @@ const UserProfile = () => {
                           {user.fullName}
                         </h2>
 
-                        <div className="h-screen dark:bg-gray-700 bg-gray-200 pt-0">
+                        <div className="">
                           {/* <div className="max-w-sm mx-auto bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg"> */}
                           <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg">
                             <div className="border-b px-4 pb-6">
@@ -271,7 +254,10 @@ const UserProfile = () => {
                                   }'s Profile`}
                                 />
                                 <div className="">
-                                  <button onClick={clickFile} className="flex-1 inline-flex rounded-full bg-blue-600 dark:bg-blue-800 text-white w-250 dark:text-white antialiased font-bold hover:bg-blue-800 dark:hover:bg-blue-900 px-4 py-2">
+                                  <button
+                                    onClick={clickFile}
+                                    className="flex-1 inline-flex rounded-full bg-red-800 text-white w-250 dark:text-white antialiased font-bold hover:bg-blue-800 dark:hover:bg-blue-900 px-4 py-2"
+                                  >
                                     <CameraIcon width="16px" height="16px" />
                                     Add Photo
                                     <input
@@ -285,11 +271,23 @@ const UserProfile = () => {
                                     />
                                   </button>
                                 </div>
-                                <button style={{ width: '150px', cursor: 'pointer', background: 'forestgreen', padding: '5px 10px', color: 'white', borderRadius: '1rem', marginTop: '20px'}} onClick={submitBtn}>Submit</button>
+                                <button
+                                  style={{
+                                    width: "150px",
+                                    cursor: "pointer",
+                                    background: "forestgreen",
+                                    padding: "5px 10px",
+                                    color: "white",
+                                    borderRadius: "1rem",
+                                    marginTop: "20px",
+                                  }}
+                                  onClick={submitBtn}
+                                >
+                                  Submit
+                                </button>
                                 <div className="py-2">
-                                  <h3 className="font-bold text-2xl text-gray-800 dark:text-white mb-1">
-                                    {user && user && user.fullName}
-                                  </h3>
+                                 
+                                  <div></div>
                                   <div className="inline-flex text-gray-700 dark:text-gray-300 items-center">
                                     {user && user && user.city} ,{" "}
                                     {user && user && user.state}
@@ -301,8 +299,8 @@ const UserProfile = () => {
                                   onClick={handlebtn1}
                                   className={
                                     selected1
-                                      ? "flex-1 rounded-full bg-blue-600 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:bg-blue-800 dark:hover:bg-blue-900 px-4 py-2"
-                                      : "flex-1 rounded-full border-2 border-gray-400 dark:border-gray-700 font-semibold text-black dark:text-white px-4 py-2"
+                                      ? "flex-1 rounded-full bg-red-800 hover:bg-red-700 text-white font-bold hover:bg-red-700 px-4 py-2"
+                                      : "flex-1 rounded-full bg-white border border-red-800 hover:bg-red-700 dark:border-gray-700 font-semibold text-red-800 dark:text-white px-4 py-2"
                                   }
                                 >
                                   Your Orders
@@ -311,8 +309,8 @@ const UserProfile = () => {
                                   onClick={handlebtn2}
                                   className={
                                     selected2
-                                      ? "flex-1 rounded-full bg-blue-600 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:bg-blue-800 dark:hover:bg-blue-900 px-4 py-2"
-                                      : "flex-1 rounded-full border-2 border-gray-400 dark:border-gray-700 font-semibold text-black dark:text-white px-4 py-2"
+                                      ? "flex-1 rounded-full bg-red-800 hover:bg-red-700 text-white font-bold hover:bg-red-700 px-4 py-2"
+                                      : "flex-1 rounded-full bg-white border border-red-800 hover:bg-red-700 dark:border-gray-700 font-semibold text-red-800 dark:text-white px-4 py-2"
                                   }
                                 >
                                   Your Profile

@@ -12,7 +12,6 @@ const OrderSuccessPage = () => {
   const { carts } = useAppSelector(selectAllCart);
   const { addToast } = useToasts();
   
-  console.log("cartss: ", carts);
   const navigate = useNavigate();
 
 
@@ -85,7 +84,7 @@ const OrderSuccessPage = () => {
 
     <Link to="/">
       <div className="flex justify-center mt-10">
-        <button className="flex justify-center align-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+        <button className="flex justify-center align-center rounded-md bg-red-800 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700">
           Continue Shopping
         </button>
       </div>

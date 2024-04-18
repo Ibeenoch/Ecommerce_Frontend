@@ -15,9 +15,7 @@ export const addToCart = async(data: any, addToast: any) => {
     try {
         
         const checkItem = await JSON.parse(localStorage.getItem('cart') as any);
-        console.log('check item cart: ', checkItem)
         if(checkItem === null || checkItem.length < 1 ){
-            console.log('newly added')
             let checkItem =[];
             checkItem.push(data);
             localStorage.setItem('cart', JSON.stringify(checkItem));
@@ -25,13 +23,8 @@ export const addToCart = async(data: any, addToast: any) => {
                 appearance: 'success',
                 autoDismiss: true,
               })
-        }else{
-            console.log('already exist')
-                //check if its the same product, if true don't add it
-               
+        }else{ 
             const index = checkItem.find((item: any) => item.id === data.id)
-
-            console.log('indexes: ', index)
             if(!index){
                 checkItem.push(data);
                 localStorage.setItem('cart', JSON.stringify(checkItem));
@@ -49,7 +42,6 @@ export const addToCart = async(data: any, addToast: any) => {
                                    
         }
         const response = await JSON.parse(localStorage.getItem('cart') as any);
-        console.log('add to cart response: ',response)
         return response
     } catch (error) {
         console.log(error);
@@ -63,7 +55,6 @@ export const updateCartQty = async(id: any, data: any) => {
         const getIndex = checkItem.find((item: any) => item.id === id);
         checkItem[getIndex].quantity = data;
         const response = JSON.parse(localStorage.getItem('cart') as any);
-        console.log(response)
         return response;
     } catch (error) {
         console.log(error);

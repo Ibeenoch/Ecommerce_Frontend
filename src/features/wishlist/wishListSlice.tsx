@@ -15,7 +15,6 @@ const initialState = {
 export const fetchAllUsersWishListAsync = createAsyncThunk('wishlist/fetchAllUserswishlist',   async (_, thunkAPI) => {
     try {
         const response = await api.fetchAllUsersWishList();
-        console.log('wishlist fetched: ', response)
           return response;
       
     } catch (error) {
@@ -29,7 +28,6 @@ export const addToWishlist = createAsyncThunk('wishlist/createwishlist', async(d
     const addToast = dataItem.addToast;
     const data = dataItem.data;
     const res = await api.addToWishList(data, addToast)
-    console.log('resfsra: ', res)
       return res;
          
   } catch (error) {
@@ -66,9 +64,7 @@ export const wishListSlice = createSlice({
       })
       .addCase(fetchAllUsersWishListAsync.fulfilled, (state, action) => {
         if(action.payload === null || action.payload === undefined){
-          console.log('empty')
         }else{
-          console.log('fetched all this wishlist: ', action.payload)
           state.status = 'success'
           state.wishlist = action.payload;
         }
@@ -82,9 +78,7 @@ export const wishListSlice = createSlice({
       })
       .addCase(addToWishlist.fulfilled, (state, action) => {
         if(action.payload === undefined){
-          console.log('state is undefined')
         }else{
-            console.log('it is an array')
             state.wishlist.push(action.payload);  
         }
         

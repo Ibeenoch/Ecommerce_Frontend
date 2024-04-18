@@ -3,7 +3,6 @@ const API = 'http://localhost:5050'
 
 export const fetchAllOrder = async (token: any) => {
     try {
-        console.log('tokenget: ', token)
       const option = {
         headers: {
           "Content-Type": "application/json",
@@ -12,7 +11,6 @@ export const fetchAllOrder = async (token: any) => {
       };
   
       const res = await axios.get(API + `/orders`, option);
-      console.log("all user orders ", res);
       return res;
     } catch (error) {
       console.log(error);
@@ -45,7 +43,6 @@ export const fetchAllOrder = async (token: any) => {
     try {
       const token = data.token;
       const id = data.id;
-      console.log({token, id})
       const option = {
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +71,6 @@ export const fetchOrderPagination = async (item: any) => {
     };
 
     const res = await axios.post(API + `/order/paginate`, data, option);
-    console.log("order api ", res);
     return res;
   } catch (error) {
     console.log(error);

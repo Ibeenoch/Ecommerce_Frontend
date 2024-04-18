@@ -15,9 +15,7 @@ export const addToWishList = async(data: any, addToast: any) => {
     try {
         
         const checkItem = await JSON.parse(localStorage.getItem('wishlist') as any);
-        console.log('check item wishlist: ', checkItem)
         if(checkItem === null || checkItem.length < 1 ){
-            console.log('newly added')
             let checkItem =[];
             checkItem.push(data);
             localStorage.setItem('wishlist', JSON.stringify(checkItem));
@@ -26,11 +24,8 @@ export const addToWishList = async(data: any, addToast: any) => {
                 autoDismiss: true,
               })
         }else{
-            console.log('already exist')
                 //check if its the same product, if true don't add it
             const index = checkItem.find((item: any) => item.id === data.id)
-
-            console.log('indexes: ', index)
             if(!index){
                 checkItem.push(data);
                 localStorage.setItem('wishlist', JSON.stringify(checkItem));
@@ -48,7 +43,6 @@ export const addToWishList = async(data: any, addToast: any) => {
                                    
         }
         const response = await JSON.parse(localStorage.getItem('wishlist') as any);
-        console.log('add to wishlist response: ',response)
         return response
     } catch (error) {
         console.log(error);
@@ -62,7 +56,6 @@ export const updateWishListQty = async(id: any, data: any) => {
         const getIndex = checkItem.find((item: any) => item.id === id);
         checkItem[getIndex].quantity = data;
         const response = JSON.parse(localStorage.getItem('wishlist') as any);
-        console.log(response)
         return response;
     } catch (error) {
         console.log(error);

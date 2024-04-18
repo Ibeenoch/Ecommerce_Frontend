@@ -1,7 +1,7 @@
 import { ChangeEvent, Fragment, ReactElement, useEffect, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import icon from '../../images/Untitled.jpg'
-import pics from '../../images/Apple 2022 MacBook Air Laptop__4.jpg'
+import icon from '../../images/images-9.png'
+import pics from '../../images/images-73.jpeg'
 import {
   Bars3Icon,
   HeartIcon,
@@ -50,15 +50,12 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
   }
 
   const handleSearch = () => {
-console.log('submit', inputText)
     dispatch(getProductSearchResult(inputText)).then((res) => {
-      console.log('the search response is ', res)
     })
   }
   
   const handleCart = () => {
     dispatch(fetchAllUsersCartAsync()).then((res) => {
-      console.log('navrcart: ', res)
      if(res.payload === undefined || res.payload === null){
       return;
      }else{
@@ -70,7 +67,6 @@ console.log('submit', inputText)
   
   const handleWishList = () => {
     dispatch(fetchAllUsersWishListAsync()).then((res) => {
-      console.log('wishlist: ', res)
      if(res.payload === undefined || res.payload === null){
       return;
      }else{
@@ -81,25 +77,37 @@ console.log('submit', inputText)
   }
 
   const handleProfile = () => {
-    navigate(`/profile/${user && user && user.id}`)
+    if(user && user.id){
+      navigate(`/profile/${user && user.id}`)
+    }else{
+      return;
+    }
   }
 
   const navigation = [
-    { name: "Marven Store", href: "#", current: true },
+    { name: "Marven Store", href: "/", current: true },
     { name: "Team", href: "#", current: false },
   ];
+
+  // const logout= () => {
+  //   localStorage.removeItem('user')
+  //   navigate('/login')
+  // }
+
   const userNavigation = [
-    { name: "Your Profile", href: `/profile/${user && user && user.id}` },
+    { name: "Your Profile", href: user ? `/profile/${user && user && user.id}` : '#' },
     { name: "Settings", href: "#" },
-    { name: "Sign out", href: "#" },
+    { name: "Sign out", href: '#' },
   ];
 
   const handleLogoClicked = () => {
     dispatch(getAllproduct()).then((res: any) => {
-      navigate('/')
+      navigate('/');
+      window.scrollTo(0, 0);
     })
   }
 
+  const hexcode = '#DEB887'
 
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
@@ -107,7 +115,7 @@ console.log('submit', inputText)
   return (
     <>
       <div  className="min-h-full">
-        <Disclosure  as="nav" className="bg-gray-800 fixed w-full z-50">
+        <Disclosure  as="nav" className="bg-white border-b border-b-gray-500 fixed w-full z-50">
           {({ open }) => (
             <>
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -130,8 +138,8 @@ console.log('submit', inputText)
                             href={item.href}
                             className={classNames(
                               item.current
-                                ? "bg-gray-900 text-white"
-                                : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                ? "bg-red-800 text-white"
+                                : "text-white-900 hover:bg-red-700 hover:text-white",
                               "rounded-md px-3 py-2 text-sm font-medium"
                             )}
                             aria-current={item.current ? "page" : undefined}
@@ -144,14 +152,10 @@ console.log('submit', inputText)
                   </div>
                     <div className="flex align-center justify-center">
                       <div className="">
-                        {
-                          showSearch && (
-                            <input type="search" width={30} onChange={(e) => setInputText(e.target.value)} value={inputText}  placeholder="search for a product" onMouseLeave={handleMouseLeave}  onMouseEnter={handleMouseEnter}/> 
-                          )
-                        }
+                            <input className="border-none bg-gray-100" type="search" width={30} onChange={(e) => setInputText(e.target.value)} value={inputText}  placeholder="search for a product" onMouseLeave={handleMouseLeave}  onMouseEnter={handleMouseEnter}/> 
                       </div>
                       <div className="cursor-pointer" onMouseLeave={handleMouseLeave}  onMouseEnter={handleMouseEnter} onClick={handleSearch}>
-                    <MagnifyingGlassIcon width={18} height={18} color="white" className="mt-3"/>
+                    <MagnifyingGlassIcon width={18} height={18} color="black" className="mt-3"/>
                       </div>
                       </div>
                   <div className="hidden md:block">
@@ -161,17 +165,18 @@ console.log('submit', inputText)
                         type="button"
                         onClick={handleWishList}
                         style={{ opacity: (isOpen ? '0.3': '1')}}
-                        className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                        className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
                         <span className="absolute -inset-1.5" />
                         <span className="sr-only"></span>
                         <HeartIcon
                           className="h-6 w-6"
                           aria-hidden="true"
+                          color="black"
                         />
                       </button>
                     
-                      <span  style={{ }} className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-1 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+                      <span  style={{ }} className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
                         {wishlist.length}
                       </span>
 
@@ -179,17 +184,18 @@ console.log('submit', inputText)
                         type="button"
                         onClick={handleCart}
                         style={{ opacity: (isOpen ? '0.3': '1')}}
-                        className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                        className="relative rounded-full  p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
                         <span className="absolute -inset-1.5" />
                         <span className="sr-only"></span>
                         <ShoppingCartIcon
                           className="h-6 w-6"
                           aria-hidden="true"
+                          color="black"
                         />
                       </button>
                     
-                      <span  style={{ }} className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-1 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+                      <span  style={{ }} className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
                         {carts.length}
                       </span>
 
@@ -202,7 +208,7 @@ console.log('submit', inputText)
                             <span className="sr-only">Open user menu</span>
                             <img
                               className="h-8 w-8 rounded-full"
-                              src={user && user && user.image && user.image.url ? user.image.url : pics}
+                              src={user && user.image && user.image.url ? user.image.url : pics}
                               alt=""
                             />
                           </Menu.Button>
@@ -240,7 +246,7 @@ console.log('submit', inputText)
                   </div>
                   <div className="-mr-2 flex md:hidden">
                     {/* Mobile menu button */}
-                    <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-800 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="absolute -inset-0.5" />
                       <span className="sr-only">Open main menu</span>
                       {open ? (
@@ -259,75 +265,6 @@ console.log('submit', inputText)
                 </div>
               </div>
 
-              {/* <Disclosure.Panel className="md:hidden">
-                <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-                  {navigation.map((item) => (
-                    <Disclosure.Button
-                      key={item.name}
-                      as="a"
-                      href={item.href}
-                      className={classNames(
-                        item.current
-                          ? "bg-gray-900 text-white"
-                          : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                        "block rounded-md px-3 py-2 text-base font-medium"
-                      )}
-                      aria-current={item.current ? "page" : undefined}
-                    >
-                      {item.name}
-                    </Disclosure.Button>
-                  ))}
-                </div>
-                <div className="border-t border-gray-700 pb-3 pt-4">
-                  <div className="flex items-center px-5">
-                    <div onClick={handleProfile}  className="flex-shrink-0">
-                      <img
-                        className="h-10 w-10 rounded-full"
-                        src={user && user && user.image && user.image.url ? user.image.url : pics}
-                        alt=""
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <div className="text-base font-medium leading-none text-white">
-                        {user && user && user.name ? user.name : 'name'}
-                      </div>
-                      <div className="text-sm font-medium leading-none text-gray-400">
-                        {user && user && user.email ? user.email : 'email'}
-                      </div>
-                    </div>
-                    <button
-                    onClick={handleCart}
-                      type="button"
-                      className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                    >
-                      <span className="absolute -inset-1.5" />
-                      <span className="sr-only">View notifications</span>
-                      <ShoppingCartIcon
-                        className="h-6 w-6"
-                        aria-hidden="true"
-                      />
-                    </button>
-    
-                      <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-1 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                      {carts.length}
-                    </span>
-                    
-                  </div>
-                  <div className="mt-3 space-y-1 px-2">
-                    {userNavigation.map((item) => (
-                      <Disclosure.Button
-                        key={item.name}
-                        as="a"
-                        href={item.href}
-                        className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                      >
-                        {item.name}
-                      </Disclosure.Button>
-                    ))}
-                  </div>
-                </div>
-              </Disclosure.Panel> */}
-
 <Disclosure.Panel className="md:hidden">
     <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
         {navigation.map((item) => (
@@ -336,7 +273,7 @@ console.log('submit', inputText)
                 as="a"
                 href={item.href}
                 className={`block rounded-md px-3 py-2 text-base font-medium ${
-                    item.current ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    item.current ? "bg-white text-gray-900 hover:bg-gray-900 hover:text-white" : "text-gray-900 bg-white hover:bg-gray-900 hover:text-white"
                 }`}
                 aria-current={item.current ? "page" : undefined}
             >
@@ -347,31 +284,31 @@ console.log('submit', inputText)
     <div className="border-t border-gray-700 pb-3 pt-4">
         <div className="flex items-center px-5">
             <div className="flex-shrink-0">
-                <img className="h-10 w-10 rounded-full" src={user?.image?.url || pics} alt="" />
+                <img className="h-10 w-10 rounded-full" src={user && user?.image && user?.image?.url || pics} alt="" />
             </div>
             <div className="ml-3">
-                <div className="text-base font-medium leading-none text-white">{user?.name || 'name'}</div>
-                <div className="text-sm font-medium leading-none text-gray-400">{user?.email || 'email'}</div>
+                <div className="text-base font-medium leading-none text-gray-900">{user?.fullName || 'name'}</div>
+                <div className="text-sm font-medium leading-none text-gray-900">{user?.email || 'email'}</div>
             </div>
             <button
                 onClick={handleWishList}
                 type="button"
-                className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="relative ml-auto flex-shrink-0 rounded-full p-1 text-gray-900 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
             >
                 <HeartIcon className="h-6 w-6" aria-hidden="true" />
             </button>
-            <span className="inline-flex items-center rounded-md z-10 bg-red-50 ml-0 px-1.5 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+            <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-3 ml-0 px-1.5 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
             {wishlist.length}
             </span>
 
             <button
                 onClick={handleCart}
                 type="button"
-                className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="relative ml-auto flex-shrink-0 rounded-full p-1 text-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
             >
                 <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
             </button>
-            <span className="inline-flex items-center rounded-md z-10 bg-red-50 ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+            <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-3 ml-0 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
                 {carts.length}
             </span>
         </div>
@@ -381,7 +318,7 @@ console.log('submit', inputText)
                     key={item.name}
                     as="a"
                     href={item.href}
-                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-700 hover:text-white"
                 >
                     {item.name}
                 </Disclosure.Button>
@@ -401,7 +338,7 @@ console.log('submit', inputText)
             </h1>
           </div>
         </header> */}
-        <main>
+        <main style={{ background: hexcode}}>
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             {children}
           </div>

@@ -148,7 +148,7 @@ export const authSlice = createSlice({
       if(action.payload !== undefined){
         localStorage.setItem('user', JSON.stringify(action.payload))
         state.user = action.payload;
-        }
+      }
     })
     .addCase(loginUser.rejected, (state, action) => {
       state.status = 'failed'
@@ -158,7 +158,6 @@ export const authSlice = createSlice({
     })
     .addCase(userVerification.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('verified user data: ', action.payload)
     })
     .addCase(userVerification.rejected, (state, action) => {
       state.status = 'failed'
@@ -168,7 +167,6 @@ export const authSlice = createSlice({
     })
     .addCase(emailLink.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('email link data: ', action.payload)
     })
     .addCase(emailLink.rejected, (state, action) => {
       state.status = 'failed'
@@ -178,11 +176,10 @@ export const authSlice = createSlice({
     })
     .addCase(passwordChange.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('changed user password: ', action.payload)
       if(action.payload !== undefined){
         localStorage.setItem('user', JSON.stringify(action.payload))
         state.user = action.payload;
-        }
+      }
     })
     .addCase(passwordChange.rejected, (state, action) => {
       state.status = 'failed'
@@ -192,11 +189,10 @@ export const authSlice = createSlice({
     })
     .addCase(getAUser.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('get a user: ', action.payload)
       if(action.payload !== undefined){
         localStorage.setItem('user', JSON.stringify(action.payload))
         state.user = action.payload;
-        }
+      }
     })
     .addCase(getAUser.rejected, (state, action) => {
       state.status = 'failed'
@@ -206,14 +202,12 @@ export const authSlice = createSlice({
     })
     .addCase(deleteUser.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('deleted user: ', action.payload)
       if(action.payload !== undefined){
         const findAllUser = JSON.parse(localStorage.getItem('alluser') as any);
         const filterUser = findAllUser.filter((it: any) => it.id !== action.payload.id);
         localStorage.setItem('alluser', JSON.stringify(filterUser))
 
         const filterStateuser = state.users.filter((it: any) => it.id !== action.payload.id)
-        console.log('filtered user: ', filterStateuser)
         }
     })
     .addCase(deleteUser.rejected, (state, action) => {
@@ -224,7 +218,6 @@ export const authSlice = createSlice({
     })
     .addCase(getAllUser.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('all users: ', action.payload)
       if(action.payload !== undefined){
         localStorage.setItem('alluser', JSON.stringify(action.payload))
         state.users = action.payload;
@@ -238,7 +231,7 @@ export const authSlice = createSlice({
     })
     .addCase(getUserPagination.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('all users: ', action.payload)
+
       if(action.payload !== undefined){
         localStorage.setItem('alluser', JSON.stringify(action.payload))
         state.users = action.payload;
@@ -252,11 +245,10 @@ export const authSlice = createSlice({
     })
     .addCase(uploadUserPhoto.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('all user photo: ', action.payload)
       if(action.payload !== undefined){
         localStorage.setItem('user', JSON.stringify(action.payload))
         state.user = action.payload;
-        }
+      }
     })
     .addCase(uploadUserPhoto.rejected, (state, action) => {
       state.status = 'failed'

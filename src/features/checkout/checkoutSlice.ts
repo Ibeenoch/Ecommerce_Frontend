@@ -130,7 +130,6 @@ export const checkoutSlice = createSlice({
             state.status = 'success'  
             if(action.payload !== undefined){
                state.allTransactions = action.payload
-            console.log('all transcation', action.payload) 
             }             
         })
         .addCase(alltransactions.rejected, (state, action) => {
@@ -143,7 +142,6 @@ export const checkoutSlice = createSlice({
             state.status = 'success'  
             if(action.payload !== undefined){
                state.allTransactions = action.payload
-            console.log('all transcation', action.payload) 
             }             
         })
         .addCase(getpaymentPagination.rejected, (state, action) => {
@@ -154,14 +152,12 @@ export const checkoutSlice = createSlice({
           })
           .addCase(getAUserTransaction.fulfilled, (state, action) => {
             state.status = 'success'
-            console.log('a user transact: ', action.payload)
             state.aUserTransactions = action.payload
             action.payload && Array.isArray(action.payload) && action.payload.forEach((elem) => {
                state.aUserOrderedProducts = elem && elem.order && elem.order.productDetails;
                state.aUserShippingAddress = elem && elem.order && elem.order.shippingDetails;
             })
 
-            console.log('all good: ', state.aUserOrderedProducts, state.aUserShippingAddress)
           })
           .addCase(getAUserTransaction.rejected, (state, action) => {
             state.status = 'failed'

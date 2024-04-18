@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import companylogo from "../../images/Untitled.jpg";
+import companylogo from "../../images/images-9.png";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useToasts } from "react-toast-notifications";
 import Switch from "react-switch";
@@ -29,12 +29,10 @@ const ChangePassword: React.FC = () => {
       const { id } = useParams();
       const { status, user } = useAppSelector(selectUser);
     
-      console.log('id is: ', id)
       const handleSwitchElem = (checked: boolean) => {
         setIsChecked(checked);
       };
       const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.value);
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
       };
@@ -43,15 +41,11 @@ const ChangePassword: React.FC = () => {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/;
       const handlePasswordRecovery = (e: FormEvent) => {
         e.preventDefault();
-        console.log(formData);
         if (passwordRegex.test(newpassword1)) {
     
           const changePassword = { formData, id };
-          console.log('password data: ' , changePassword)
 
-          dispatch(passwordChange(changePassword)).then((res: any) => {
-                        
-            console.log('reset payload ', res, res.payload)
+          dispatch(passwordChange(changePassword)).then((res: any) => {                        
             if(res && res.payload && res.payload.id){
                 addToast("Password Changed Successfully, Please Login with the new password to continue", {
                 appearance: "success",
@@ -85,16 +79,20 @@ const ChangePassword: React.FC = () => {
         setIsShowConfirmPassword(!isShowConfirmPassword);
       };
     
+      const hexcode = '#DEB887'
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+    <div style={{ background: hexcode, height: '100vh'}} className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-       <Link to='/'> 
-       <img
+      <Link to='/'> 
+       <div style={{ width: '40px', height: '40px', marginLeft: '40%', borderRadius: '50%' , background: 'red', overflow: 'hidden'}}>
+         <img
           className="mx-auto h-10 w-auto"
           src={companylogo}
           alt="Your Company"
         />
+       </div>
+      
         </Link>
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Password Recovery
@@ -130,9 +128,9 @@ const ChangePassword: React.FC = () => {
                 className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer z-30"
               >
                 {isShowPassword2 ? (
-                  <EyeIcon color="indigo" className="w-4 h-4 z-30" />
+                  <EyeIcon color="brown" className="w-4 h-4 z-30" />
                 ) : (
-                  <EyeSlashIcon color="indigo" className="w-4 h-4 z-30" />
+                  <EyeSlashIcon color="brown" className="w-4 h-4 z-30" />
                 )}
               </div>
             </div>
@@ -163,9 +161,9 @@ const ChangePassword: React.FC = () => {
                 className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer z-30"
               >
                 {isShowPassword3 ? (
-                  <EyeIcon color="indigo" className="w-4 h-4 z-30" />
+                  <EyeIcon color="brown" className="w-4 h-4 z-30" />
                 ) : (
-                  <EyeSlashIcon color="indigo" className="w-4 h-4 z-30" />
+                  <EyeSlashIcon color="brown" className="w-4 h-4 z-30" />
                 )}
               </div>
             </div>
@@ -175,7 +173,7 @@ const ChangePassword: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="flex w-full justify-center rounded-md bg-red-800 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {status === "loading" ? (
                 <CircularProgress size={25} style={{ color: "white" }} />
@@ -187,9 +185,9 @@ const ChangePassword: React.FC = () => {
         </form>
 
         <Link to="/register">
-          <p className="mt-10 text-center text-sm text-gray-500">
+          <p className="mt-10 text-center text-sm text-gray-800">
             Not a member?{" "}
-            <div className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+            <div className="font-semibold leading-6 text-gray-800 hover:text-gray-700">
               Start a 14 day free trial
             </div>
           </p>

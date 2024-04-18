@@ -6,11 +6,9 @@ import { selectCheckout } from '../checkout/checkoutSlice'
 
 const MoreProfileDetails = () => {
     const { aUserOrderedProducts } = useAppSelector(selectCheckout)
-    console.log('parent aUserOrderedProducts ', aUserOrderedProducts)
   return (
     <>
     {aUserOrderedProducts && aUserOrderedProducts.map((detail: any, index: number) => (
-        // { console.log('el detail ', detail.title)}  
          <div key={detail} className="product" style={{  borderBottom: '2px gray solid' }}>
          <h4>Product Details {index + 1}</h4>
        <div className="flex items-center my-1">

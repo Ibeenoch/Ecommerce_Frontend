@@ -8,7 +8,9 @@ import {
   getACategory,
   getAllproduct,
   getAproduct,
+  getaProductReviews,
   selectProduct,
+  similarproduct,
   sortproductAsc,
   sortproductDesc,
   sortproductNewest,
@@ -39,7 +41,8 @@ import ProductReview from "./ProductReview";
 import { selectUser } from "../../auth/authSlice";
 import Loading from "../../../Loading";
 import LoadingPage from "../../../pages/LoadingPage";
-import { addToWishlist } from "../../wishlist/wishListSlice";
+import { addToWishlist, selectAllWishList } from "../../wishlist/wishListSlice";
+import Carousel from "./Carousel";
 
 interface ItogglePopup {
   isOpen: boolean;
@@ -57,6 +60,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const { status, products, product, categories, category, brands, brand } =
     useAppSelector(selectProduct);
   const { user } = useAppSelector(selectUser);
+  const { wishlist } = useAppSelector(selectAllWishList);
 
   const token = user && user && user.token;
 
@@ -69,40 +73,32 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const handleAddToCart = (productId: any) => {
     const quantity = 1;
     dispatch(getAproduct(productId)).then((res) => {
-      console.log("response product ", res.payload);
       const receive = res.payload;
       const data = { ...receive, quantity };
-      console.log("cart added: ", data);
       const dataitem = { data, addToast };
       dispatch(addtocart(dataitem));
     });
   };
-  const handleAddToWishlist = (productId: any, index: any) => {
-
-    setWishlistUpdate(index)
+  const handleAddToWishlist = (productId: any) => {
+   
     const quantity = 1;
-    dispatch(getAproduct(productId)).then((res) => {
-      console.log("response product ", res.payload);
+    dispatch(getAproduct(productId)).then((res: any) => {
       const receive = res.payload;
       const data = { ...receive, quantity };
-      console.log("wishlist added: ", data);
       const dataitem = { data, addToast };
       dispatch(addToWishlist(dataitem)).then((res: any) => {
-        dispatch(getAllproduct()).then((res) => {
-          console.log('res all pro ', res.payload)
-          const getIndex = products.find((it: any) => it.id === productId);
-          // products[getIndex] =
+        dispatch(getAllproduct()).then((res: any) => {
+          
         })
       })
     });
   };
 
+
   const handleSort = (option: any) => {
     if (option === "Price: Low to High") {
-      console.log("price asc");
       dispatch(sortproductAsc());
     } else if (option === "Price: High to Low") {
-      console.log("price desc");
       dispatch(sortproductDesc());
     } else if (option === "Newest") {
       dispatch(sortproductNewest());
@@ -111,22 +107,26 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
     }
   };
   useEffect(() => {
-    dispatch(getAllproduct()).then((res) => {
+    dispatch(getAllproduct()).then((res: any) => {
         setTotalCount(res.payload.length)
     })
   }, [dispatch, navigate]);
-  console.log('this is the total count: ' ,totalCount)
 
   const handleProductDetails = (productId: any) => {
     dispatch(getAproduct(productId)).then((res) => {
-      console.log("product res: ", res);
-      if (res && res.payload && res.payload.images && res.payload.images.set) {
-        console.log(
-          "product resent: ",
-          res.payload.images.set,
-          res.payload.images.set[0]
-        );
-        navigate(`/product/details/${productId}`);
+      if (res && res.payload && res.payload.category) {
+        const data = {
+          category: res && res.payload && res.payload.category && res.payload.category.name,
+          brand: res && res.payload && res.payload.brand && res.payload.brand.name,
+        }
+       dispatch(similarproduct(data)).then((res: any) => {
+        if(res && res.payload && res.payload !== undefined){
+            dispatch(getaProductReviews(productId)).then((res: any) => {
+              console.log('products review ', res.payload)
+              navigate(`/product/details/${productId}`);
+            })
+        }
+       })
       }
     });
   };
@@ -179,8 +179,6 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   };
 
   const handleCategoryOrBrand = (filter: string, name: string) => {
-    console.log("we have this category: ", filter, " & ", name);
-
     if (filter === "Category") {
       dispatch(getACategory(name));
     }
@@ -201,21 +199,20 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const fetchCategories = (name: string) => {
     //options is an array of objects
     if (name === "Product") {
-      console.log('none')
     } else if (name === "Category") {
       dispatch(fetchAllCategories()).then((res) => {
-        console.log("response: ", res.payload);
       });
     } else {
       dispatch(fetchAllBrands()).then((res) => {
-        console.log("response: ", res.payload);
       });
     }
   };
 
+  const getwishlist = JSON.parse(localStorage.getItem('wishlist') as any)
+
+
   const handleProductReview = (id: any) => {
     dispatch(getAproduct(id)).then((res) => {
-      console.log("product  res: ", res);
       if (res && res.payload && res.payload.id) {
        
         navigate(`/product/review/${id}`);
@@ -242,14 +239,12 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
 
   return (
      <>
-      {/* <div style={{ width: '100%', height: '80vh', background: 'orange', zIndex: 40}}>
-the carosel
-      </div> */}
+      {/* <Carousel /> */}
 
-      <div>
+      <div style={{  }}>
      
       <div>
-        <div className="">
+        <div >
           <div>
             {/* Mobile filter dialog */}
             <Transition.Root show={mobileFiltersOpen} as={Fragment}>
@@ -306,12 +301,12 @@ the carosel
                             {({ open }) => (
                               <>
                                 <h3 className="-mx-2 -my-3 flow-root">
-                                  <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                                  <Disclosure.Button className="flex w-full items-center bg-white hover:bg-red-700 justify-between bg-white px-2 py-3 text-gray-400 hover:text-white">
                                     <span
                                       onClick={() =>
                                         fetchCategories(section.name)
                                       }
-                                      className="font-medium text-gray-900"
+                                      className="font-medium text-gray-900 hover:text-white"
                                     >
                                       {section.name}
                                     </span>
@@ -402,7 +397,7 @@ the carosel
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Menu.Items className="absolute right-0 z-50 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <div className="py-1">
                           {sortOptions.map((option) => (
                             <Menu.Item key={option.name}>
@@ -466,9 +461,9 @@ the carosel
                         {({ open }) => (
                           <>
                             <h3 className="-my-3 flow-root">
-                              <Disclosure.Button className="flex w-full px-3 hover:bg-indigo-300 items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
+                              <Disclosure.Button className="flex w-full px-3 hover:bg-red-700 items-center justify-between bg-white py-3 text-sm text-gray-900 hover:text-white">
                                 <span
-                                  className="font-medium text-gray-900"
+                                  className="font-medium hover:text-white"
                                   onClick={() => fetchCategories(section.name)}
                                 >
                                   {section.name}
@@ -531,16 +526,195 @@ the carosel
                   </form>
 
                   {/* Product grid */}
-                  <div className="lg:col-span-3 bg-white rounded-lg">
-                    {/* this is product list Content */}
+                  <div className="lg:col-span-3 rounded-lg">
+                    {/* this is product list Content class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8"*/}
                     <div className="">
-                      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                      <div >
+                        <h2 className="text-2xl font-bold tracking-tight p-4 text-gray-900">
                           Top Selling
                         </h2>
 
                         <div className="mt-1 grid grid-cols-1 gap-x-1 gap-y-3 sm:grid-cols-3 px-1  py-2 lg:grid-cols-3 xl:gap-x-4">
-                          {products.map((product: any, index: number) => (
+                          {products && Array.isArray(products) ? products.map((product: any, index: number) => (
+                            <div
+                              key={product.id}
+                              className="group relative shadow-2xl rounded-lg"
+                              style={{
+                                border: "1px white solid",
+                                padding: "5px",
+                                background: "white",
+                                
+                              }}
+                            >
+                              <div className="w-full md:w-64 h-64 contain">
+                                {user &&
+                                user &&
+                                user.role &&
+                                user.role !== "ADMIN" ? (
+                                  // edit product
+                                  <div className="flex justify-between">
+                                    <div
+                                      onClick={() => handleEdit(product.id)}
+                                      className="icon1 z-30 cursor-pointer"
+                                    >
+                                      <PencilIcon
+                                        className="h-4 w-4 z-30 cursor-pointer"
+                                        aria-hidden="true"
+                                        color="blue"
+                                      />
+                                    </div>
+                                    {/* update product */}
+
+                                    <div
+                                      onClick={() => handleDelete(product.id)}
+                                      className="icon2 z-30 cursor-pointer"
+                                    >
+                                      <TrashIcon
+                                        className="h-4 w-4 z-30 cursor-pointer"
+                                        aria-hidden="true"
+                                        color="red"
+                                      />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div
+                                    className="parent-img-div"
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      borderRadius: "0.7px",
+                                    }}
+                                  >
+                                    <button
+                                      type="button"
+                                      className="relative border-none rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                    >
+                                      <button
+                                        id="popup-trigger"
+                                        className="text-gray-500 hover:text-gray-900"
+                                        
+                                      >
+                                        <div
+                                        onClick={() => handleProductReview(product.id)}
+                                          className="flex border-none cursor-pointer"
+                                          style={{
+                                            opacity: isOpen ? "0.99" : "1", cursor: 'pointer'
+                                          }}
+                                        >
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color={product && product.rating && product.rating >=1 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=1 ? "yellow" : "gray"}
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color={product && product.rating && product.rating >=2 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=2 ? "yellow" : "gray"}
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color={product && product.rating && product.rating >=3 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=3 ? "yellow" : "gray"}
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color={product && product.rating && product.rating >=4 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=4 ? "yellow" : "gray"}
+                                          />
+                                          <StarIcon
+                                            className="h-4 w-4 z-30 cursor-pointer"
+                                            aria-hidden="true"
+                                            color={product && product.rating && product.rating >=5 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=5 ? "yellow" : "gray"}
+                                          />
+                                        </div>
+                                      </button>
+                                      {/* Popup */}
+                                  
+                                    </button>
+
+                                    <div
+                                      onClick={() => handleAddToWishlist(product.id)}
+                                      style={{ opacity: isOpen ? "0.2" : "1" }}
+                                      className={`relative border-none rounded-full z-30 cursor-pointer bg-white-800 p-1 text-gray-400 hover:text-cyan focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800`}>
+                                      
+                                      <HeartIcon
+                                        className="h-4 w-4 border-none"
+                                        aria-hidden="true"
+                                        color={ getwishlist.find((it: any) => it.id === product.id) ? 'red': 'gray'}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div
+                                  className="py-1"
+                                  style={{
+                                    width: "300px",
+                                    height: "200px",
+                                    overflow: "hidden",
+                                  }}
+                                  onClick={() =>
+                                    handleProductDetails(product.id)
+                                  }
+                                >
+                                  <img
+                                    src={product.thumbnail.url
+                                      ? product.thumbnail.url
+                                      : pics}
+                                    alt=""
+                                   
+                                    style={{ objectPosition: 'center'}}
+                                    className="object-contain object-center w-[70%] h-full"
+                                  />
+                                 
+                                </div>
+                      
+                                <div
+                                  className="mt-4 flex justify-between elem"
+                                  style={{
+                                    borderTop: "0.5px gray solid",
+                                  }}
+                                >
+                                  <div
+                                    onClick={() =>
+                                      handleProductDetails(product.id)
+                                    }
+                                  >
+                                    <div>
+                                      <h3 className="text-sm text-gray-900">
+                                        <div>
+                                          <span
+                                            aria-hidden="true"
+                                            className="absolute inset-0"
+                                          />
+                                          <strong>{product.title}</strong>
+                                          <p className="text-sm font-medium text-gray-900">
+                                            <strong>${product.price}</strong>
+                                          </p>
+                                        </div>
+                                      </h3>
+                                    </div>
+                                  </div>
+
+                                  <div
+                                    onClick={() => handleAddToCart(product.id)}
+                                    className="relative cursor-pointer rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                  >
+                                    <ShoppingBagIcon
+                                      className="h-5 w-5 text-red-800"
+                                      aria-hidden="true"
+                                      
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )) : (
                             <div
                               key={product.id}
                               className="group relative shadow-xl"
@@ -609,27 +783,32 @@ the carosel
                                           <StarIcon
                                             className="h-4 w-4 z-30 cursor-pointer"
                                             aria-hidden="true"
-                                            color="yellow"
+                                            color={product && product.rating && product.rating >=1 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=1 ? "yellow" : "gray"}
                                           />
                                           <StarIcon
                                             className="h-4 w-4 z-30 cursor-pointer"
                                             aria-hidden="true"
-                                            color="yellow"
+                                            color={product && product.rating && product.rating >=2 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=2 ? "yellow" : "gray"}
                                           />
                                           <StarIcon
                                             className="h-4 w-4 z-30 cursor-pointer"
                                             aria-hidden="true"
-                                            color="yellow"
+                                            color={product && product.rating && product.rating >=3 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=3 ? "yellow" : "gray"}
                                           />
                                           <StarIcon
                                             className="h-4 w-4 z-30 cursor-pointer"
                                             aria-hidden="true"
-                                            color="yellow"
+                                            color={product && product.rating && product.rating >=4 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=4 ? "yellow" : "gray"}
                                           />
                                           <StarIcon
-                                            className="h-4 w-4 z-30 cursor-pointer opacity-40"
+                                            className="h-4 w-4 z-30 cursor-pointer"
                                             aria-hidden="true"
-                                            color="gray"
+                                            color={product && product.rating && product.rating >=5 ? "yellow" : "gray"}
+                                            fill={product && product.rating && product.rating >=5 ? "yellow" : "gray"}
                                           />
                                         </div>
                                       </button>
@@ -638,14 +817,15 @@ the carosel
                                     </button>
 
                                     <div
-                                      onClick={() => handleAddToWishlist(product.id, index)}
+                                      onClick={() => handleAddToWishlist(product.id)}
                                       style={{ opacity: isOpen ? "0.2" : "1" }}
                                       className={`relative border-none rounded-full z-30 cursor-pointer bg-white-800 p-1 text-gray-400 hover:text-cyan focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800`}>
                                       
                                       <HeartIcon
                                         className="h-4 w-4 border-none"
                                         aria-hidden="true"
-                                        color={wishlistUpdate === index ? 'red': 'gray'}
+                                        color={ getwishlist.find((it: any) => it.id === product.id) ? 'brown': 'gray'}
+                                        fill={ getwishlist.find((it: any) => it.id === product.id) ? 'brown': 'gray'}
                                       />
                                     </div>
                                   </div>
@@ -667,8 +847,7 @@ the carosel
                                       ? product.thumbnail.url
                                       : pics}
                                     alt=""
-                                    // style={{ width: '50%', height: '100%', marginLeft: '10%'}}
-                                    // className="w-48 md:w-32 lg:w-48 object-contain"
+                                   
                                     style={{ objectPosition: 'center'}}
                                     className="object-contain object-center w-[70%] h-full"
                                   />
@@ -678,7 +857,7 @@ the carosel
                                 <div
                                   className="mt-4 flex justify-between elem"
                                   style={{
-                                    borderTop: "0.5px midnightblue solid",
+                                    borderTop: "0.5px gray solid",
                                   }}
                                 >
                                   <div
@@ -687,7 +866,7 @@ the carosel
                                     }
                                   >
                                     <div>
-                                      <h3 className="text-sm text-gray-700">
+                                      <h3 className="text-sm text-gray-900">
                                         <div>
                                           <span
                                             aria-hidden="true"
@@ -695,8 +874,7 @@ the carosel
                                           />
                                           <strong>{product.title}</strong>
                                           <p className="text-sm font-medium text-gray-900">
-                                            ${product.price} %{product.discount}{" "}
-                                            discount
+                                            <strong>${product.price}</strong>
                                           </p>
                                         </div>
                                       </h3>
@@ -708,15 +886,16 @@ the carosel
                                     className="relative cursor-pointer rounded-full bg-white-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                                   >
                                     <ShoppingBagIcon
-                                      className="h-5 w-5"
+                                      className="h-5 w-5 text-gray-900"
                                       aria-hidden="true"
-                                      color="midnightblue"
+                                      
                                     />
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          ))}
+                            // end of product 
+                          )}
                         </div>
                       </div>
                     </div>

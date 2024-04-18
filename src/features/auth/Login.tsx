@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import companylogo from "../../images/Untitled.jpg";
+import companylogo from "../../images/images-9.png";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useToasts } from "react-toast-notifications";
 import Switch from "react-switch";
@@ -33,7 +33,6 @@ const Login = () => {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -43,24 +42,20 @@ const Login = () => {
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
     setIsClicked(true)
-    console.log(formData);
     if(password) {
 
       const login = { ...formData, passcode };
       dispatch(loginUser(login)).then((res: any) => {
-        console.log('login res ', res, res.payload)
         if(res && res.payload && res.payload === undefined){        
           return;
-        }else if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN') {
-          console.log('getting token: ', res && res.payload && res.payload.id)
-      
+        }else if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN') {      
           addToast("Successfully Login As Admin", {
             appearance: "success",
             autoDismiss: true,
           });
-          navigate(`/admin/${res.payload.id}`);
+          navigate(`/`);
+          // navigate(`/admin/${res.payload.id}`);
         }else if(res && res.payload && res.payload.role && res.payload.role === 'USER') {
-          console.log('getting token: ', res && res.payload && res.payload.id)
           const data = {
             id: res && res.payload && res.payload.id,
             token: res && res.payload && res.payload.token,
@@ -108,15 +103,18 @@ const Login = () => {
 
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center mt-10 px-6 py-1 lg:px-8">
+    <div className="flex min-h-full flex-1 flex-col justify-center mt-12 px-6 py-1 lg:px-8">
       <div className="shadow-lg">
       <div className="sm:mx-auto sm:w-1/2 px-4 sm:max-w-sm">
        <Link to='/'> 
-       <img
+       <div style={{ width: '40px', height: '40px', marginLeft: '40%', borderRadius: '50%' , background: 'red', overflow: 'hidden'}}>
+         <img
           className="mx-auto h-10 w-auto"
           src={companylogo}
           alt="Your Company"
         />
+       </div>
+      
         </Link>
         <h2 className="mt-5 text-center text-lg font-bold leading-4 tracking-tight text-gray-900">
           Login to Maven Store Account
@@ -171,9 +169,9 @@ const Login = () => {
                 className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer z-30"
               >
                 {isShowPassword ? (
-                  <EyeIcon color="indigo" className="w-4 h-4 z-30" />
+                  <EyeIcon color="brown" className="w-4 h-4 z-30" />
                 ) : (
-                  <EyeSlashIcon color="indigo" className="w-4 h-4 z-30" />
+                  <EyeSlashIcon color="brown" className="w-4 h-4 z-30" />
                 )}
               </div>
             </div>
@@ -181,7 +179,7 @@ const Login = () => {
 
           <div className="flex justify-between px-4">
             <div>
-              <Switch onChange={handleSwitchElem} height={16} handleDiameter={20} offHandleColor="#00FFFF" onHandleColor="#00FFFF" checked={ischecked} />
+              <Switch onChange={handleSwitchElem} height={16} handleDiameter={20} offHandleColor="#991B1B" onHandleColor="#991B1B" checked={ischecked} />
               <p>
                 {ischecked ? (
                   <div className="flex flex-col">
@@ -201,7 +199,7 @@ const Login = () => {
                         value={passcode}
                         onChange={(e) => setPasscode(e.target.value)}
                         placeholder="Enter Passcode"
-                        className="block w-full text-sm rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className="block w-full text-sm rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         />
                     </div>
                   </div>
@@ -219,7 +217,7 @@ const Login = () => {
             </div>
             <div className="text-sm">
               <Link to='/password/link'
-                className="font-semibold text-indigo-600 hover:text-indigo-500"
+                className="font-semibold text-gray-900 hover:text-gray-700"
               >
                 Forgot password?
               </Link>
@@ -229,10 +227,10 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="flex w-full justify-center rounded-md bg-red-800 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {isClicked && status === "loading" ? (
-                <CircularProgress size={25} style={{ color: "white" }} />
+                <CircularProgress size={25} style={{ color: "brown" }} />
               ) : (
                 "Sign in"
               )}
@@ -241,9 +239,9 @@ const Login = () => {
         </form>
 
         <Link to="/register">
-          <p className="mt-10 text-center text-sm text-gray-500">
+          <p className="mt-10 text-center text-sm text-gray-900">
             Not a member?{" "}
-            <div className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+            <div className="font-semibold leading-6 text-gray-900 hover:text-gray-700">
               Start a 14 day free trial
             </div>
           </p>

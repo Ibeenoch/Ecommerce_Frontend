@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import companylogo from "../../images/Untitled.jpg";
+import companylogo from "../../images/images-9.png";
 import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { emailLink, selectUser, userVerification } from "./authSlice";
@@ -18,7 +18,6 @@ const PasswordRecovery = () => {
     const data = { email, addToast };
     dispatch(emailLink(data)).then((res: any) => {
        if (res && res.payload && res.payload.message) {
-         console.log("email link ", res);
         addToast("Password Recovery Mail Sent", {
           appearance: "success",
           autoDismiss: true,
@@ -27,15 +26,21 @@ const PasswordRecovery = () => {
     });
   };
 
+  const hexcode = '#DEB887'
+  
+
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+    <div style={{ background: hexcode, height: '100vh'}} className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <Link to="/">
-          <img
-            className="mx-auto h-10 w-auto"
-            src={companylogo}
-            alt="Your Company"
-          />
+      <Link to='/'> 
+       <div style={{ width: '40px', height: '40px', marginLeft: '40%', borderRadius: '50%' , background: 'red', overflow: 'hidden'}}>
+         <img
+          className="mx-auto h-10 w-auto"
+          src={companylogo}
+          alt="Your Company"
+        />
+       </div>
+      
         </Link>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
@@ -65,7 +70,7 @@ const PasswordRecovery = () => {
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="flex w-full justify-center rounded-md bg-red-800 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
              
               {status === "loading" ? (

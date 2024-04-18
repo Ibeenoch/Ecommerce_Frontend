@@ -60,7 +60,6 @@ const Payment = () => {
     
       const handleChange = (e : ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        console.log(e.target.value)
         setCheckOutForm({...checkOutForm, [name]:value})
       }
     
@@ -133,10 +132,8 @@ const Payment = () => {
       const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         const data = {...checkOutForm, id}
-        console.log(data);
         if(data){
           dispatch(createAddress(data)).then((res: any) => {
-            console.log('added address: ' ,res, res.payload)
           })
         }
     

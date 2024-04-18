@@ -89,37 +89,31 @@ const Admin = () => {
         const limit = 3;
         const currentPage = 1;
         const data = { limit, currentPage };
-        console.log("data counted: ", data);
         dispatch(getPagination(data) as any).then(() => {
-          console.log("finish");
         });
       };
 
       handlePages();
     });
   }, [dispatch, navigate]);
-  console.log("this is the total product count: ", totalProductCount);
 
   useEffect(() => {
     dispatch(getAllOrders(token)).then((res: any) => {
       setTotalOrderCount(res.payload.length);
     });
   }, [dispatch, navigate]);
-  console.log("this is the total order count: ", totalOrderCount);
 
   useEffect(() => {
     dispatch(getAllUser(token)).then((res: any) => {
       setTotalUserCount(res.payload.length);
     });
   }, [dispatch, navigate]);
-  console.log("this is the total user count: ", totalUserCount);
 
   useEffect(() => {
     dispatch(alltransactions(token)).then((res: any) => {
       setTotalPaymentCount(res.payload.length);
     });
   }, [dispatch, navigate]);
-  console.log("this is the total payment count: ", totalPaymentCount);
 
   useEffect(() => {
     const data = {
@@ -128,7 +122,6 @@ const Admin = () => {
     };
     dispatch(getAUser(data)).then((res: any) => {
       if (res && res.payload && res.payload.id) {
-        console.log("user fetch: ", res, res.payload);
       }
     });
   }, [dispatch]);
@@ -143,7 +136,6 @@ const Admin = () => {
       );
     });
   }, []);
-  console.log("get products result: ", products);
 
   const handleEdit = (productId: any) => {
     dispatch(getAproduct(productId)).then((res) => {
@@ -235,7 +227,6 @@ const Admin = () => {
       const data = { id, token };
       dispatch(deleteATransaction(data)).then((res: any) => {
         if (res && res.payload && res.payload.id) {
-          console.log("delete res ", res);
           addToast("Order successfully deleted", {
             appearance: "success",
             autoDismiss: true,
@@ -255,7 +246,6 @@ const Admin = () => {
     }
 
     dispatch(deleteUser(data)).then((res: any) => {
-      console.log('deleted user: ', res.payload)
       if(res && res.payload && res.payload.id){
         addToast(`${name} account is successfully deleted`, {
           appearance: "info",
@@ -269,13 +259,8 @@ const Admin = () => {
 
   const handleProductDetails = (productId: any) => {
     dispatch(getAproduct(productId)).then((res) => {
-      console.log("product res: ", res);
       if (res && res.payload && res.payload.images && res.payload.images.set) {
-        console.log(
-          "product resent: ",
-          res.payload.images.set,
-          res.payload.images.set[0]
-        );
+       
         navigate(`/product/details/${productId}`);
       }
     });
@@ -298,7 +283,6 @@ const Admin = () => {
         const currentPage = 1;
         const item = { limit, currentPage };
         dispatch(getPagination(item) as any).then(() => {
-          console.log("finish");
         });
       };
 
@@ -315,7 +299,6 @@ const Admin = () => {
         const data = { limit, currentPage };
         const item = { token, data };
         dispatch(getOrderPagination(item) as any).then(() => {
-          console.log("finish");
         });
       };
 
@@ -332,7 +315,6 @@ const Admin = () => {
         const item = { limit, currentPage };
         const data = { token, item };
         dispatch(getpaymentPagination(item) as any).then(() => {
-          console.log("finish");
         });
       };
 
@@ -349,13 +331,11 @@ const Admin = () => {
         const item = { limit, currentPage };
         const data = { token, item };
         dispatch(getUserPagination(data) as any).then(() => {
-          console.log("finish");
         });
       };
 
       handlePages();
     } else {
-      console.log("none");
     }
   };
 
@@ -369,7 +349,6 @@ const Admin = () => {
 
     dispatch(orderUpdate(data)).then((res: any) => {
       if (res.payload.id) {
-        console.log("res status update: ", res.payload);
         dispatch(getAllOrders(token));
       }
     });
@@ -459,7 +438,7 @@ const Admin = () => {
                             {({ open }) => (
                               <>
                                 <h3 className="-mx-2 flow-root">
-                                  <Disclosure.Button className="flex w-full hover:bg-indigo-300 items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                                  <Disclosure.Button className="flex w-full hover:bg-red-700 items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
                                     <span className="font-medium text-gray-900">
                                       {section.name}
                                     </span>
@@ -872,125 +851,6 @@ const Admin = () => {
                               </>
                             ) : isUser ? (
                               <>
-                                {/* {users &&
-                                  users.map((item: any, index: number) => (
-                                    <div className="border border-gray-300 flex flex-col">
-                                      <div                                      
-                                        className="flex flex-col lg:flex-row justify-between px-4 py-2 w-full hover:bg-indigo-200 cursor-pointer"
-                                      >
-                                         <h2 className="text-base border border-bottom-gray-400 font-semibold text-center leading-7 text-gray-900">
-                                                  #User {index + 1}
-                                              </h2>
-                                        <div className="first">
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              <strong> Name:</strong>{" "}
-                                              {item.fullName}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>Email:</strong>{" "}
-                                              {item.email}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>price:</strong>{" "}
-                                              {item.price}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>Role:</strong>{" "}
-                                              {item.role}
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="second">
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>
-                                                Phone:
-                                              </strong>{" "}
-                                              {item.phone}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong> Address:</strong>{" "}
-                                              {item.address}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>City:</strong>{" "}
-                                              {item.city}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>State:</strong>{" "}
-                                              {item.state}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>Country:</strong>{" "}
-                                              {item.state}
-                                            </div>
-                                          </div>
-
-                                          <div className="sm:col-span-3">
-                                            <div className="block text-sm font-medium leading-6 text-gray-900">
-                                              {" "}
-                                              <strong>No Of Purchase:</strong>{" "}
-                                              {item.Order.length}
-                                            </div>
-                                          </div>
-
-                                          <div className="flex justify-between">
-                                            {" "}
-                                            <div></div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="flex justify-between px-4 pt-0 pb-2 w-full">
-                                        <div 
-                                        onClick={() =>viewUser(item.id)}
-                                        >
-                                        <EyeIcon
-                                            width="16px"
-                                            height="16px"
-                                            color="blue"
-                                            className="cursor-pointer"
-                                          />
-                                        </div>
-                                        <TrashIcon
-                                          width="16px"
-                                          height="16px"
-                                          color="red"
-                                          className="cursor-pointer"
-                                        />{" "}
-                                      </div>
-                                    </div>
-                                  ))} */}
 
                                 <ul
                                   role="list"

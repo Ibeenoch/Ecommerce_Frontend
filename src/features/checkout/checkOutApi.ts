@@ -24,7 +24,6 @@ export const sendTransaction = async(data: any) => {
             },
           };
         const response = await axios.post(API+'/checkout/transaction', data); 
-        console.log('payment recorded' ,response)       
         return response
     } catch (error) {
         console.log(error);
@@ -41,7 +40,6 @@ export const fetchAUserTransactions = async (id: any) => {
     };
 
     const res = await axios.get(API + `/transactions/${id}`);
-    console.log("a user transactions ", res);
     return res;
   } catch (error) {
     console.log(error);
@@ -58,7 +56,6 @@ export const fetchTransactions = async (token: any) => {
     };
 
     const res = await axios.get(API + `/transactions`, option);
-    console.log("all transactions ", res);
     return res;
   } catch (error) {
     console.log(error);
@@ -77,7 +74,6 @@ export const deleteTransaction = async (data: any) => {
     };
 
     const res = await axios.delete(API + `/transaction/${id}`, option);
-    console.log("deleted transactions ", res);
     return res;
   } catch (error) {
     console.log(error);
@@ -98,7 +94,6 @@ export const fetchpaymentPagination = async (data: any) => {
     };
 
     const res = await axios.post(API + `/payment/paginate`, item, option);
-    console.log("payment pagination api ", res);
     return res;
   } catch (error) {
     console.log(error);

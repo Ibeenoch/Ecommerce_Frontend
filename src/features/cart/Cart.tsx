@@ -13,7 +13,6 @@ const Cart = () => {
   const { user } = useAppSelector(selectUser);
   const { addToast } = useToasts();
   
-  console.log("cartss: ", carts);
   const navigate = useNavigate();
 
   const subTotal = () => {
@@ -116,20 +115,22 @@ const Cart = () => {
                             <div className="width-full flex justify-between px-1 py-1 bg-white-600 ">
                               <div
                                 onClick={() => handleAdd(cart.id)}
-                                className="cursor-pointer bg-indigo-500 border border-indigo-500 rounded-md"
+                                className="cursor-pointer bg-red-800 border border-red-800 rounded-md"
                               >
                                 <PlusIcon
                                   className="h-4 w-4 z-20 cursor-pointer"
                                   color="white"
+                                  fill="white"
                                 />
                               </div>
                               <div
                                 onClick={() => handleMinus(cart.id)}
-                                className="cursor-pointer bg-indigo-500 border border-indigo-500 rounded-md ml-5"
+                                className="cursor-pointer bg-red-800 border border-red-800 rounded-md ml-5"
                               >
                                 <MinusIcon
                                   className="z-20 h-4 w-4"
                                   color="white"
+                                  fill="white"
                                 />
                               </div>
                             </div>
@@ -141,7 +142,7 @@ const Cart = () => {
                               onClick={() => handleRemove(cart.id)}
                               className="font-medium text-indigo-600 hover:text-indigo-500"
                             >
-                              <TrashIcon color="indigo" className="h-6 w-5" />
+                              <TrashIcon color="brown" className="h-6 w-5" />
                             </button>
                           </div>
                         </div>
@@ -162,7 +163,7 @@ const Cart = () => {
             </p>
             <div className="mt-6">
               <Link to={user && user && user.id ? `/checkout/${user.id}`: '/login'}>
-                <div className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
+                <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
                   Checkout
                 </div>
               </Link>
@@ -173,7 +174,7 @@ const Cart = () => {
                 <Link to="/">
                   <button
                     type="button"
-                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                    className="font-medium text-gray-900 hover:text-gray-700"
                     onClick={() => setOpen(false)}
                   >
                     Continue Shopping

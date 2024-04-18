@@ -9,6 +9,7 @@ import { MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { createAddress, selectCheckout, transactionmade } from "./checkoutSlice";
 import { useFlutterwave, closePaymentModal, FlutterWaveButton } from 'flutterwave-react-v3'
 import { selectUser } from "../auth/authSlice";
+import { jwtDecode } from "jwt-decode";
 
 
 
@@ -43,6 +44,7 @@ const CheckOut = () => {
   const { checkoutInfo } = useAppSelector(selectCheckout)
   const { user } = useAppSelector(selectUser)
   
+  const token = user && user.token;
 const handleSelectedAddress = (e: ChangeEvent<HTMLInputElement>, index: number) => {
   setSelectedOption(e.target.value)
  setAddressSelected(index)
@@ -51,9 +53,7 @@ const handleSelectedAddress = (e: ChangeEvent<HTMLInputElement>, index: number) 
 
 const handleSelectedPayment = (e: ChangeEvent<HTMLInputElement>) => {
   setSelectedOption2(e.target.value)
- // console.log(e.target.value, selectedOption2)
 }
-console.log('addressof him ', selectedOption2, checkoutInfo[addressSelected])
   const navigate = useNavigate();
   const { id } = useParams()
 
@@ -133,7 +133,6 @@ console.log('addressof him ', selectedOption2, checkoutInfo[addressSelected])
     const data = {...checkOutForm, id}
     if(data){
       dispatch(createAddress(data)).then((res: any) => {
-        console.log('added address: ' ,res, res.payload)
       })
     }
 
@@ -173,6 +172,46 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
     })
   }
 
+  
+
+   const isTokenExpired = (token: any) => {
+    if(!token){
+      addToast('Session expiry please login to continue',
+        {
+          appearance: 'info',
+          autoDismiss: true,
+        }
+      )
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
+    const decodeToken = jwtDecode(token);
+    const currentTime = Math.floor(Date.now()/1000);
+    const expiryTime = decodeToken?.exp;
+  console.log(currentTime, expiryTime);
+  
+  
+    if(expiryTime){
+     console.log(currentTime > expiryTime);
+       if(currentTime > expiryTime){
+        addToast('Session expiry please login to continue',
+        {
+          appearance: 'info',
+          autoDismiss: true,
+        }
+      ) 
+
+        localStorage.removeItem('user');
+        navigate('/login')
+       }else{
+        return;
+       }
+    }
+      
+  }
+
+  isTokenExpired(token)
+  
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-10 mt-6 lg:grid-cols-5 px-4">
       <div className="lg:col-span-3">
@@ -362,7 +401,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
              
               <button
                 type="submit"
-                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="rounded-md bg-red-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Add New Address
               </button>
@@ -391,7 +430,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                         defaultChecked
                         checked={selectedOption === `address${index}`}
                         onChange={(e) => handleSelectedAddress(e, index)}
-                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                        className="h-4 w-4 border-red-800 text-red-800 focus:ring-red-800"
                       />
                         
                         <div className="min-w-0 flex-auto">
@@ -441,7 +480,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                         value="cash"
                         checked={selectedOption === "cash"}
                         onChange={handleSelectedPayment}
-                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                        className="h-4 w-4 border-red-800 text-red-800 focus:ring-red-800"
                       />
                       <label
                         htmlFor="push-everything"
@@ -457,7 +496,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                         value="onlinepayment"
                         checked={selectedOption === "onlinepayment"}
                         onChange={handleSelectedPayment}
-                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                        className="h-4 w-4 border-red-800 text-red-800 focus:ring-red-800"
                       />
                       <label
                         htmlFor="push-everything"
@@ -508,7 +547,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                             <div className="width-full flex justify-between px-1 py-1 bg-white-600 ">
                               <div
                                 onClick={() => handleAdd(cart.id)}
-                                className="cursor-pointer bg-indigo-500 border border-indigo-500 rounded-md"
+                                className="cursor-pointer bg-red-800 border border-red-800 rounded-md"
                               >
                                 <PlusIcon
                                   className="h-4 w-4 z-20 cursor-pointer"
@@ -517,7 +556,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                               </div>
                               <div
                                 onClick={() => handleMinus(cart.id)}
-                                className="cursor-pointer bg-indigo-500 border border-indigo-500 rounded-md ml-5"
+                                className="cursor-pointer bg-red-800 border border-red-800 rounded-md ml-5"
                               >
                                 <MinusIcon
                                   className="z-20 h-4 w-4"
@@ -533,7 +572,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                               onClick={() => handleRemove(cart.id)}
                               className="font-medium text-indigo-600 hover:text-indigo-500"
                             >
-                              <TrashIcon color="indigo" className="h-6 w-5" />
+                              <TrashIcon color="brown" className="h-6 w-5" />
                             </button>
                           </div>
                         </div>
@@ -556,7 +595,6 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
              <div onClick={() => {
               handleFlutterPayment({
                 callback: (response) => {
-                  console.log(response);
                   if(response.status === "successful"){
                     const shippingDetails = checkoutInfo[addressSelected]
                     const details = {
@@ -566,7 +604,6 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                     response
                   }
                   dispatch(transactionmade(details)).then((res) => {
-                    console.log('payment response: ', res)
                     if(res && res.payload && res.payload.status && res.payload.status==="SUCCESSFUL"){
                       localStorage.removeItem('cart')
                       navigate('/order/success')
@@ -581,13 +618,13 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                 }
               })
             }} className="mt-6 cursor-pointer">
-                <div className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
+                <div className="flex items-center justify-center rounded-md border border-transparent rounded-md bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
                   Pay Now
                 </div>
             </div>
            ) : (
-             <div onClick={informUser} className="mt-6 cursor-pointer bg-gray-500">
-                <div className="flex items-center justify-center rounded-md border border-transparent bg-gray-500 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
+             <div onClick={informUser} className="mt-6 cursor-pointer bg-red-800 rounded-md">
+                <div className="flex items-center justify-center rounded-md border rounded-md border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
                   Pay Now
                 </div>
             </div>
@@ -599,7 +636,7 @@ const name = checkoutInfo && checkoutInfo[0] && checkoutInfo[0].fullName;
                 <Link to="/">
                   <button
                     type="button"
-                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                    className="font-medium text-gray-900 hover:text-gray-700"
                     onClick={() => setOpen(false)}
                   >
                     Continue Shopping

@@ -9,6 +9,7 @@ export interface ProductState {
   products: any,
   product: any,
   productReview: any,
+  similarProduct: any,
   brands: any,
   brand: any,
   categories: any,
@@ -21,6 +22,7 @@ const initialState: ProductState = {
   products: [],
   product: [],
   productReview: [],
+  similarProduct: [],
   brands: [],
   brand: [],
   categories: [],
@@ -75,6 +77,26 @@ export const getAllproduct = createAsyncThunk('product/getProducts', async(_, th
 export const sortproductAsc = createAsyncThunk('product/getsortProductAsc', async(_, thunkAPI) => {
   try {
     const res = await api.sortProductInAsc();
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
+export const similarproduct = createAsyncThunk('product/similarproduct', async(data: any, thunkAPI) => {
+  try {
+    const res = await api.getSimilarProduct(data);
+    return res?.data;
+  } catch (error) {
+    const message = thunkAPI.rejectWithValue(error);
+    return message;
+  }
+})
+
+export const updatetheProductRating = createAsyncThunk('product/updaterating', async(data: any, thunkAPI) => {
+  try {
+    const res = await api.updateproductReview(data);
     return res?.data;
   } catch (error) {
     const message = thunkAPI.rejectWithValue(error);
@@ -171,9 +193,9 @@ export const fetchAllBrands = createAsyncThunk('product/getAllBrands', async(_, 
   }
 })
 
-export const getallProductReviews = createAsyncThunk('product/getAllProductReviews', async(_, thunkAPI) => {
+export const getaProductReviews = createAsyncThunk('product/getAllProductReviews', async(id: any, thunkAPI) => {
   try {
-    const res = await api.getAllProductReview();
+    const res = await api.getAProductReview(id);
     return res?.data;
   } catch (error) {
     const message = thunkAPI.rejectWithValue(error);
@@ -233,7 +255,6 @@ export const productSlice = createSlice({
     addCase(getAllproduct.fulfilled, (state, action) => {
       state.status = 'success'
       state.products = action.payload;
-      console.log('state of the product: ', state.products, 'action: ', action.payload)
     })
     .
     addCase(getAllproduct.rejected, (state, action) => {
@@ -261,9 +282,7 @@ export const productSlice = createSlice({
       state.status = 'success'
       // const index = state.products.findIndex((pro: { id: any; }) => pro.id === action.payload.id );
       const index = state.products.findIndex((pro: any) => pro.id === action.payload.id );
-      console.log('index: ', index)
       state.products[index] = action.payload
-      console.log('updated: ', state.products[index])
     })
     .
     addCase(updateproduct.rejected, (state, action) => {
@@ -309,6 +328,19 @@ export const productSlice = createSlice({
       state.status = 'failed'
       state.message = action.payload
     })
+    .addCase(updatetheProductRating.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(updatetheProductRating.fulfilled, (state, action) => {
+      state.status = 'success'
+      state.products = action.payload
+    })
+    .
+    addCase(updatetheProductRating.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
     .addCase(sortproductNewest.pending, (state, action) => {
       state.status = 'loading'
     })
@@ -342,10 +374,24 @@ export const productSlice = createSlice({
     addCase(fetchAllCategories.fulfilled, (state, action) => {
       state.status = 'success'
       state.categories = action.payload
-      console.log('fetch categories: ', state.categories )
     })
     .
     addCase(fetchAllCategories.rejected, (state, action) => {
+      state.status = 'failed'
+      state.message = action.payload
+    })
+    .addCase(similarproduct.pending, (state, action) => {
+      state.status = 'loading'
+    })
+    .
+    addCase(similarproduct.fulfilled, (state, action) => {
+      state.status = 'success'
+      if(action.payload !== undefined){
+        state.similarProduct = action.payload
+      }
+    })
+    .
+    addCase(similarproduct.rejected, (state, action) => {
       state.status = 'failed'
       state.message = action.payload
     })
@@ -357,7 +403,6 @@ export const productSlice = createSlice({
       state.status = 'success'
       if(action.payload !== undefined || action.payload !== null){
         state.products = action.payload
-        console.log('search product: ', state.products )
       }
     })
     .
@@ -373,7 +418,6 @@ export const productSlice = createSlice({
       state.status = 'success'
       state.category = action.payload;
       state.products = action.payload.products;
-      console.log('fetch category: ', state.category )
     })
     .
     addCase(getACategory.rejected, (state, action) => {
@@ -387,7 +431,6 @@ export const productSlice = createSlice({
     addCase(fetchAllBrands.fulfilled, (state, action) => {
       state.status = 'success'
       state.brands = action.payload;
-      console.log('fetch brands: ', state.brands )
     })
     .
     addCase(fetchAllBrands.rejected, (state, action) => {
@@ -402,7 +445,6 @@ export const productSlice = createSlice({
       state.status = 'success'
       state.brand = action.payload
       state.products = action.payload.products
-      console.log('fetch brand: ', state.brand )
     })
     .
     addCase(fetchABrand.rejected, (state, action) => {
@@ -416,7 +458,6 @@ export const productSlice = createSlice({
     addCase(getPagination.fulfilled, (state, action) => {
       state.status = 'success'
       state.products = action.payload
-      console.log('fetch pagination: ', state.products )
     })
     .
     addCase(getPagination.rejected, (state, action) => {
@@ -431,7 +472,6 @@ export const productSlice = createSlice({
       state.status = 'success'
       if(action.payload !== undefined){
         state.productReview = action.payload
-      console.log('created review: ', action.payload)
       }
       
     })
@@ -440,20 +480,17 @@ export const productSlice = createSlice({
       state.status = 'failed'
       state.message = action.payload
     })
-    .addCase(getallProductReviews.pending, (state, action) => {
+    .addCase(getaProductReviews.pending, (state, action) => {
       state.status = 'loading'
     })
-    .
-    addCase(getallProductReviews.fulfilled, (state, action) => {
+    .addCase(getaProductReviews.fulfilled, (state, action) => {
       state.status = 'success'
       if(action.payload !== undefined){
         state.productReview = action.payload
-      console.log('created review: ', state.productReview )
       }
       
     })
-    .
-    addCase(getallProductReviews.rejected, (state, action) => {
+    .addCase(getaProductReviews.rejected, (state, action) => {
       state.status = 'failed'
       state.message = action.payload
     })

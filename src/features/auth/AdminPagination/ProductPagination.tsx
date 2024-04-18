@@ -16,20 +16,15 @@ const ProductPagination: React.FC<ChildComponentProp> = ({ totalCount }) => {
   const totalItem = totalCount;
   const handlePages = (num: number) => {
     setPage(num);
-    console.log('current ', num)
     const limit = iTemLimitPerPage;
     const currentPage = num;
     const data = { limit, currentPage };
     dispatch(getPagination(data) as any);
   };
-  console.log('total count', )
-
   
-  console.log("page: ", page);
 
   const handlePrevious = (num: number) => {
     setPage(num);
-    console.log('previous: ', num)
     const limit = iTemLimitPerPage;
     const currentPage = num;
     const data = { limit, currentPage };
@@ -38,7 +33,6 @@ const ProductPagination: React.FC<ChildComponentProp> = ({ totalCount }) => {
 
   const handleNext = (num: number) => {
     setPage(num);
-    console.log('next: ', num)
     const limit = iTemLimitPerPage;
     const currentPage = num;
     const data = { limit, currentPage };

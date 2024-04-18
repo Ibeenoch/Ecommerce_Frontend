@@ -21,7 +21,6 @@ const initialState: CartInterface = {
 export const fetchAllUsersCartAsync = createAsyncThunk('cart/fetchAllUsersCart',   async (_, thunkAPI) => {
     try {
         const response = await api.fetchAllUsersCart();
-        console.log('cart fetched: ', response)
           return response;
       
     } catch (error) {
@@ -35,7 +34,6 @@ export const addtocart = createAsyncThunk('cart/createcart', async(dataItem: any
     const addToast = dataItem.addToast;
     const data = dataItem.data;
     const res = await api.addToCart(data, addToast)
-    console.log('resfsra: ', res)
       return res;
          
   } catch (error) {
@@ -72,9 +70,7 @@ export const cartSlice = createSlice({
       })
       .addCase(fetchAllUsersCartAsync.fulfilled, (state, action) => {
         if(action.payload === null || action.payload === undefined){
-          console.log('empty')
         }else{
-          console.log('fetched all this cart: ', action.payload)
           state.status = 'success'
           state.carts = action.payload;
         }
@@ -88,10 +84,8 @@ export const cartSlice = createSlice({
       })
       .addCase(addtocart.fulfilled, (state, action) => {
         if(action.payload === undefined){
-          // state.carts.push(action.payload);
-          console.log('state is undefined')
+          console.log('none')
         }else{
-            console.log('it is an array')
             state.carts.push(action.payload);  
         }
         

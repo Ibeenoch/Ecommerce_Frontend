@@ -8,7 +8,6 @@ export const createProduct = async (products: any) => {
   try {
     const token = products.token;
     const product = products.product;
-    console.log(product, token);
     const option = {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -18,7 +17,6 @@ export const createProduct = async (products: any) => {
 
     if (product) {
       const res = await axios.post(API + "/product/create", product, option);
-      console.log(res);
       return res;
     }
   } catch (error) {
@@ -40,14 +38,30 @@ export const getProducts = async () => {
   }
 };
 
-export const getAllProductReview = async () => {
+export const getAProductReview = async (id: any) => {
   try {
     const option = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    const res = await axios.get(API + "/reviews/product");
+    const res = await axios.get(API + `/reviews/product/${id}`);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getSimilarProduct = async (data: any) => {
+  try {
+    const category = data.category;
+    const brand = data.brand;
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const res = await axios.get(API + `/similar/product?q=${category}&m=${brand}`, option);
     return res;
   } catch (error) {
     console.log(error);
@@ -101,7 +115,6 @@ export const deleteProduct = async (product: any) => {
     const token = product.token;
 
     if (productId) {
-      console.log("api delete ", product);
       const option = {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -113,7 +126,6 @@ export const deleteProduct = async (product: any) => {
         `${API}/product/delete/${productId}`,
         option
       );
-      console.log(res);
       return res;
     }
   } catch (error) {
@@ -128,9 +140,7 @@ export const updateProduct = async (products: any) => {
     const images = products.images;
     const token = products.token;
 
-    console.log("product sending; ", product, product.images);
     if (product && images) {
-      console.log("with img: ", productId, product, token);
       const option = {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -144,11 +154,9 @@ export const updateProduct = async (products: any) => {
           product,
           option
         );
-        console.log("server res: ", res);
         return res;
       }
     } else {
-      console.log("no img: ", productId, product, token);
       const option = {
         headers: {
           "Content-Type": "application/json",
@@ -162,7 +170,6 @@ export const updateProduct = async (products: any) => {
           product,
           option
         );
-        console.log(res);
         return res;
       }
     }
@@ -174,7 +181,6 @@ export const updateProduct = async (products: any) => {
 export const sortProductInAsc = async () => {
   try {
     const res = await axios.get(API + "/sort/product/asc");
-    console.log(res);
     return res;
   } catch (error) {
     console.log(error);
@@ -184,7 +190,6 @@ export const sortProductInAsc = async () => {
 export const sortProductInDesc = async () => {
   try {
     const res = await axios.get(API + "/sort/product/desc");
-    console.log(res);
     return res;
   } catch (error) {
     console.log(error);
@@ -194,7 +199,6 @@ export const sortProductInDesc = async () => {
 export const sortProductInLatest = async () => {
   try {
     const res = await axios.get(API + "/sort/product/latest");
-    console.log(res);
     return res;
   } catch (error) {
     console.log(error);
@@ -204,7 +208,6 @@ export const sortProductInLatest = async () => {
 export const sortProductInRated = async () => {
   try {
     const res = await axios.get(API + "/sort/product/rating");
-    console.log(res);
     return res;
   } catch (error) {
     console.log(error);
@@ -214,7 +217,6 @@ export const sortProductInRated = async () => {
 export const getAllCategories = async () => {
   try {
     const res = await axios.get(API + "/categories");
-    console.log("categories fetch", res);
     return res;
   } catch (error) {
     console.log(error);
@@ -224,7 +226,6 @@ export const getAllCategories = async () => {
 export const getACategory = async (name: any) => {
   try {
     const res = await axios.get(API + `/category/${name}`);
-    console.log(res);
     return res;
   } catch (error) {
     console.log(error);
@@ -234,7 +235,6 @@ export const getACategory = async (name: any) => {
 export const getAllBrands = async () => {
   try {
     const res = await axios.get(API + "/brands");
-    console.log(res);
     return res;
   } catch (error) {
     console.log(error);
@@ -244,7 +244,18 @@ export const getAllBrands = async () => {
 export const getABrand = async (name: any) => {
   try {
     const res = await axios.get(API + `/brand/${name}`);
-    console.log("brand api ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateproductReview = async (data: any) => {
+  try {
+    const id = data.id;
+    const updatedRating = { updatedRating: data.updatedRating};
+    
+    const res = await axios.put(API + `/similar/product/${id}`, updatedRating);
     return res;
   } catch (error) {
     console.log(error);
@@ -254,7 +265,6 @@ export const getABrand = async (name: any) => {
 export const fetchPagination = async (data: any) => {
   try {
     const res = await axios.post(API + `/product/paginate`, data);
-    console.log("pagination api ", res);
     return res;
   } catch (error) {
     console.log(error);

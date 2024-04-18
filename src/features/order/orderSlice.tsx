@@ -68,7 +68,6 @@ export const orderSlice = createSlice({
     })
     .addCase(getAllOrders.fulfilled, (state, action) => {
       state.status = 'success'
-      console.log('all orders ', action.payload)
       state.orders = action.payload
     })
     .addCase(getAllOrders.rejected, (state, action) => {
@@ -81,7 +80,6 @@ export const orderSlice = createSlice({
       state.status = 'success'
       const findIndex = state.orders.findIndex((item: any) => item.id === action.payload.id)
       state.orders[findIndex] = action.payload
-      console.log('update order ', action.payload, state.orders)
     })
     .addCase(orderUpdate.rejected, (state, action) => {
       state.status = 'failed'
@@ -93,7 +91,6 @@ export const orderSlice = createSlice({
       state.status = 'success'
       const findIndex = state.orders.findIndex((item: any) => item.id === action.payload.id)
       state.orders.splice(findIndex, 1)
-      console.log('delete order ',)
     })
     .addCase(deleteOrder.rejected, (state, action) => {
       state.status = 'failed'

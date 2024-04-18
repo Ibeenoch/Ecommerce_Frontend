@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom/client";
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
+import { jwtDecode } from "jwt-decode";
 import { ToastProvider } from "react-toast-notifications";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
@@ -25,6 +26,8 @@ import VerifyMsgPage from "./pages/VerifyMsgPage";
 import WishListPage from "./pages/WishListPage";
 import ProductReviewPage from "./pages/ProductReviewPage";
 import ProductReviewFormPage from "./pages/ProductReviewFormPage";
+import { useAppSelector } from "./app/hooks";
+import { selectUser } from "./features/auth/authSlice";
 
 const router = createBrowserRouter([
   {
@@ -69,7 +72,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/product/review/form/:id",
-    element: <ProductReviewFormPage />,
+    element: (<ProtectedRoute child={<ProductReviewFormPage />} />),
   },
   {
     path: "/product/details/:id",
@@ -124,7 +127,11 @@ const router = createBrowserRouter([
   },
 ]);
 
+
+
 function App() {
+
+
   return (
     <ToastProvider>
       <div className="App">

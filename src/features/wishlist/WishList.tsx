@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { MinusIcon, PlusIcon, ShoppingBagIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
@@ -15,7 +15,6 @@ const WishList = () => {
   const { user } = useAppSelector(selectUser);
   const { addToast } = useToasts();
   
-  console.log("wishlist: ", wishlist);
   const navigate = useNavigate();
 
   const subTotal = () => {
@@ -36,10 +35,8 @@ const WishList = () => {
   const handleAddCart = (productId: any) => {
     const quantity = 1;
     dispatch(getAproduct(productId)).then((res) => {
-      console.log("response product ", res.payload);
       const receive = res.payload;
       const data = { ...receive, quantity };
-      console.log("cart added: ", data);
       const dataitem = { data, addToast };
       dispatch(addtocart(dataitem));
     });
@@ -111,17 +108,17 @@ const WishList = () => {
                         <div className="flex flex-1 items-end justify-between text-sm">
                           <div 
                           onClick={() => handleAddCart(wish.id)}
-                          className="cursor-pointer rounded-full bg-orange-600 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-gray dark:hover:bg-blue-900 px-4 py-2">
-                            Add To Cart
+                          className="flex cursor-pointer rounded-full bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2">
+                           <ShoppingBagIcon width={30} height={20} />  <div>Add To Cart</div>
                           </div>
 
                           <div className="flex">
                             <button
                               type="button"
                               onClick={() => handleRemove(wish.id)}
-                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                              className="font-medium text-red-800 hover:text-red-700"
                             >
-                              <TrashIcon color="indigo" className="h-6 w-5" />
+                              <TrashIcon color="brown" className="h-6 w-5" />
                             </button>
                           </div>
                         </div>
@@ -145,10 +142,10 @@ const WishList = () => {
                 <Link to="/">
                   <button
                     type="button"
-                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                          className="flex cursor-pointer rounded-full bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2"
                     onClick={() => setOpen(false)}
                   >
-                    Continue Shopping
+                  <strong> Continue Shopping</strong> 
                     <span aria-hidden="true"> &rarr;</span>
                   </button>
                 </Link>
