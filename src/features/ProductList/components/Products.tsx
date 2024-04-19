@@ -239,7 +239,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
 
   return (
      <>
-      {/* <Carousel /> */}
+      <Carousel />
 
       <div style={{  }}>
      

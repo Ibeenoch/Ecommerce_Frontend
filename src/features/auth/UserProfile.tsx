@@ -1,15 +1,22 @@
 import {
+  CalendarDaysIcon,
+  CalendarIcon,
   CameraIcon,
   CheckBadgeIcon,
+  ChevronDoubleRightIcon,
+  EnvelopeIcon,
   FunnelIcon,
   HeartIcon,
+  HomeIcon,
   MinusIcon,
   PencilIcon,
+  PhoneIcon,
   PlusIcon,
   ShoppingBagIcon,
   Squares2X2Icon,
   StarIcon,
   TrashIcon,
+  UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -21,6 +28,7 @@ import pics from "../../images/image.jpeg";
 import { useToasts } from "react-toast-notifications";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import ShippingDetails from "./ShippingDetails";
+import { GlobeAltIcon, UserGroupIcon } from "@heroicons/react/20/solid";
 
 const UserProfile = () => {
   const dispatch = useAppDispatch();
@@ -388,73 +396,59 @@ const UserProfile = () => {
                                   </h3>
 
                                   <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong> Fullname:</strong>{" "}
-                                      {user.fullName}
+                                    <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><UserIcon width={25} height={25} color="brown" fill="brown" /> </strong>{" "}
+                                      {user.fullName.toUpperCase()}
                                     </div>
                                   </div>
 
                                   <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong>Phone:</strong> {user.phone}
+                                    <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><PhoneIcon width={25} height={25} color="brown" fill="brown" /> </strong> 
+                                      {user.phone}
                                     </div>
                                   </div>
 
                                   <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong>Address:</strong> {user.address}
+                                  <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><HomeIcon width={25} height={25} color="brown" fill="brown" /> </strong>{" "}
+                                      {user.address}
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex items-center my-1">
+                                    <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><EnvelopeIcon width={25} height={25} color="white" fill="brown" /> </strong>{" "}
+                                      {user.email}
+                                    </div>
+                                  </div>
+
+                      
+
+                                  <div className="flex items-center my-1">
+                                    <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><GlobeAltIcon width={25} height={25} color="brown" fill="brown" /> </strong>{" "}
+                                     {user.city}, {user.state}, {user.country}.
                                     </div>
                                   </div>
 
                                   <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg  font-poppins text-center">
-                                      {" "}
-                                      <strong>City:</strong> {user.city}
+                                    <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><ChevronDoubleRightIcon width={25} height={25} color="brown" fill="brown" /> </strong>{" "}
+                                     {user.zipcode}
                                     </div>
                                   </div>
 
                                   <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong> State:</strong> {user.state}
+                                    <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><UserGroupIcon width={25} height={25} color="brown" fill="brown" /> </strong>{" "}
+                                     {user.role}
                                     </div>
                                   </div>
 
                                   <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong>Email:</strong> {user.email}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg  font-poppins text-center">
-                                      {" "}
-                                      <strong>Country:</strong> {user.country}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong>Zipcode:</strong> {user.zipcode}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong>Role:</strong> {user.role}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center my-1">
-                                    <div className="ml-6 truncate text-lg font-poppins text-center">
-                                      {" "}
-                                      <strong>Joined Since:</strong>{" "}
+                                    <div className="flex ml-6 gap-6 truncate text-lg font-poppins text-center">
+                                      <strong className="flex  align-center"><CalendarDaysIcon width={25} height={25} color="white" fill="brown" /> </strong>{" "}
                                       {user.createdAt.slice(0, 4)}
                                     </div>
                                   </div>

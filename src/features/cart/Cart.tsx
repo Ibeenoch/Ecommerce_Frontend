@@ -31,9 +31,10 @@ const Cart = () => {
 
   const handleAdd = (id: number): void => {
     const checkItem = JSON.parse(localStorage.getItem("cart") as any);
-
     if (checkItem.length === 1) {
-      checkItem.quantity++;
+       console.log('types ', typeof checkItem)
+      checkItem[0].quantity++;
+      console.log('updated ', checkItem)
       localStorage.setItem("cart", JSON.stringify(checkItem));
       dispatch(fetchAllUsersCartAsync());
     } else {
@@ -49,7 +50,14 @@ const Cart = () => {
     const checkItem = JSON.parse(localStorage.getItem("cart") as any);
 
     if (checkItem.length === 1) {
-      return;
+      if(checkItem[0].quantity === 1){
+        return;
+      }else{
+        checkItem[0].quantity--;
+        console.log('updated minus', checkItem)
+      localStorage.setItem("cart", JSON.stringify(checkItem));
+      dispatch(fetchAllUsersCartAsync());
+      }
     } else {
       if (checkItem && Array.isArray(checkItem)) {
         const index = checkItem.findIndex((item: any) => item.id === id);

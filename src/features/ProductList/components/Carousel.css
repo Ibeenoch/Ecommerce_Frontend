@@ -1,0 +1,37 @@
+.carousel {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .carousel-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 2rem;
+  }
+  
+  .carousel-images {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0rem;
+  }
+  
+  .carousel-image img {
+    width: 100%;
+    height: auto;
+  }
+  
+  @media (max-width: 1199px) {
+    .carousel-images {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .carousel-images {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+  

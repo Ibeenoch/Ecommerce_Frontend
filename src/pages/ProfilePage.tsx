@@ -25,6 +25,7 @@ const ProfilePage: React.FC = () => {
        <NavBar isOpen={isOpen} >
             <UserProfile />
        </NavBar>
+       <Footer />
       </>
       
     )

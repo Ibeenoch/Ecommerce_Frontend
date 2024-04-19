@@ -12,64 +12,16 @@ const OrderSuccessPage = () => {
   const { carts } = useAppSelector(selectAllCart);
   const { addToast } = useToasts();
   
-  const navigate = useNavigate();
-
-
-  const dispatch = useAppDispatch();
+  
   useEffect(() => {
-    dispatch(fetchAllUsersCartAsync());
+    localStorage.removeItem('cart');
+    addToast('Thank you for placing from us', {
+      appearance: 'info',
+      autoDismiss: true
+    })
   }, []);
 
-  const handleAdd = (id: number): void => {
-    const checkItem = JSON.parse(localStorage.getItem("cart") as any);
-
-    if (checkItem.length === 1) {
-      checkItem.quantity++;
-      localStorage.setItem("cart", JSON.stringify(checkItem));
-      dispatch(fetchAllUsersCartAsync());
-    } else {
-      if (checkItem && Array.isArray(checkItem)) {
-        const index = checkItem.findIndex((item: any) => item.id === id);
-        checkItem[index].quantity++;
-        localStorage.setItem("cart", JSON.stringify(checkItem));
-        dispatch(fetchAllUsersCartAsync());
-      }
-    }
-  };
-  const handleMinus = (id: number): void => {
-    const checkItem = JSON.parse(localStorage.getItem("cart") as any);
-
-    if (checkItem.length === 1) {
-      return;
-    } else {
-      if (checkItem && Array.isArray(checkItem)) {
-        const index = checkItem.findIndex((item: any) => item.id === id);
-        if (checkItem[index].quantity === 1) {
-          return;
-        }
-        checkItem[index].quantity--;
-        localStorage.setItem("cart", JSON.stringify(checkItem));
-        dispatch(fetchAllUsersCartAsync());
-      }
-    }
-  };
-
-  const handleRemove = (id: any) => {
-    var checkItem = JSON.parse(localStorage.getItem("cart") as any);
-    if (checkItem && Array.isArray(checkItem)) {
-      const index = checkItem.findIndex((item) => item.id === id);
-      checkItem.splice(index, 1);
-      localStorage.setItem("cart", JSON.stringify(checkItem));
-      dispatch(fetchAllUsersCartAsync());
-    } else {
-      checkItem = {};
-      localStorage.setItem("cart", JSON.stringify(checkItem));
-      dispatch(fetchAllUsersCartAsync()).then(() => {
-        navigate("/");
-      });
-    }
-  };
-
+ 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
     <div className="sm:mx-auto sm:w-full sm:max-w-sm">

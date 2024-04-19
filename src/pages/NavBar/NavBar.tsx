@@ -33,7 +33,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
   const { wishlist } = useAppSelector(selectAllWishList);
   const { user } = useAppSelector(selectUser);
 
-  
+  console.log( 'cart ',carts)
   useEffect(() => {
     dispatch(fetchAllUsersCartAsync())
   }, [navigate])
@@ -115,7 +115,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
   return (
     <>
       <div  className="min-h-full">
-        <Disclosure  as="nav" className="bg-white border-b border-b-gray-500 fixed w-full z-50">
+        <Disclosure  as="nav" className="bg-white border-b border-b-red-800 fixed w-full z-50">
           {({ open }) => (
             <>
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

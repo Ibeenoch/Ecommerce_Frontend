@@ -1,76 +1,76 @@
 import React, { useEffect, useState } from 'react'
-import pic1 from '../../../images/Apple 2022 MacBook Air Laptop 1.jpg'
-import pic2 from '../../../images/Dell AlienWare 1-1.jpg'
-import pic3 from '../../../images/Dell Newest Inspiron 15 3511 Laptop, 15.6_ FHD Touchscreen__2.jpg'
+import pic1 from '../../../images/nike air2.png'
+import pic2 from '../../../images/OPPO Find N2 Flip Dual-SIM 256GB ROM + 8GB RAM__3.jpg'
+import pic3 from '../../../images/T-shirt 2.png'
 import pic4 from '../../../images/s24 ultra6.jpg'
 import pic5 from '../../../images/lenovo yoga i7 5.jpg'
-import pic6 from '../../../images/Untitled.jpg'
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/20/solid'
-
-const Carousel = () => {
-
-    const [currentSlide, setCurrentSlide] = useState(0);
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
-      }, 3000); // Change slide every 3 seconds
-  
-      return () => {
-        clearInterval(interval);
-      };
-    }, []);
+import pic6 from '../../../images/T-shirt 1.png'
+import pic7 from '../../../images/Samsung s24 ultra.jpg'
+import pic8 from '../../../images/apple watch2 .png'
+import pic9 from '../../../images/ps5 3.png'
+import './Carousel.css'; // Import your CSS file for styles
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 
 
-    const slides = [pic1, pic2, pic3, pic4, pic5, pic6];
 
-    const goToPreviousSlide = () => {
-        setCurrentSlide((prevSlide) => (prevSlide === 0 ? slides.length - 1 : prevSlide - 1));
-      };
-    
-      const goToNextSlide = () => {
-        setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
-      };
-  
-    return (
-      <div className="carousel w-full relative bg-orange-500 max-w-screen-lg mt-10 mx-auto overflow-hidden">
-        <div
-          className="slides flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-        >
-          {slides.map((slide) => (
-            <div key={slide} className="w-full flex-shrink-0">
-              <img
-                src={slide}
-                alt=''
-                className="w-full h-auto object-cover"
-              />
-            </div>
-          ))}
-        </div>
-        
-          {/* Previous Button */}
-      <button
-        className="absolute top-1/2 left-0 transform  -translate-y-1/2 p-6 bg-gray-300 opacity-50 hover:opacity-75 focus:outline-none"
-        onClick={goToPreviousSlide}
-        aria-label="Previous Slide"
-      >
-        &lt;
+const Carousel: React.FC = () => {
+  const images = [pic1, pic2, pic3, pic4, pic5, pic6, pic7, pic8, pic9];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [numImagesToShow, setNumImagesToShow] = useState(3);
+
+  // Update the number of images to show based on the window size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1200) {
+        setNumImagesToShow(3);
+      } else if (window.innerWidth >= 768) {
+        setNumImagesToShow(2);
+      } else {
+        setNumImagesToShow(1);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    // Initial call
+    handleResize();
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + numImagesToShow) % images.length);
+  };
+
+  const handlePrevious = () => {
+    setCurrentIndex((prevIndex) =>
+      (prevIndex - numImagesToShow + images.length) % images.length
+    );
+  };
+
+  return (
+    <div className="carousel">
+      <button onClick={handlePrevious} className="carousel-button p-4">
+        <ChevronLeftIcon className='bg-gray-400' width={30} height={35} fill='white' color='white' />
       </button>
 
-      {/* Next Button */}
-      <button
-        className="absolute top-1/2 right-0 transform -translate-y-1/2 p-6 bg-gray-300 opacity-50 hover:opacity-75 focus:outline-none"
-        onClick={goToNextSlide}
-        aria-label="Next Slide"
-      >
-        &gt;
-      </button>
-
+      <div className="carousel-images">
+        {images.slice(currentIndex, currentIndex + numImagesToShow).map((image, index) => (
+          <div key={index} className="carousel-image">
+            <img src={image} alt={`Carousel ${index}`} />
+          </div>
+        ))}
       </div>
 
+      <button onClick={handleNext} className="carousel-button p-4">
+       <ChevronRightIcon className='bg-gray-400' width={30} height={35} fill='white' color='white' />
+      </button>
+    </div>
+  );
+};
 
-  )
-}
-
-export default Carousel
+export default Carousel;
