@@ -155,7 +155,7 @@ const Admin = () => {
     setThestatus(allSelectOption);
     setOrderIndex(index);
   };
-
+console.log(theStatus)
   const token = user && user.role === 'ADMIN' && user.token;
 
   const handleDelete = (productId: any) => {
@@ -432,14 +432,14 @@ const Admin = () => {
                           <Disclosure
                             as="div"
                             key={section.id}
-                            className="border-t border-gray-200 px-4 py-6"
+                            className="border-t hover:text-white border-gray-200 px-4 py-6"
                             onClick={() => fetchCategories(section.name)}
                           >
                             {({ open }) => (
                               <>
                                 <h3 className="-mx-2 flow-root">
-                                  <Disclosure.Button className="flex w-full hover:bg-red-700 items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                                    <span className="font-medium text-gray-900">
+                                  <Disclosure.Button className="flex w-full hover:bg-red-800 items-center justify-between bg-white px-2 py-3 text-gray-900 hover:text-white">
+                                    <span className="font-medium text-gray-900 hover:text-white">
                                       {section.name}
                                     </span>
                                     <span className="ml-6 flex items-center"></span>
@@ -465,18 +465,18 @@ const Admin = () => {
                 <div className="flex items-center">
                   <button
                     type="button"
-                    className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7"
+                    className="-m-2 ml-5 p-2 text-gray-900 hover:text-gray-700 sm:ml-7"
                   >
                     <span className="sr-only">View grid</span>
-                    <Squares2X2Icon className="h-5 w-5" aria-hidden="true" />
+                    <Squares2X2Icon className="h-6 w-6" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
-                    className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
+                    className="-m-2 ml-4 p-2 text-gray-900 hover:text-gray-800 sm:ml-6 lg:hidden"
                     onClick={() => setMobileFiltersOpen(true)}
                   >
                     <span className="sr-only"></span>
-                    <FunnelIcon className="h-5 w-5" aria-hidden="true" />
+                    <FunnelIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -502,8 +502,8 @@ const Admin = () => {
                         {({ open }) => (
                           <>
                             <h3 className="-my-3 flow-root">
-                              <Disclosure.Button className="flex w-full hover:bg-indigo-300 items-center px-4 justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                                <span className="font-medium text-gray-900">
+                              <Disclosure.Button className="flex w-full hover:bg-red-800 items-center px-4 justify-between bg-white py-3 text-sm text-gray-400 hover:text-white">
+                                <span className="font-medium text-gray-900 hover:text-white">
                                   {section.name}
                                 </span>
                                 <span className="ml-6 flex items-center"></span>
@@ -534,7 +534,7 @@ const Admin = () => {
                                   </h2>
                                   <div
                                     onClick={handleCreateProduct}
-                                    className="text-sm text-center text-bold text-sky-800 cursor-pointer bg-indigo hover:bg-indigo-500 hover:text-white px-3 pt-3 rounded-full border border-blue-300"
+                                    className="text-sm text-center text-bold text-white cursor-pointer bg-red-800 hover:bg-red-700 hover:text-white px-3 pb-0 pt-1.5 mt-2 ml-2 rounded-full border border-blue-300"
                                   >
                                     <strong>Add Product </strong>
                                   </div>
@@ -547,7 +547,7 @@ const Admin = () => {
                                         onClick={() =>
                                           handleProductDetails(item.id)
                                         }
-                                        className="flex flex-col lg:flex-row justify-between px-4 py-2 w-full hover:bg-indigo-200 cursor-pointer"
+                                        className="flex flex-col lg:flex-row justify-between px-4 py-2 w-full hover:bg-red-100 cursor-pointer"
                                       >
                                         <div className="first">
                                           <div className="sm:col-span-3">
@@ -630,7 +630,7 @@ const Admin = () => {
                                           <PencilIcon
                                             width="16px"
                                             height="16px"
-                                            color="blue"
+                                            color="brown"
                                             className="cursor-pointer"
                                           />{" "}
                                         </div>
@@ -798,8 +798,8 @@ const Admin = () => {
                                                   Delivery Status:{" "}
                                                 </strong>
                                                 <select
-                                                  className="w-1/8 lg:w-1/6 p-2 border border-green-300 rounded"
-                                                  value={item.status}
+                                                  className="w-1/8 lg:w-1/6 p-2 border border-red-800 rounded"
+                                                  value={theStatus ? theStatus[0] : item.status}
                                                   onChange={(e) =>
                                                     handleStatus(e, index)
                                                   }
@@ -821,7 +821,7 @@ const Admin = () => {
                                                   onClick={() =>
                                                     sendUpdate(item.id)
                                                   }
-                                                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                                  className="rounded-md bg-red-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                                 >
                                                   Update Status
                                                 </button>
@@ -885,7 +885,7 @@ const Admin = () => {
                                             <EyeIcon
                                               width="16px"
                                               height="16px"
-                                              color="blue"
+                                              color="brown"
                                               className="cursor-pointer"
                                             />
                                           </div>

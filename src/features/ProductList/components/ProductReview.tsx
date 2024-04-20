@@ -11,7 +11,7 @@ import { LinearProgress } from "@material-ui/core";
 const ProductReview = () => {
 
   const { product, productReview } = useAppSelector(selectProduct);
-  const { user } = useAppSelector(selectUser);
+  const user = JSON.parse(localStorage.getItem('user') as any)
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const totalRating = 0;
@@ -86,7 +86,11 @@ const ProductReview = () => {
   const firstBar = (Math.round((totalOnestar / totalRatingGiven) * 10) * 10)
   console.log('edae: ', fifthBar, fourthBar, thirdBar, secondBar, firstBar, totalRatingGiven, Math.round(0.7));
   
+  const handleLogin = () => {
+    navigate('/login')
+  }
   
+  const fiveRate = 'h-full bg-red-500 w-['+ fifthBar +'%] rounded-[30px] flex';
 
   return (
     <>
@@ -133,7 +137,7 @@ const ProductReview = () => {
                   </svg>
                   
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-indigo-500 w-[${fifthBar && fifthBar}%] rounded-[30px] flex`} />
+                    <span style={{ width: `${fifthBar}%`}} className={`h-full bg-red-500 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                     {totalFivestar && totalFivestar}
@@ -163,7 +167,7 @@ const ProductReview = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-indigo-500 w-[${fourthBar && fourthBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${fourthBar}%`}} className={`h-full bg-red-500 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                     {totalFourstar && totalFourstar}
@@ -193,7 +197,7 @@ const ProductReview = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-indigo-500 w-[${thirdBar && thirdBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${thirdBar}%`}} className={`h-full bg-red-500 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                   {totalThreestar && totalThreestar}
@@ -224,7 +228,7 @@ const ProductReview = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-indigo-500 w-[${secondBar && secondBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${secondBar}%`}} className={`h-full bg-red-500 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                   {totalTwostar}
@@ -254,7 +258,7 @@ const ProductReview = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-indigo-500 w-[${firstBar && firstBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${firstBar}%`}} className={`h-full bg-red-500 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                     {totalOnestar && totalOneRatingArr}
@@ -286,22 +290,34 @@ const ProductReview = () => {
                 </div>
                 <div className="col-span-12 md:col-span-4 max-lg:mt-8 md:pl-8">
                   <div className="flex items-center flex-col justify-center w-full h-full ">
-                    <button
+                    {user && user.id ? (
+                      <button
                       onClick={() => handleReviewForm(product.id)}
-                      className="rounded-full px-6 py-4 bg-indigo-600 font-semibold text-lg text-white whitespace-nowrap mb-6 w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-indigo-700 hover:shadow-indigo-400"
+                      className="rounded-full px-6 py-4 bg-red-800 font-semibold text-lg text-white whitespace-nowrap mb-6 w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-red-700 hover:shadow-red-400"
                     >
                       Write A Review
                     </button>
-                    {/* <button className="rounded-full px-6 py-4 bg-white font-semibold text-lg text-indigo-600 whitespace-nowrap w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-indigo-100 hover:shadow-indigo-200">
-                See All Reviews
-              </button> */}
+                    ) : (
+                      <button
+                      onClick={handleLogin}
+                      className="rounded-full px-6 py-4 bg-red-800 font-semibold text-lg text-white whitespace-nowrap mb-6 w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-red-700 hover:shadow-red-400"
+                    >
+                      Write A Review
+                    </button>
+                    )}
+                    
+                    
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {productReview &&
+          { !productReview.length ? (
+            <div  className="p-6 text-base rounded-lg dark:bg-gray-900">
+            <p>No product review </p>
+            </div>
+          ) : (
             productReview.map((review: any) => (
               <>
                 <article className="p-6 text-base bg-white rounded-lg dark:bg-gray-900">
@@ -310,10 +326,10 @@ const ProductReview = () => {
                       <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
                         <img
                           className="mr-2 w-6 h-6 rounded-full"
-                          src={user && user.image && user.image.url}
+                          src={review && review.user && review.user.image && review.user.image.url}
                           alt=""
                         />
-                        {user && user.fullName}
+                        {review && review.user && review.user.fullName}
                       </p>
                       <div className="flex text-sm text-gray-600 dark:text-gray-400">
                         <div>
@@ -431,7 +447,8 @@ const ProductReview = () => {
                   </p>
                 </article>
               </>
-            ))}
+            ))
+          ) }
         </div>
       </div>
     </section>

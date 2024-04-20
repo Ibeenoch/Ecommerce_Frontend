@@ -102,6 +102,7 @@ export const orderSlice = createSlice({
       state.status = 'success'
       if(action.payload !== undefined){
         state.orders = action.payload
+        console.log('ordrers ', state.orders)
       }
     })
     .addCase(getOrderPagination.rejected, (state, action) => {

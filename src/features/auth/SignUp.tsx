@@ -40,9 +40,11 @@ const SignUp: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
   const { fullname, email, password, confirmPassword } = formData;
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@_!#$%^&*(),.?":{}|<>]).{8,}$/;
+
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
+    console.log('testing ', passwordRegex.test(password))
     setIsClicked(true)
     if (passwordRegex.test(password)) {
       //continue
@@ -51,6 +53,7 @@ const SignUp: React.FC = () => {
           appearance: "warning",
           autoDismiss: true,
         });
+        setIsChecked(false);
       }
       const register = { ...formData, passcode };
       dispatch(registerUser(register)).then((res) => {
@@ -59,6 +62,7 @@ const SignUp: React.FC = () => {
             appearance: "warning",
             autoDismiss: true,
           });
+          setIsChecked(false);
         }else if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN'){
           addToast("Registered As Admin Successful", {
             appearance: "success",
@@ -76,13 +80,14 @@ const SignUp: React.FC = () => {
             appearance: "error",
             autoDismiss: true,
           });
+          setIsChecked(false);
           return;
         }
         
       });
     } else {
       addToast(
-        "the password must be at least 8 character, the password should contain a upper case letter, the password should contain a lower case letter, the password should contain a number, the password should contain a special character e.g Password1!",
+        "Password must be eight characters including one uppercase letter, one special character and alphanumeric characters e.g Password1!",
         {
           appearance: "warning",
           autoDismiss: true,
@@ -135,7 +140,7 @@ const SignUp: React.FC = () => {
                 value={formData.fullname}
                 required
                 placeholder=" Surname Firstname"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -156,7 +161,7 @@ const SignUp: React.FC = () => {
                 value={formData.email}
                 required
                 placeholder="Email Address"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -179,7 +184,7 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
                 required
                 placeholder="Password"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
               />
               <div
                 onClick={changeVisibilty}
@@ -213,7 +218,7 @@ const SignUp: React.FC = () => {
                 onChange={handleChange}
                 required
                 placeholder="Confirm Your Password"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
               />
               <div
                 onClick={changeConfirmVisibilty}
@@ -249,8 +254,8 @@ const SignUp: React.FC = () => {
                       value={passcode}
                       onChange={(e) => setPasscode(e.target.value)}
                       placeholder="Enter Passcode"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
+                      className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                      />
                   </div>
                 </div>
               ) : (

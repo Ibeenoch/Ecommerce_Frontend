@@ -15,7 +15,7 @@ export const addToCart = async(data: any, addToast: any) => {
     try {
         
         const checkItem = await JSON.parse(localStorage.getItem('cart') as any);
-        if(checkItem === null || checkItem.length < 1 ){
+        if(checkItem === undefined || checkItem === null || !checkItem.length || !Object.keys(checkItem).length ){
             let checkItem =[];
             checkItem.push(data);
             localStorage.setItem('cart', JSON.stringify(checkItem));

@@ -10,7 +10,7 @@ import { selectUser } from "../auth/authSlice";
 const Cart = () => {
   const [open, setOpen] = useState(true);
   const { carts } = useAppSelector(selectAllCart);
-  const { user } = useAppSelector(selectUser);
+  const user = JSON.parse(localStorage.getItem('user') as any)
   const { addToast } = useToasts();
   
   const navigate = useNavigate();
@@ -28,6 +28,7 @@ const Cart = () => {
   useEffect(() => {
     dispatch(fetchAllUsersCartAsync());
   }, []);
+
 
   const handleAdd = (id: number): void => {
     const checkItem = JSON.parse(localStorage.getItem("cart") as any);
@@ -170,11 +171,19 @@ const Cart = () => {
               Shipping and taxes calculated at checkout.
             </p>
             <div className="mt-6">
-              <Link to={user && user && user.id ? `/checkout/${user.id}`: '/login'}>
-                <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
-                  Checkout
-                </div>
-              </Link>
+             { user ? (
+               <Link to={`/checkout/${user.id}`}>
+               <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
+                 Checkout
+               </div>
+             </Link>
+             ) : (
+              <Link to='/login'>
+              <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
+                Checkout
+              </div>
+            </Link>
+             )}
             </div>
             <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
               <p>

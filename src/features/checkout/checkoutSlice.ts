@@ -17,7 +17,7 @@ const initialState: CheckOut = {
     checkoutInfo: [],
     latestTransaction: [],
     allTransactions: [],
-    aUserTransactions: [],
+    aUserTransactions: {},
     aUserOrderedProducts: [],
     aUserShippingAddress: [],
     aUserPayment: {},
@@ -36,6 +36,15 @@ export const createAddress = createAsyncThunk('checkout/add', async(data: any) =
 export const transactionmade = createAsyncThunk('checkout/transaction', async(data: any) => {
     try {
         const res = await api.sendTransaction(data);
+        return res?.data
+    } catch (error) {
+        
+    }
+})
+
+export const atransactionOfAUser = createAsyncThunk('checkout/singletransaction', async(data: any) => {
+    try {
+        const res = await api.getATransactionforAUser(data);
         return res?.data
     } catch (error) {
         
@@ -70,10 +79,10 @@ export const getpaymentPagination = createAsyncThunk('checkout/paginate', async(
 })
 
 
-export const getAUserTransaction = createAsyncThunk('/user/getAUserTransactions', async(id: any) => {
+export const getAUserTransaction = createAsyncThunk('/user/getAUserTransactions', async(data: any) => {
     try {
   
-      const res =  await api.fetchAUserTransactions(id);
+      const res =  await api.fetchAUserTransactions(data);
       return res?.data
     } catch (error) {
       console.log(error)
@@ -94,8 +103,6 @@ export const checkoutSlice = createSlice({
         .addCase(createAddress.fulfilled, (state, action) => {
             state.status = 'success'
            if(Array.isArray(state.checkoutInfo)){
-                state.checkoutInfo.push(action.payload)
-           }else{
             state.checkoutInfo = [action.payload]
            }
         })
@@ -160,6 +167,21 @@ export const checkoutSlice = createSlice({
 
           })
           .addCase(getAUserTransaction.rejected, (state, action) => {
+            state.status = 'failed'
+          })
+        .addCase(atransactionOfAUser.pending, (state, action) => {
+            state.status = 'loading'
+          })
+          .addCase(atransactionOfAUser.fulfilled, (state, action) => {
+            state.status = 'success'
+            state.aUserTransactions = action.payload
+            action.payload && Array.isArray(action.payload) && action.payload.forEach((elem) => {
+               state.aUserOrderedProducts = elem && elem.order && elem.order.productDetails;
+               state.aUserShippingAddress = elem && elem.order && elem.order.shippingDetails;
+            })
+            console.log('checkout slice: ', action.payload)
+          })
+          .addCase(atransactionOfAUser.rejected, (state, action) => {
             state.status = 'failed'
           })
         

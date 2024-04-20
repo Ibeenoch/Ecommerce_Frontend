@@ -18,7 +18,7 @@ const ProductReviewForm = () => {
     const ratingRef4 = useRef<HTMLDivElement>(null);
     const ratingRef5 = useRef<HTMLDivElement>(null);
     const [getRatingVal, setGetRatingVal] = useState<any>('');
-    const { user } = useAppSelector(selectUser)
+    const user = JSON.parse(localStorage.getItem('user') as any)
     const { product } = useAppSelector(selectProduct)
     const dispatch = useAppDispatch();
 
@@ -28,44 +28,6 @@ const ProductReviewForm = () => {
    const token = user && user.token;
    const userId = user && user.id;
    const productId = product && product.id;
-
-   const isTokenExpired = (token: any) => {
-    if(!token){
-      addToast('Session expiry please login to continue',
-        {
-          appearance: 'info',
-          autoDismiss: true,
-        }
-      )
-      localStorage.removeItem('user');
-      navigate('/login');
-    }
-    const decodeToken = jwtDecode(token);
-    const currentTime = Math.floor(Date.now()/1000);
-    const expiryTime = decodeToken?.exp;
-  console.log(currentTime, expiryTime);
-  
-  
-    if(expiryTime){
-     console.log(currentTime > expiryTime);
-       if(currentTime > expiryTime){
-        addToast('Session expiry please login to continue',
-        {
-          appearance: 'info',
-          autoDismiss: true,
-        }
-      ) 
-
-        localStorage.removeItem('user');
-        navigate('/login')
-       }else{
-        return;
-       }
-    }
-      
-  }
-
-  isTokenExpired(token)
 
     const handleReviewremark = (e: FormEvent) => {
         e.preventDefault();
@@ -114,6 +76,9 @@ const ProductReviewForm = () => {
         })
     }
 
+    if(!Object.keys(user).length){
+      navigate('/login')
+    }
     const handleRatingNumberOne = (e: React.MouseEvent<HTMLDivElement>) => {
         const dataVal = ratingRef1.current?.getAttribute('data-rating-num');
         setGetRatingVal(dataVal)

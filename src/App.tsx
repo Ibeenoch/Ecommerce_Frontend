@@ -28,6 +28,8 @@ import ProductReviewPage from "./pages/ProductReviewPage";
 import ProductReviewFormPage from "./pages/ProductReviewFormPage";
 import { useAppSelector } from "./app/hooks";
 import { selectUser } from "./features/auth/authSlice";
+import Logout from "./features/auth/Logout";
+import PageNotFound from "./pages/PageNotFound";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +39,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/logout",
+    element: <Logout />,
   },
   {
     path: "/register",
@@ -67,6 +73,10 @@ const router = createBrowserRouter([
     element: <WishListPage />,
   },
   {
+    path: "*",
+    element: <PageNotFound />,
+  },
+  {
     path: "/product/review/:id",
     element: <ProductReviewPage />,
   },
@@ -80,11 +90,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/product/create",
-    element: (<ProtectedRoute child={<ProductFormPage />}/>),
+    element: (<AdminProtectedRoute child={<ProductFormPage />}/>),
   },
   {
     path: "/product/update/:id",
-    element: (<ProtectedRoute child={<ProductFormPage />}/>),
+    element: (<AdminProtectedRoute child={<ProductFormPage />}/>),
   },
   {
     path: "/products",
@@ -106,7 +116,7 @@ const router = createBrowserRouter([
     element: (<ProtectedRoute child={<PaymentPage />}/>) ,
   },
   {
-    path: "/order/success",
+    path: "/order/success/:id",
     element: (<ProtectedRoute child={<SuccessOrderPage />}/>),
   },
   {

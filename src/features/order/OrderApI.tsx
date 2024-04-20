@@ -62,7 +62,7 @@ export const fetchOrderPagination = async (item: any) => {
   try {
     const token = item.token;
     const data = item.data;
-    
+    console.log('data', data)
     const option = {
       headers: {
         "Content-Type": "application/json",
@@ -71,6 +71,7 @@ export const fetchOrderPagination = async (item: any) => {
     };
 
     const res = await axios.post(API + `/order/paginate`, data, option);
+    console.log('order pag ', res)
     return res;
   } catch (error) {
     console.log(error);

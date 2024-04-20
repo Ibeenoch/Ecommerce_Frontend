@@ -39,10 +39,8 @@ export const login = async(user: any) => {
   }
 }
 
-export const verifyUser = async(data: any) => {
+export const verifyUser = async(id: any) => {
   try {
-   const addToast = data.addToast;
-   const id = data.id
   const option = {
     headers: {
       'Content-Type': 'application/json'
@@ -51,10 +49,6 @@ export const verifyUser = async(data: any) => {
 
   if(id){
     const res = await axios.put(API+ `/user/verify/${id}`, option);
-  addToast("Email Verification Successful", {
-    appearance: "success",
-    autoDismiss: true,
-  });
   return res;
   }
   } catch (error) {
@@ -102,6 +96,7 @@ export const passwordReset = async(data: any) => {
 
 export const fetchAUser = async (data: any) => {
   try {
+    console.log('data ', data)
     const id = data.id;
     const token = data.token;
     const option = {
@@ -111,7 +106,8 @@ export const fetchAUser = async (data: any) => {
       },
     };
 
-    const res = await axios.get(API + `/user/${id}`);
+    const res = await axios.get(API + `/user/${id}`, option);
+    console.log('agasshhbh ', res)
     return res;
   } catch (error) {
     console.log(error);

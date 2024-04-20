@@ -3,7 +3,7 @@ import { StarIcon, PlusIcon, MinusIcon } from "@heroicons/react/20/solid";
 import { RadioGroup } from "@headlessui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { getAproduct, getaProductReviews, selectProduct, updatetheProductRating } from "../ProductSlice";
+import { getAllproduct, getAproduct, getaProductReviews, selectProduct, updatetheProductRating } from "../ProductSlice";
 import ReactImageMagnify from "react-image-magnify";
 import pics from "../../../images/download-29.jpeg";
 import { addtocart, selectAllCart } from "../../cart/cartSlice";
@@ -12,13 +12,15 @@ import ProductReview from "./ProductReview";
 import SimlilarProduct from "./SimlilarProduct";
 import { selectUser } from "../../auth/authSlice";
 import { format } from "date-fns";
+import { HeartIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { addToWishlist } from "../../wishlist/wishListSlice";
 
 const ProductDetail = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate()
   const { id } = useParams();
   const { status, product, productReview } = useAppSelector(selectProduct);
-  const { user } = useAppSelector(selectUser);
+  const user = JSON.parse(localStorage.getItem('user') as any);
   const { carts } = useAppSelector(selectAllCart);
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
@@ -86,6 +88,7 @@ const ProductDetail = () => {
   };
   const reviews = { href: "#", average: 4, totalCount: 117 };
 
+ 
   const [selectedColor, setSelectedColor] = useState(products.colors[0]);
   const [selectedSize, setSelectedSize] = useState(products.sizes[2]);
 
@@ -177,11 +180,41 @@ const ProductDetail = () => {
     
   }, [id])
 
+  const handleAddCart = (productId: any) => {
+    const quantity = 1;
+    dispatch(getAproduct(productId)).then((res) => {
+      const receive = res.payload;
+      const data = { ...receive, quantity };
+      const dataitem = { data, addToast };
+      dispatch(addtocart(dataitem));
+    });
+  };
+
+
+  const handleAddToWishlist = (productId: any) => {
+   
+    const quantity = 1;
+    dispatch(getAproduct(productId)).then((res: any) => {
+      const receive = res.payload;
+      const data = { ...receive, quantity };
+      const dataitem = { data, addToast };
+      dispatch(addToWishlist(dataitem)).then((res: any) => {
+        dispatch(getAllproduct()).then((res: any) => {
+          
+        })
+      })
+    });
+  };
+
   const fifthBar = (Math.round((totalFivestar / totalRatingGiven) * 10) * 10)
   const fourthBar = (Math.round((totalFourstar / totalRatingGiven) * 10) * 10)
   const thirdBar = (Math.round((totalThreestar / totalRatingGiven) * 10) * 10)
   const secondBar = (Math.round((totalTwostar / totalRatingGiven) * 10) * 10)
   const firstBar = (Math.round((totalOnestar / totalRatingGiven) * 10) * 10)
+
+  const handlelogin = () => {
+    navigate('/login')
+  }
 
   return (
     <>
@@ -192,28 +225,32 @@ const ProductDetail = () => {
             role="list"
             className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8"
           >
-            {products.breadcrumbs.map((breadcrumb) => (
-              <li key={breadcrumb.id}>
-                <div className="flex items-center">
-                  <a
-                    href={breadcrumb.href}
-                    className="mr-2 text-sm font-medium text-gray-900"
-                  >
-                    {breadcrumb.name}
-                  </a>
-                  <svg
-                    width={16}
-                    height={20}
-                    viewBox="0 0 16 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                    className="h-5 w-4 text-gray-300"
-                  >
-                    <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
-                  </svg>
-                </div>
-              </li>
-            ))}
+            { !Object.keys(products).length || !products.breadcrumbs.length ? (
+              <div>No Product Item Available</div>
+            ) : (
+              products.breadcrumbs.map((breadcrumb) => (
+                <li key={breadcrumb.id}>
+                  <div className="flex items-center">
+                    <a
+                      href={breadcrumb.href}
+                      className="mr-2 text-sm font-medium text-gray-900"
+                    >
+                      {breadcrumb.name}
+                    </a>
+                    <svg
+                      width={16}
+                      height={20}
+                      viewBox="0 0 16 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                      className="h-5 w-4 text-gray-300"
+                    >
+                      <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
+                    </svg>
+                  </div>
+                </li>
+              ))
+            )}
             <li className="text-sm">
               <div
                 className="font-medium text-gray-500 hover:text-gray-600"
@@ -302,20 +339,34 @@ const ProductDetail = () => {
 
           {/* Options */}
           <div className="mt-4 lg:row-span-3 lg:mt-0">
+
+          <div className="flex text-sm"> 
+           <div 
+            onClick={() => handleAddToWishlist(product.id)}
+            className="flex cursor-pointer border border-white bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2">
+              <HeartIcon width={30} height={20} />  <div></div>
+            </div>
+
+          <div 
+          onClick={() => handleAddCart(product.id)}
+            className="flex cursor-pointer border border-white bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2">
+              <ShoppingBagIcon width={30} height={20} />  <div>Add To Cart</div>
+            </div>
+            </div>
+
             <h2 className="sr-only">Product information</h2>
-            <p className="text-3xl tracking-tight text-gray-900">
-             ${product.price} 
+            <p className="text-2xl tracking-tight text-gray-900">
+           <strong> ${product.price}</strong>   
             </p>
-            <p className="text-3xl tracking-tight text-gray-900 line-through">
-              ${Math.ceil(product.price + (product.price * product.discountPercentage / 100))}
-            </p>
+            <p className="">{product.discountPercentage}% off</p>
+           
 
             {/* Reviews */}
             <div className="mt-6">
               <h3 className="sr-only">Reviews</h3>
               <div className="flex items-center">
                 <div className="flex items-center">
-                  {[0, 1, 2, 3, 4].map((rating) => (
+                  {/* {[0, 1, 2, 3, 4].map((rating) => (
                     <StarIcon
                       key={rating}
                       className={classNames(
@@ -326,14 +377,21 @@ const ProductDetail = () => {
                       )}
                       aria-hidden="true"
                     />
-                  ))}
+                  ))} */}
+                  <StarIcon width={20} height={20} color={ parseInt(theProductRating ? theProductRating : '0') >= 1  ? "orange" : "gray"} fill={ parseInt(theProductRating ? theProductRating : '0') >= 1  ? "orange" : "gray"} />
+                  <StarIcon width={20} height={20} color={ parseInt(theProductRating ? theProductRating : '0') >= 2  ? "orange" : "gray"} fill={ parseInt(theProductRating ? theProductRating : '0') >= 1  ? "orange" : "gray"} />
+                  <StarIcon width={20} height={20} color={ parseInt(theProductRating ? theProductRating : '0') >= 3  ? "orange" : "gray"} fill={ parseInt(theProductRating ? theProductRating : '0') >= 1  ? "orange" : "gray"} />
+                  <StarIcon width={20} height={20} color={ parseInt(theProductRating ? theProductRating : '0') >= 4  ? "orange" : "gray"} fill={ parseInt(theProductRating ? theProductRating : '0') >= 1  ? "orange" : "gray"} />
+                  <StarIcon width={20} height={20} color={ parseInt(theProductRating ? theProductRating : '0') >= 5  ? "orange" : "gray"} fill={ parseInt(theProductRating ? theProductRating : '0') >= 1  ? "orange" : "gray"} />
+
+
                 </div>
-                <p className="sr-only">{reviews.average} out of 5 stars</p>
+                <p className="sr-only">{theProductRating ? theProductRating : 0 } out of 5 stars</p>
                 <a
                   href={reviews.href}
                   className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500"
                 >
-                  {reviews.totalCount} reviews
+                  {totalRatingGiven ? totalRatingGiven : 0} reviews
                 </a>
               </div>
               
@@ -359,7 +417,7 @@ const ProductDetail = () => {
     </div>
     <SimlilarProduct />
     <>
-     { !productReview ? (
+     { !productReview.length ? (
      <>
      <div>
      <h2 className="font-manrope font-bold text-3xl mt-10 sm:text-4xl leading-10 text-black mb-8 text-center">
@@ -402,7 +460,7 @@ const ProductDetail = () => {
                   </svg>
                   
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-red-800 w-[${fifthBar && fifthBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${fifthBar}%`}} className={`h-full bg-red-800 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                     {totalFivestar && totalFivestar}
@@ -432,7 +490,7 @@ const ProductDetail = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-red-800 w-[${fourthBar && fourthBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${fourthBar}%`}} className={`h-full bg-red-800 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                     {totalFourstar && totalFourstar}
@@ -462,7 +520,7 @@ const ProductDetail = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-red-800 w-[${thirdBar && thirdBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${thirdBar}%`}} className={`h-full bg-red-800 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                   {totalThreestar && totalThreestar}
@@ -493,7 +551,7 @@ const ProductDetail = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px] bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-red-800 w-[${secondBar && secondBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${secondBar}%`}} className={`h-full bg-red-800 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                   {totalTwostar}
@@ -523,7 +581,7 @@ const ProductDetail = () => {
                     </defs>
                   </svg>
                   <p className="h-2 w-full sm:min-w-[278px] rounded-[30px]  bg-gray-200 ml-5 mr-3">
-                    <span className={`h-full bg-red-800 w-[${firstBar && firstBar}%] rounded-[30px] flex`} />
+                    <span  style={{ width: `${firstBar}%`}} className={`h-full bg-red-800 rounded-[30px] flex`} />
                   </p>
                   <p className="font-medium text-lg py-[1px] text-black mr-[2px]">
                     {totalOnestar && totalOneRatingArr}
@@ -555,12 +613,22 @@ const ProductDetail = () => {
                 </div>
                 <div className="col-span-12 md:col-span-4 max-lg:mt-8 md:pl-8">
                   <div className="flex items-center flex-col justify-center w-full h-full ">
+                   {user && user.id ? (
+                     <button
+                     onClick={() => handleReviewForm(product.id)}
+                     className="rounded-full px-6 py-4 bg-red-800 font-semibold text-lg text-white whitespace-nowrap mb-6 w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-red-700 hover:shadow-indigo-400"
+                   >
+                     Write A Review
+                   </button>
+
+                   ) : (
                     <button
-                      onClick={() => handleReviewForm(product.id)}
-                      className="rounded-full px-6 py-4 bg-red-800 font-semibold text-lg text-white whitespace-nowrap mb-6 w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-red-700 hover:shadow-indigo-400"
-                    >
-                      Write A Review
-                    </button>
+                    onClick={handlelogin}
+                    className="rounded-full px-6 py-4 bg-red-800 font-semibold text-lg text-white whitespace-nowrap mb-6 w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-red-700 hover:shadow-indigo-400"
+                  >
+                    Write A Review
+                  </button>
+                   )}
                     {/* <button className="rounded-full px-6 py-4 bg-white font-semibold text-lg text-indigo-600 whitespace-nowrap w-full text-center shadow-sm shadow-transparent transition-all duration-500 hover:bg-indigo-100 hover:shadow-indigo-200">
                 See All Reviews
               </button> */}
@@ -579,10 +647,10 @@ const ProductDetail = () => {
                       <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
                         <img
                           className="mr-2 w-6 h-6 rounded-full"
-                          src={user && user.image && user.image.url}
+                          src={review && review.user && review.user.image && review.user.image.url}
                           alt=""
                         />
-                        {user && user.fullName}
+                        {review && review.user && review.user.fullName}
                       </p>
                       <div className="flex text-sm text-gray-600 dark:text-gray-400">
                         <div>

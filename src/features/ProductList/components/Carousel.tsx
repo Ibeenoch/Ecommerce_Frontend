@@ -8,7 +8,7 @@ import pic6 from '../../../images/T-shirt 1.png'
 import pic7 from '../../../images/Samsung s24 ultra.jpg'
 import pic8 from '../../../images/apple watch2 .png'
 import pic9 from '../../../images/ps5 3.png'
-import './Carousel.css'; // Import your CSS file for styles
+import './Carousel.css'; 
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 
@@ -55,7 +55,7 @@ const Carousel: React.FC = () => {
   return (
     <div className="carousel">
       <button onClick={handlePrevious} className="carousel-button p-4">
-        <ChevronLeftIcon className='bg-gray-400' width={30} height={35} fill='white' color='white' />
+        <ChevronLeftIcon className='bg-red-400' width={30} height={35} fill='white' color='white' />
       </button>
 
       <div className="carousel-images">
@@ -67,8 +67,9 @@ const Carousel: React.FC = () => {
       </div>
 
       <button onClick={handleNext} className="carousel-button p-4">
-       <ChevronRightIcon className='bg-gray-400' width={30} height={35} fill='white' color='white' />
+       <ChevronRightIcon className='bg-red-400' width={30} height={35} fill='white' color='white' />
       </button>
+      
     </div>
   );
 };

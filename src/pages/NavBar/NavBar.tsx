@@ -1,7 +1,7 @@
 import { ChangeEvent, Fragment, ReactElement, useEffect, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import icon from '../../images/images-9.png'
-import pics from '../../images/images-73.jpeg'
+import pics from '../../images/image.jpeg'
 import {
   Bars3Icon,
   HeartIcon,
@@ -31,12 +31,14 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
   const location = useLocation();
   const { carts } = useAppSelector(selectAllCart);
   const { wishlist } = useAppSelector(selectAllWishList);
-  const { user } = useAppSelector(selectUser);
+  const user = JSON.parse(localStorage.getItem('user') as any)
 
-  console.log( 'cart ',carts)
+  console.log( 'online user', user)
   useEffect(() => {
     dispatch(fetchAllUsersCartAsync())
-  }, [navigate])
+  }, [dispatch, navigate])
+  const checkCart = JSON.parse(localStorage.getItem('cart') as any);
+
 
   const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target.value) 
@@ -86,18 +88,14 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
 
   const navigation = [
     { name: "Marven Store", href: "/", current: true },
-    { name: "Team", href: "#", current: false },
+    { name: "Team", href: user && user.role === 'ADMIN' ? `/admin/${user.id}` : "#", current: false },
   ];
 
-  // const logout= () => {
-  //   localStorage.removeItem('user')
-  //   navigate('/login')
-  // }
 
   const userNavigation = [
-    { name: "Your Profile", href: user ? `/profile/${user && user && user.id}` : '#' },
+    { name: "Your Profile", href: user === undefined || user === null ? '/login' :  user.address === null ? `/checkout/${user.id}` : `/profile/${user && user && user.id}` },
     { name: "Settings", href: "#" },
-    { name: "Sign out", href: '#' },
+    { name: "Sign out", href: '/logout' },
   ];
 
   const handleLogoClicked = () => {
@@ -107,7 +105,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
     })
   }
 
-  const hexcode = '#DEB887'
+  const hexcode = '#DEB887';
 
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
@@ -196,7 +194,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                       </button>
                     
                       <span  style={{ }} className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                        {carts.length}
+                        {checkCart ? checkCart.length : 0 }
                       </span>
 
                       
@@ -309,7 +307,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                 <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
             </button>
             <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-3 ml-0 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                {carts.length}
+                {checkCart ? checkCart.length : 0 }
             </span>
         </div>
         <div className="mt-3 space-y-1 px-2">

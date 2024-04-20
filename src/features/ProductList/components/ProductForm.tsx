@@ -214,18 +214,15 @@ const ProductForm = () => {
     
   };
 
-  if(status === 'loading'){
-    return <LoadingPage />
-  }
+  const hexcode = '#DEB887';
 
   return (
-    <>
-      <div className="mx-auto z-12 max-w-7xl px-4 sm:px-6 mt-6 lg:px-8">
-        <form onSubmit={handleSubmit}>
+    <div style={{ background: hexcode }}>
+      <div style={{ background: hexcode }} className="mx-auto z-12 max-w-7xl px-4 sm:px-6 mt-6 lg:px-8">
+        <form style={{ background: hexcode }} onSubmit={handleSubmit}>
           <div
             className="space-y-12"
             style={{
-              background: "white",
               padding: "16px",
               borderRadius: "0.5rem",
             }}
@@ -426,12 +423,12 @@ const ProductForm = () => {
                 </div>
 
                 <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                  <div className="col-span-full">
+                  <div className="col-span-full bg-white">
                     <label
                       htmlFor="cover-image"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
-                      Add Product Photos
+                      { id ? 'Update Product Photos' : 'Add Product Photos'} 
                     </label>
                     <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                       <div className="text-center">
@@ -442,7 +439,7 @@ const ProductForm = () => {
                         <div className="mt-4 flex text-sm leading-6 text-gray-600">
                           <label
                             htmlFor="fileupload"
-                            className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                            className="relative bg-none cursor-pointer rounded-md bg-white font-semibold text-gray-800 focus-within:outline-none focus-within:ring-2 focus-within:ring-red-600 focus-within:ring-offset-2 hover:text-red-700"
                           >
                             <span>Upload a file</span>
                             <input
@@ -471,7 +468,7 @@ const ProductForm = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-x-6" style={{ background: 'white'}}>
+          <div className="mt-6 flex items-center justify-end gap-x-6" >
             <button
               type="button"
               className="text-sm font-semibold leading-6 text-gray-900"
@@ -480,14 +477,14 @@ const ProductForm = () => {
             </button>
             <button
               type="submit"
-              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="rounded-md bg-red-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
              { id ? 'Update' : 'Save'} 
             </button>
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -43,6 +43,7 @@ import Loading from "../../../Loading";
 import LoadingPage from "../../../pages/LoadingPage";
 import { addToWishlist, selectAllWishList } from "../../wishlist/wishListSlice";
 import Carousel from "./Carousel";
+import PageWriteUp from "./PageWriteUp";
 
 interface ItogglePopup {
   isOpen: boolean;
@@ -124,6 +125,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
             dispatch(getaProductReviews(productId)).then((res: any) => {
               console.log('products review ', res.payload)
               navigate(`/product/details/${productId}`);
+              window.scrollTo(0,0)
             })
         }
        })
@@ -214,8 +216,8 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   const handleProductReview = (id: any) => {
     dispatch(getAproduct(id)).then((res) => {
       if (res && res.payload && res.payload.id) {
-       
         navigate(`/product/review/${id}`);
+         window.scrollTo(0, 0);
       }
     });
   }
@@ -240,6 +242,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
   return (
      <>
       <Carousel />
+      <PageWriteUp />
 
       <div style={{  }}>
      
@@ -425,18 +428,18 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
 
                   <button
                     type="button"
-                    className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7"
+                    className="-m-2 ml-5 p-2 text-white hover:text-gray-300 sm:ml-7"
                   >
                     <span className="sr-only">View grid</span>
-                    <Squares2X2Icon className="h-5 w-5" aria-hidden="true" />
+                    <Squares2X2Icon className="h-6 w-6" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
-                    className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
+                    className="-m-2 ml-4 p-2 text-white hover:text-gray-300 sm:ml-6 lg:hidden"
                     onClick={() => setMobileFiltersOpen(true)}
                   >
                     <span className="sr-only">Filters By</span>
-                    <FunnelIcon className="h-5 w-5" aria-hidden="true" />
+                    <FunnelIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -550,7 +553,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                 {user &&
                                 user &&
                                 user.role &&
-                                user.role !== "ADMIN" ? (
+                                user.role === "ADMIN" ? (
                                   // edit product
                                   <div className="flex justify-between">
                                     <div
@@ -645,7 +648,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                       <HeartIcon
                                         className="h-4 w-4 border-none"
                                         aria-hidden="true"
-                                        color={ getwishlist.find((it: any) => it.id === product.id) ? 'red': 'gray'}
+                                        color={getwishlist && getwishlist.find((it: any) => it.id === product.id) ? 'brown': 'gray'}
                                       />
                                     </div>
                                   </div>
@@ -657,6 +660,7 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                     width: "300px",
                                     height: "200px",
                                     overflow: "hidden",
+                                    cursor: "pointer"
                                   }}
                                   onClick={() =>
                                     handleProductDetails(product.id)
@@ -668,8 +672,8 @@ const Products: React.FC<ItogglePopup> = ({ isOpen, togglePopup }) => {
                                       : pics}
                                     alt=""
                                    
-                                    style={{ objectPosition: 'center'}}
-                                    className="object-contain object-center w-[70%] h-full"
+                                    style={{ objectPosition: 'center', cursor: "pointer",}}
+                                    className="object-containobject-center w-[70%] h-full"
                                   />
                                  
                                 </div>

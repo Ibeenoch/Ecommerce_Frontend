@@ -47,47 +47,55 @@ const Login = () => {
       const login = { ...formData, passcode };
       dispatch(loginUser(login)).then((res: any) => {
         if(res && res.payload && res.payload === undefined){        
+          setIsClicked(false);
           return;
         }else if(res && res.payload && res.payload.role && res.payload.role === 'ADMIN') {      
           addToast("Successfully Login As Admin", {
             appearance: "success",
             autoDismiss: true,
           });
+          setIsClicked(false);
           navigate(`/`);
-          // navigate(`/admin/${res.payload.id}`);
+
         }else if(res && res.payload && res.payload.role && res.payload.role === 'USER') {
           const data = {
             id: res && res.payload && res.payload.id,
             token: res && res.payload && res.payload.token,
-          }
-          dispatch(getAUser(data)).then((res)=> {
-               if(res && res.payload && res.payload.id){
-                addToast("Successfully Login As User", {
-                  appearance: "success",
-                  autoDismiss: true,
-                });
-                navigate("/");
-               }
-          })  
+          };
+          setIsClicked(false);
+          console.log('data ', data)
+         if(data){
+          addToast("Successfully Login As User", {
+            appearance: "success",
+            autoDismiss: true,
+          });
+          setIsClicked(false);
+          navigate("/");
+
+         }
 
         } else if( res && res.payload && res.payload === 'user does not exist'){
+          setIsClicked(false);
           addToast("user does not exist", {
             appearance: "error",
             autoDismiss: true,
           });
         }else if( res && res.payload && res.payload === 'password does not match!'){
+          setIsClicked(false);
           addToast("password does not match!", {
             appearance: "error",
             autoDismiss: true,
           });
         }
         else{
+          setIsClicked(false);
           return;
         }
         
 
       });
     } else {
+      setIsClicked(false);
       return;
     }
   };
@@ -100,7 +108,14 @@ const Login = () => {
     setIsShowConfirmPassword(!isShowConfirmPassword);
   };
 
+useEffect(() => {
+  
+  addToast("Please login to continue", {
+    appearance: 'info',
+    autoDismiss: true,
+  });
 
+}, [])
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center mt-12 px-6 py-1 lg:px-8">
@@ -139,7 +154,7 @@ const Login = () => {
                 value={formData.email}
                 required
                 placeholder="Email Address"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -162,7 +177,7 @@ const Login = () => {
                 onChange={handleChange}
                 required
                 placeholder="Password"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
               />
               <div
                 onClick={changeVisibilty}
