@@ -5,7 +5,13 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useToasts } from "react-toast-notifications";
 import Switch from "react-switch";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
-import { emailLink, loginUser, passwordChange, registerUser, selectUser } from "./authSlice";
+import {
+  emailLink,
+  loginUser,
+  passwordChange,
+  registerUser,
+  selectUser,
+} from "./authSlice";
 import { CircularProgress } from "@material-ui/core";
 import PasswordRecovery from "./PasswordRecovery";
 
@@ -15,84 +21,95 @@ interface Login {
 }
 
 const ChangePassword: React.FC = () => {
-    const [formData, setFormData] = useState<Login>({
-        newpassword1: "",
-        newpassword2: "",
-      });
-      const dispatch = useAppDispatch();
-      const navigate = useNavigate();
-      const [ischecked, setIsChecked] = useState(false);
-      const [isShowPassword2, setIsShowPassword2] = useState(false);
-      const [isShowPassword3, setIsShowPassword3] = useState(false);
-      const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
-      const { addToast } = useToasts();
-      const { id } = useParams();
-      const { status, user } = useAppSelector(selectUser);
-    
-      const handleSwitchElem = (checked: boolean) => {
-        setIsChecked(checked);
-      };
-      const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-      };
+  const [formData, setFormData] = useState<Login>({
+    newpassword1: "",
+    newpassword2: "",
+  });
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [ischecked, setIsChecked] = useState(false);
+  const [isShowPassword2, setIsShowPassword2] = useState(false);
+  const [isShowPassword3, setIsShowPassword3] = useState(false);
+  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
+  const { addToast } = useToasts();
+  const { id } = useParams();
+  const { status, user } = useAppSelector(selectUser);
 
-      const { newpassword1, newpassword2 } = formData;
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/;
-      const handlePasswordRecovery = (e: FormEvent) => {
-        e.preventDefault();
-        if (passwordRegex.test(newpassword1)) {
-    
-          const changePassword = { formData, id };
+  const handleSwitchElem = (checked: boolean) => {
+    setIsChecked(checked);
+  };
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-          dispatch(passwordChange(changePassword)).then((res: any) => {                        
-            if(res && res.payload && res.payload.id){
-                addToast("Password Changed Successfully, Please Login with the new password to continue", {
-                appearance: "success",
-                autoDismiss: true,
-              });
-              navigate("/login");
-            }
-            
-          });
+  const { newpassword1, newpassword2 } = formData;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/;
+  const handlePasswordRecovery = (e: FormEvent) => {
+    e.preventDefault();
+    if (passwordRegex.test(newpassword1)) {
+      const changePassword = { formData, id };
 
-        } else {
+      dispatch(passwordChange(changePassword)).then((res: any) => {
+        if (res && res.payload && res.payload.id) {
           addToast(
-            "the password must be at least 8 character, the password should contain a upper case letter, the password should contain a lower case letter, the password should contain a number, the password should contain a special character e.g Password1!",
+            "Password Changed Successfully, Please Login with the new password to continue",
             {
-              appearance: "warning",
+              appearance: "success",
               autoDismiss: true,
             }
           );
+          navigate("/login");
         }
-      };
-    
-      
-      const changeVisibilty2 = () => {
-        setIsShowPassword2(!isShowPassword2);
-      };
-      const changeVisibilty3 = () => {
-        setIsShowPassword3(!isShowPassword3);
-      };
-    
-      const changeConfirmVisibilty = () => {
-        setIsShowConfirmPassword(!isShowConfirmPassword);
-      };
-    
-      const hexcode = '#DEB887'
+      });
+    } else {
+      addToast(
+        "the password must be at least 8 character, the password should contain a upper case letter, the password should contain a lower case letter, the password should contain a number, the password should contain a special character e.g Password1!",
+        {
+          appearance: "warning",
+          autoDismiss: true,
+        }
+      );
+    }
+  };
+
+  const changeVisibilty2 = () => {
+    setIsShowPassword2(!isShowPassword2);
+  };
+  const changeVisibilty3 = () => {
+    setIsShowPassword3(!isShowPassword3);
+  };
+
+  const changeConfirmVisibilty = () => {
+    setIsShowConfirmPassword(!isShowConfirmPassword);
+  };
+
+  const hexcode = "#DEB887";
 
   return (
-    <div style={{ background: hexcode, height: '100vh'}} className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+    <div
+      style={{ background: hexcode, height: "100vh" }}
+      className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+    >
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-      <Link to='/'> 
-       <div style={{ width: '40px', height: '40px', marginLeft: '40%', borderRadius: '50%' , background: 'red', overflow: 'hidden'}}>
-         <img
-          className="mx-auto h-10 w-auto"
-          src={companylogo}
-          alt="Your Company"
-        />
-       </div>
-      
+        <Link to="/">
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              marginLeft: "40%",
+              borderRadius: "50%",
+              background: "red",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              className="mx-auto h-10 w-auto"
+              src={companylogo}
+              alt="Your Company"
+            />
+          </div>
         </Link>
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Password Recovery
@@ -101,15 +118,13 @@ const ChangePassword: React.FC = () => {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handlePasswordRecovery}>
-          
-         
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <label
                 htmlFor="newpassword1"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-               New Password
+                New Password
               </label>
             </div>
             <div className="mt-2 relative">
@@ -135,14 +150,14 @@ const ChangePassword: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <label
                 htmlFor="newpassword2"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-               Confirm New Password
+                Confirm New Password
               </label>
             </div>
             <div className="mt-2 relative">
@@ -169,7 +184,6 @@ const ChangePassword: React.FC = () => {
             </div>
           </div>
 
-      
           <div>
             <button
               type="submit"
@@ -194,7 +208,7 @@ const ChangePassword: React.FC = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ChangePassword
+export default ChangePassword;

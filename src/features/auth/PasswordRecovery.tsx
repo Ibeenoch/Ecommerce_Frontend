@@ -11,13 +11,13 @@ const PasswordRecovery = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const { addToast } = useToasts();
-  const { status } = useAppSelector(selectUser)
+  const { status } = useAppSelector(selectUser);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const data = { email, addToast };
     dispatch(emailLink(data)).then((res: any) => {
-       if (res && res.payload && res.payload.message) {
+      if (res && res.payload && res.payload.message) {
         addToast("Password Recovery Mail Sent", {
           appearance: "success",
           autoDismiss: true,
@@ -26,21 +26,31 @@ const PasswordRecovery = () => {
     });
   };
 
-  const hexcode = '#DEB887'
-  
+  const hexcode = "#DEB887";
 
   return (
-    <div style={{ background: hexcode, height: '100vh'}} className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+    <div
+      style={{ background: hexcode, height: "100vh" }}
+      className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+    >
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-      <Link to='/'> 
-       <div style={{ width: '40px', height: '40px', marginLeft: '40%', borderRadius: '50%' , background: 'red', overflow: 'hidden'}}>
-         <img
-          className="mx-auto h-10 w-auto"
-          src={companylogo}
-          alt="Your Company"
-        />
-       </div>
-      
+        <Link to="/">
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              marginLeft: "40%",
+              borderRadius: "50%",
+              background: "red",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              className="mx-auto h-10 w-auto"
+              src={companylogo}
+              alt="Your Company"
+            />
+          </div>
         </Link>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
@@ -72,7 +82,6 @@ const PasswordRecovery = () => {
               type="submit"
               className="flex w-full justify-center rounded-md bg-red-800 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-             
               {status === "loading" ? (
                 <CircularProgress size={25} style={{ color: "white" }} />
               ) : (

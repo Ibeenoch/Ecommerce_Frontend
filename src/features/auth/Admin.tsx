@@ -89,8 +89,7 @@ const Admin = () => {
         const limit = 3;
         const currentPage = 1;
         const data = { limit, currentPage };
-        dispatch(getPagination(data) as any).then(() => {
-        });
+        dispatch(getPagination(data) as any).then(() => {});
       };
 
       handlePages();
@@ -155,8 +154,8 @@ const Admin = () => {
     setThestatus(allSelectOption);
     setOrderIndex(index);
   };
-console.log(theStatus)
-  const token = user && user.role === 'ADMIN' && user.token;
+  console.log(theStatus);
+  const token = user && user.role === "ADMIN" && user.token;
 
   const handleDelete = (productId: any) => {
     const getConfirmation = window.confirm(
@@ -236,31 +235,31 @@ console.log(theStatus)
     }
   };
 
-  const handleDeleteUser = (id: any, name:string) => {
-   const getConfirmation = window.confirm(`Are you sure you want to delete ${name} account?`);
+  const handleDeleteUser = (id: any, name: string) => {
+    const getConfirmation = window.confirm(
+      `Are you sure you want to delete ${name} account?`
+    );
 
-    if(getConfirmation){
+    if (getConfirmation) {
       const data = {
-      token,
-      id,
-    }
+        token,
+        id,
+      };
 
-    dispatch(deleteUser(data)).then((res: any) => {
-      if(res && res.payload && res.payload.id){
-        addToast(`${name} account is successfully deleted`, {
-          appearance: "info",
-          autoDismiss: true,
-        });
-      }
-    })
+      dispatch(deleteUser(data)).then((res: any) => {
+        if (res && res.payload && res.payload.id) {
+          addToast(`${name} account is successfully deleted`, {
+            appearance: "info",
+            autoDismiss: true,
+          });
+        }
+      });
     }
-    
-  }
+  };
 
   const handleProductDetails = (productId: any) => {
     dispatch(getAproduct(productId)).then((res) => {
       if (res && res.payload && res.payload.images && res.payload.images.set) {
-       
         navigate(`/product/details/${productId}`);
       }
     });
@@ -282,8 +281,7 @@ console.log(theStatus)
         const limit = 3;
         const currentPage = 1;
         const item = { limit, currentPage };
-        dispatch(getPagination(item) as any).then(() => {
-        });
+        dispatch(getPagination(item) as any).then(() => {});
       };
 
       handlePages();
@@ -298,8 +296,7 @@ console.log(theStatus)
         const currentPage = 1;
         const data = { limit, currentPage };
         const item = { token, data };
-        dispatch(getOrderPagination(item) as any).then(() => {
-        });
+        dispatch(getOrderPagination(item) as any).then(() => {});
       };
 
       handlePages();
@@ -314,8 +311,7 @@ console.log(theStatus)
         const currentPage = 1;
         const item = { limit, currentPage };
         const data = { token, item };
-        dispatch(getpaymentPagination(item) as any).then(() => {
-        });
+        dispatch(getpaymentPagination(item) as any).then(() => {});
       };
 
       handlePages();
@@ -330,8 +326,7 @@ console.log(theStatus)
         const currentPage = 1;
         const item = { limit, currentPage };
         const data = { token, item };
-        dispatch(getUserPagination(data) as any).then(() => {
-        });
+        dispatch(getUserPagination(data) as any).then(() => {});
       };
 
       handlePages();
@@ -799,7 +794,11 @@ console.log(theStatus)
                                                 </strong>
                                                 <select
                                                   className="w-1/8 lg:w-1/6 p-2 border border-red-800 rounded"
-                                                  value={theStatus ? theStatus[0] : item.status}
+                                                  value={
+                                                    theStatus
+                                                      ? theStatus[0]
+                                                      : item.status
+                                                  }
                                                   onChange={(e) =>
                                                     handleStatus(e, index)
                                                   }
@@ -851,7 +850,6 @@ console.log(theStatus)
                               </>
                             ) : isUser ? (
                               <>
-
                                 <ul
                                   role="list"
                                   className="divide-y divide-gray-100 px-4"
@@ -879,16 +877,18 @@ console.log(theStatus)
                                             <p className="mt-1 truncate text-xs leading-5 text-gray-500">
                                               {person.email}
                                             </p>
-                                          <div
-                                            onClick={() => viewUser(person.id)}
-                                          >
-                                            <EyeIcon
-                                              width="16px"
-                                              height="16px"
-                                              color="brown"
-                                              className="cursor-pointer"
-                                            />
-                                          </div>
+                                            <div
+                                              onClick={() =>
+                                                viewUser(person.id)
+                                              }
+                                            >
+                                              <EyeIcon
+                                                width="16px"
+                                                height="16px"
+                                                color="brown"
+                                                className="cursor-pointer"
+                                              />
+                                            </div>
                                           </div>
                                         </div>
                                         <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
@@ -905,8 +905,7 @@ console.log(theStatus)
                                                   "HH:mm:ss yyyy-MM-dd"
                                                 )}
                                               </time>
-                                            </p>                                            
-                                            
+                                            </p>
                                           ) : (
                                             <div className="mt-1 flex items-center gap-x-1.5">
                                               <div className="flex-none rounded-full bg-emerald-500/20 p-1">
@@ -915,12 +914,16 @@ console.log(theStatus)
                                               <p className="text-xs leading-5 text-gray-500">
                                                 Just Joined
                                               </p>
-                                              
                                             </div>
-                                          )
-                                          
-                                          }
-                                         <div onClick={() =>handleDeleteUser(person.id, person.fullName)}>
+                                          )}
+                                          <div
+                                            onClick={() =>
+                                              handleDeleteUser(
+                                                person.id,
+                                                person.fullName
+                                              )
+                                            }
+                                          >
                                             <TrashIcon
                                               width="16px"
                                               height="16px"
@@ -928,7 +931,6 @@ console.log(theStatus)
                                               className="cursor-pointer"
                                             />{" "}
                                           </div>
-                                          
                                         </div>
                                       </li>
                                     ))}

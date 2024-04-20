@@ -1,18 +1,17 @@
-import React, { useState } from 'react'
-import NavBar from './NavBar/NavBar';
-import Admin from '../features/auth/Admin';
+import React, { useState } from "react";
+import NavBar from "./NavBar/NavBar";
+import Admin from "../features/auth/Admin";
 
 const AdminPanel = () => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    return (
-      <>
-       <NavBar isOpen={isOpen} >
+  return (
+    <>
+      <NavBar isOpen={isOpen}>
         <Admin />
-       </NavBar>
-      </>
-      
-    )
-}
+      </NavBar>
+    </>
+  );
+};
 
-export default AdminPanel
+export default AdminPanel;

@@ -1,41 +1,41 @@
 import axios from "axios";
 
-const API = 'http://localhost:5050'
+const API = "http://localhost:5050";
 
-export const addAddress = async(data: any) => {
-    try {
-        const option = {
-            headers: {
-              'Content-Type': 'application/json'
-            },
-          };
-        const response = await axios.post(API+'/checkout/info', data);    
-        console.log('ressffdgf ', response);    
-        return response
-    } catch (error) {
-        console.log(error);
-    }
-}
+export const addAddress = async (data: any) => {
+  try {
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const response = await axios.post(API + "/checkout/info", data);
+    console.log("ressffdgf ", response);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-export const sendTransaction = async(data: any) => {
-    try {
-        const option = {
-            headers: {
-              'Content-Type': 'application/json'
-            },
-          };
-        const response = await axios.post(API+'/checkout/transaction', data); 
-        return response
-    } catch (error) {
-        console.log(error);
-    }
-}
+export const sendTransaction = async (data: any) => {
+  try {
+    const option = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const response = await axios.post(API + "/checkout/transaction", data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const fetchAUserTransactions = async (data: any) => {
   try {
     const token = data.token;
     const id = data.id;
-    console.log(' sending ', data)
+    console.log(" sending ", data);
     const option = {
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export const deleteTransaction = async (data: any) => {
     const option = {
       headers: {
         "Content-Type": "application/json",
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     };
 
@@ -103,16 +103,15 @@ export const deleteTransaction = async (data: any) => {
   }
 };
 
-
 export const fetchpaymentPagination = async (data: any) => {
   try {
     const token = data.token;
     const item = data.item;
-    
+
     const option = {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     };
 

@@ -3,7 +3,13 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { createproduct, getAllproduct, getAproduct, selectProduct, updateproduct } from "../ProductSlice";
+import {
+  createproduct,
+  getAllproduct,
+  getAproduct,
+  selectProduct,
+  updateproduct,
+} from "../ProductSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import Loading from "../../../Loading";
@@ -17,7 +23,6 @@ const ProductForm = () => {
   const { user } = useAppSelector(selectUser);
   const { id } = useParams();
   const { addToast } = useToasts();
-  
 
   type FormValues = {
     title: string;
@@ -75,150 +80,155 @@ const ProductForm = () => {
     keywords,
   } = productForm;
 
- 
-
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-  if(id){
-      
-    const token = user && user && user.token;
-
-    if(images){
-      if(images.length < 4){
-        addToast('To Update the Product images, Please Ensure to Add a Minimum of 4 photos of the Product!!!', {
-          appearance: 'error',
-          autoDismiss: true,
-          
-        })
-        return;
-      }else{
-      const product = new FormData();
-      product.append("title", title);
-      product.append("description", description);
-      product.append("price", price.toString());
-      product.append("discountPercentage", discountPercentage.toString());
-      product.append("stock", stock.toString());
-      product.append("brand", brand);
-      product.append("category", category);
-      product.append("keywords", keywords);
-  
-  
-      images.map((image) => {
-        product.append("fileupload", image);
-      });
-
-      const products = {
-        id,
-        product,
-        token,
-        images
-      }
-        
-          dispatch(updateproduct(products)).then((res: any) => {
-           if(res && res.payload && res.payload.id){
-            dispatch(getAllproduct()).then(() => {
-              navigate('/')
-            })
-           }
-          })
-
-        }
-
-    }else{
-      const product = {
-        title,
-        description,
-        price,
-        discountPercentage,
-        stock,
-        keywords,
-      }
-    const products = {
-      id,
-      product,
-      token
-    }
-             
-        dispatch(updateproduct(products)).then(() => {
-          dispatch(getAllproduct()).then(() => {
-            navigate('/')
-          })
-        });
-
-    }
-
-   
-
-  }else{
-    
-    if(!title || !description || !price || !discountPercentage || !stock || !brand || !category || !keywords){
-      addToast('Please Ensure to add all fields', {
-        appearance: 'error',
-        autoDismiss: true,
-      })
-
-      return;
-    }else if (images.length < 4) {
-     
-      addToast('Please Ensure to Add a Minimum of 4 photos of the Product!!!', {
-        appearance: 'error',
-        autoDismiss: true,
-      })
-      return;
-    }else{
-      const product = new FormData();
-      product.append("title", title);
-      product.append("description", description);
-      product.append("price", price.toString());
-      product.append("discountPercentage", discountPercentage.toString());
-      product.append("stock", stock.toString());
-      product.append("brand", brand);
-      product.append("category", category);
-      product.append("keywords", keywords);
-  
-  
-      images.map((image) => {
-        product.append("fileupload", image);
-      });
-  
+    if (id) {
       const token = user && user && user.token;
 
-      const products = {
-        product,
-        token
-      }
-      
-      dispatch(createproduct(products)).then((res) => {
-        if(res.payload && res.payload.response && res.payload.response.data && res.payload.response.data.error){
-          addToast('Something went wrong', {
-            appearance: 'error',
-            autoDismiss: true,
-          })
+      if (images) {
+        if (images.length < 4) {
+          addToast(
+            "To Update the Product images, Please Ensure to Add a Minimum of 4 photos of the Product!!!",
+            {
+              appearance: "error",
+              autoDismiss: true,
+            }
+          );
           return;
-        }else{
-          addToast('Product Successfully Added!!!', {
-            appearance: 'success',
-            autoDismiss: true,
-          })
-          dispatch(getAllproduct()).then(() => {
-            navigate('/')
-          })
-          
-        }
-       
-      });
+        } else {
+          const product = new FormData();
+          product.append("title", title);
+          product.append("description", description);
+          product.append("price", price.toString());
+          product.append("discountPercentage", discountPercentage.toString());
+          product.append("stock", stock.toString());
+          product.append("brand", brand);
+          product.append("category", category);
+          product.append("keywords", keywords);
 
+          images.map((image) => {
+            product.append("fileupload", image);
+          });
+
+          const products = {
+            id,
+            product,
+            token,
+            images,
+          };
+
+          dispatch(updateproduct(products)).then((res: any) => {
+            if (res && res.payload && res.payload.id) {
+              dispatch(getAllproduct()).then(() => {
+                navigate("/");
+              });
+            }
+          });
+        }
+      } else {
+        const product = {
+          title,
+          description,
+          price,
+          discountPercentage,
+          stock,
+          keywords,
+        };
+        const products = {
+          id,
+          product,
+          token,
+        };
+
+        dispatch(updateproduct(products)).then(() => {
+          dispatch(getAllproduct()).then(() => {
+            navigate("/");
+          });
+        });
+      }
+    } else {
+      if (
+        !title ||
+        !description ||
+        !price ||
+        !discountPercentage ||
+        !stock ||
+        !brand ||
+        !category ||
+        !keywords
+      ) {
+        addToast("Please Ensure to add all fields", {
+          appearance: "error",
+          autoDismiss: true,
+        });
+
+        return;
+      } else if (images.length < 4) {
+        addToast(
+          "Please Ensure to Add a Minimum of 4 photos of the Product!!!",
+          {
+            appearance: "error",
+            autoDismiss: true,
+          }
+        );
+        return;
+      } else {
+        const product = new FormData();
+        product.append("title", title);
+        product.append("description", description);
+        product.append("price", price.toString());
+        product.append("discountPercentage", discountPercentage.toString());
+        product.append("stock", stock.toString());
+        product.append("brand", brand);
+        product.append("category", category);
+        product.append("keywords", keywords);
+
+        images.map((image) => {
+          product.append("fileupload", image);
+        });
+
+        const token = user && user && user.token;
+
+        const products = {
+          product,
+          token,
+        };
+
+        dispatch(createproduct(products)).then((res) => {
+          if (
+            res.payload &&
+            res.payload.response &&
+            res.payload.response.data &&
+            res.payload.response.data.error
+          ) {
+            addToast("Something went wrong", {
+              appearance: "error",
+              autoDismiss: true,
+            });
+            return;
+          } else {
+            addToast("Product Successfully Added!!!", {
+              appearance: "success",
+              autoDismiss: true,
+            });
+            dispatch(getAllproduct()).then(() => {
+              navigate("/");
+            });
+          }
+        });
+      }
     }
-  }
-    
   };
 
-  const hexcode = '#DEB887';
+  const hexcode = "#DEB887";
 
   return (
     <div style={{ background: hexcode }}>
-      <div style={{ background: hexcode }} className="mx-auto z-12 max-w-7xl px-4 sm:px-6 mt-6 lg:px-8">
+      <div
+        style={{ background: hexcode }}
+        className="mx-auto z-12 max-w-7xl px-4 sm:px-6 mt-6 lg:px-8"
+      >
         <form style={{ background: hexcode }} onSubmit={handleSubmit}>
           <div
             className="space-y-12"
@@ -229,7 +239,7 @@ const ProductForm = () => {
           >
             <div className="border-b border-gray-900/10 pb-12">
               <h2 className="text-2xl font-bold tracking-tight text-gray-900 text-center">
-                { id ? 'Update Product': 'Add Product'}
+                {id ? "Update Product" : "Add Product"}
               </h2>
 
               <div className="border-b border-gray-900/10 pb-12">
@@ -294,7 +304,6 @@ const ProductForm = () => {
                     </div>
                   </div>
 
-
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="discountPercentage"
@@ -354,49 +363,47 @@ const ProductForm = () => {
                   </div>
                 </div>
 
-              { id ? (<></>) : (
+                {id ? (
+                  <></>
+                ) : (
                   <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-               
-                  <div className="sm:col-span-3">
-                    <label
-                      htmlFor="category"
-                      className="block text-sm font-medium leading-6 text-gray-900"
-                    >
-                      Category
-                    </label>
-                    <div className="mt-2">
-                      <input
-                        type="text"
-                        name="category"
-                        id="category"
-                        value={productForm?.category}
-                        onChange={handleChange}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      />
+                    <div className="sm:col-span-3">
+                      <label
+                        htmlFor="category"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Category
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          name="category"
+                          id="category"
+                          value={productForm?.category}
+                          onChange={handleChange}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
                     </div>
-
-                    
+                    <div className="sm:col-span-3">
+                      <label
+                        htmlFor="brand"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Brand
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          name="brand"
+                          id="brand"
+                          value={productForm?.brand}
+                          onChange={handleChange}
+                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="sm:col-span-3">
-                  <label
-                    htmlFor="brand"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    Brand
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="brand"
-                      id="brand"
-                      value={productForm?.brand}
-                      onChange={handleChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-                  
-                </div>
                 )}
 
                 <div className="col-span-full">
@@ -428,7 +435,7 @@ const ProductForm = () => {
                       htmlFor="cover-image"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
-                      { id ? 'Update Product Photos' : 'Add Product Photos'} 
+                      {id ? "Update Product Photos" : "Add Product Photos"}
                     </label>
                     <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                       <div className="text-center">
@@ -468,7 +475,7 @@ const ProductForm = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-x-6" >
+          <div className="mt-6 flex items-center justify-end gap-x-6">
             <button
               type="button"
               className="text-sm font-semibold leading-6 text-gray-900"
@@ -479,7 +486,7 @@ const ProductForm = () => {
               type="submit"
               className="rounded-md bg-red-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-             { id ? 'Update' : 'Save'} 
+              {id ? "Update" : "Save"}
             </button>
           </div>
         </form>

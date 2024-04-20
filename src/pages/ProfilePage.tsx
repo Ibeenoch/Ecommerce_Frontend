@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import NavBar from './NavBar/NavBar';
-import UserProfile from '../features/auth/UserProfile';
-import Footer from './Footer';
+import React, { useState } from "react";
+import NavBar from "./NavBar/NavBar";
+import UserProfile from "../features/auth/UserProfile";
+import Footer from "./Footer";
 
 // interface User {
 //   name: string;
@@ -18,17 +18,16 @@ import Footer from './Footer';
 // };
 
 const ProfilePage: React.FC = () => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    return (
-      <>
-       <NavBar isOpen={isOpen} >
-            <UserProfile />
-       </NavBar>
-       <Footer />
-      </>
-      
-    )
-}
+  return (
+    <>
+      <NavBar isOpen={isOpen}>
+        <UserProfile />
+      </NavBar>
+      <Footer />
+    </>
+  );
+};
 
-export default ProfilePage
+export default ProfilePage;

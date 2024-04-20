@@ -1,7 +1,13 @@
-import { ChangeEvent, Fragment, ReactElement, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Fragment,
+  ReactElement,
+  useEffect,
+  useState,
+} from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import icon from '../../images/images-9.png'
-import pics from '../../images/image.jpeg'
+import icon from "../../images/images-9.png";
+import pics from "../../images/image.jpeg";
 import {
   Bars3Icon,
   HeartIcon,
@@ -10,123 +16,144 @@ import {
   ShoppingCartIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchAllUsersCartAsync, selectAllCart } from "../../features/cart/cartSlice";
+import {
+  fetchAllUsersCartAsync,
+  selectAllCart,
+} from "../../features/cart/cartSlice";
 import { selectUser } from "../../features/auth/authSlice";
-import { getAllproduct, getProductSearchResult } from "../../features/ProductList/ProductSlice";
-import { fetchAllUsersWishListAsync, selectAllWishList } from "../../features/wishlist/wishListSlice";
+import {
+  getAllproduct,
+  getProductSearchResult,
+} from "../../features/ProductList/ProductSlice";
+import {
+  fetchAllUsersWishListAsync,
+  selectAllWishList,
+} from "../../features/wishlist/wishListSlice";
 
 interface Child {
   children: ReactElement;
-  isOpen: boolean
+  isOpen: boolean;
 }
-
 
 const NavBar: React.FC<Child> = ({ children, isOpen }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const location = useLocation();
   const { carts } = useAppSelector(selectAllCart);
   const { wishlist } = useAppSelector(selectAllWishList);
-  const user = JSON.parse(localStorage.getItem('user') as any)
+  const user = JSON.parse(localStorage.getItem("user") as any);
 
-  console.log( 'online user', user)
+  console.log("online user", user);
   useEffect(() => {
-    dispatch(fetchAllUsersCartAsync())
-  }, [dispatch, navigate])
-  const checkCart = JSON.parse(localStorage.getItem('cart') as any);
-
+    dispatch(fetchAllUsersCartAsync());
+  }, [dispatch, navigate]);
+  const checkCart = JSON.parse(localStorage.getItem("cart") as any);
 
   const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
-    setInputText(e.target.value) 
-  }
+    setInputText(e.target.value);
+  };
 
   const handleMouseEnter = () => {
-    setShowSearch(true)
-  }
+    setShowSearch(true);
+  };
   const handleMouseLeave = () => {
-    setShowSearch(false)
-  }
+    setShowSearch(false);
+  };
 
   const handleSearch = () => {
-    dispatch(getProductSearchResult(inputText)).then((res) => {
-    })
-  }
-  
+    dispatch(getProductSearchResult(inputText)).then((res) => {});
+  };
+
   const handleCart = () => {
     dispatch(fetchAllUsersCartAsync()).then((res) => {
-     if(res.payload === undefined || res.payload === null){
-      return;
-     }else{
-      navigate('/cart')
-     }
-      
-    })
-  }
-  
+      if (res.payload === undefined || res.payload === null) {
+        return;
+      } else {
+        navigate("/cart");
+      }
+    });
+  };
+
   const handleWishList = () => {
     dispatch(fetchAllUsersWishListAsync()).then((res) => {
-     if(res.payload === undefined || res.payload === null){
-      return;
-     }else{
-      navigate('/wishlist')
-     }
-      
-    })
-  }
+      if (res.payload === undefined || res.payload === null) {
+        return;
+      } else {
+        navigate("/wishlist");
+      }
+    });
+  };
 
   const handleProfile = () => {
-    if(user && user.id){
-      navigate(`/profile/${user && user.id}`)
-    }else{
+    if (user && user.id) {
+      navigate(`/profile/${user && user.id}`);
+    } else {
       return;
     }
-  }
+  };
 
   const navigation = [
     { name: "Marven Store", href: "/", current: true },
-    { name: "Team", href: user && user.role === 'ADMIN' ? `/admin/${user.id}` : "#", current: false },
+    {
+      name: "Team",
+      href: user && user.role === "ADMIN" ? `/admin/${user.id}` : "#",
+      current: false,
+    },
   ];
 
-
   const userNavigation = [
-    { name: "Your Profile", href: user === undefined || user === null ? '/login' :  user.address === null ? `/checkout/${user.id}` : `/profile/${user && user && user.id}` },
+    {
+      name: "Your Profile",
+      href:
+        user === undefined || user === null
+          ? "/login"
+          : user.address === null
+          ? `/checkout/${user.id}`
+          : `/profile/${user && user && user.id}`,
+    },
     { name: "Settings", href: "#" },
-    { name: "Sign out", href: '/logout' },
+    { name: "Sign out", href: "/logout" },
   ];
 
   const handleLogoClicked = () => {
     dispatch(getAllproduct()).then((res: any) => {
-      navigate('/');
+      navigate("/");
       window.scrollTo(0, 0);
-    })
-  }
+    });
+  };
 
-  const hexcode = '#DEB887';
+  const hexcode = "#DEB887";
 
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
   }
   return (
     <>
-      <div  className="min-h-full">
-        <Disclosure  as="nav" className="bg-white border-b border-b-red-800 fixed w-full z-50">
+      <div className="min-h-full">
+        <Disclosure
+          as="nav"
+          className="bg-white border-b border-b-red-800 fixed w-full z-50"
+        >
           {({ open }) => (
             <>
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                   <div className="flex items-center">
                     <div>
-                    <div onClick={handleLogoClicked} className="flex-shrink-0 cursor-pointer">
-                      <img
-                        className="h-8 w-8"
-                        src={icon}
-                        alt="Your Company"
-                      />
-                    </div>
+                      <div
+                        onClick={handleLogoClicked}
+                        className="flex-shrink-0 cursor-pointer"
+                      >
+                        <img
+                          className="h-8 w-8"
+                          src={icon}
+                          alt="Your Company"
+                        />
+                      </div>
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
@@ -148,21 +175,39 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                       </div>
                     </div>
                   </div>
-                    <div className="flex align-center justify-center">
-                      <div className="">
-                            <input className="border-none bg-gray-100" type="search" width={30} onChange={(e) => setInputText(e.target.value)} value={inputText}  placeholder="search for a product" onMouseLeave={handleMouseLeave}  onMouseEnter={handleMouseEnter}/> 
-                      </div>
-                      <div className="cursor-pointer" onMouseLeave={handleMouseLeave}  onMouseEnter={handleMouseEnter} onClick={handleSearch}>
-                    <MagnifyingGlassIcon width={18} height={18} color="black" className="mt-3"/>
-                      </div>
-                      </div>
+                  <div className="flex align-center justify-center">
+                    <div className="">
+                      <input
+                        className="border-none bg-gray-100"
+                        type="search"
+                        width={30}
+                        onChange={(e) => setInputText(e.target.value)}
+                        value={inputText}
+                        placeholder="search for a product"
+                        onMouseLeave={handleMouseLeave}
+                        onMouseEnter={handleMouseEnter}
+                      />
+                    </div>
+                    <div
+                      className="cursor-pointer"
+                      onMouseLeave={handleMouseLeave}
+                      onMouseEnter={handleMouseEnter}
+                      onClick={handleSearch}
+                    >
+                      <MagnifyingGlassIcon
+                        width={18}
+                        height={18}
+                        color="black"
+                        className="mt-3"
+                      />
+                    </div>
+                  </div>
                   <div className="hidden md:block">
-                    
                     <div className="ml-4 flex items-center md:ml-6">
                       <button
                         type="button"
                         onClick={handleWishList}
-                        style={{ opacity: (isOpen ? '0.3': '1')}}
+                        style={{ opacity: isOpen ? "0.3" : "1" }}
                         className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
                         <span className="absolute -inset-1.5" />
@@ -173,15 +218,18 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                           color="black"
                         />
                       </button>
-                    
-                      <span  style={{ }} className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+
+                      <span
+                        style={{}}
+                        className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10"
+                      >
                         {wishlist.length}
                       </span>
 
                       <button
                         type="button"
                         onClick={handleCart}
-                        style={{ opacity: (isOpen ? '0.3': '1')}}
+                        style={{ opacity: isOpen ? "0.3" : "1" }}
                         className="relative rounded-full  p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
                         <span className="absolute -inset-1.5" />
@@ -192,12 +240,14 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                           color="black"
                         />
                       </button>
-                    
-                      <span  style={{ }} className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                        {checkCart ? checkCart.length : 0 }
+
+                      <span
+                        style={{}}
+                        className="inline-flex items-center rounded-md z-10 bg-red-50 mb-8 -ml-2 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10"
+                      >
+                        {checkCart ? checkCart.length : 0}
                       </span>
 
-                      
                       {/* Profile dropdown */}
                       <Menu as="div" className="relative ml-3">
                         <div>
@@ -206,7 +256,11 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                             <span className="sr-only">Open user menu</span>
                             <img
                               className="h-8 w-8 rounded-full"
-                              src={user && user.image && user.image.url ? user.image.url : pics}
+                              src={
+                                user && user.image && user.image.url
+                                  ? user.image.url
+                                  : pics
+                              }
                               alt=""
                             />
                           </Menu.Button>
@@ -240,7 +294,6 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                         </Transition>
                       </Menu>
                     </div>
-                    
                   </div>
                   <div className="-mr-2 flex md:hidden">
                     {/* Mobile menu button */}
@@ -263,68 +316,80 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
                 </div>
               </div>
 
-<Disclosure.Panel className="md:hidden">
-    <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-        {navigation.map((item) => (
-            <Disclosure.Button
-                key={item.name}
-                as="a"
-                href={item.href}
-                className={`block rounded-md px-3 py-2 text-base font-medium ${
-                    item.current ? "bg-white text-gray-900 hover:bg-gray-900 hover:text-white" : "text-gray-900 bg-white hover:bg-gray-900 hover:text-white"
-                }`}
-                aria-current={item.current ? "page" : undefined}
-            >
-                {item.name}
-            </Disclosure.Button>
-        ))}
-    </div>
-    <div className="border-t border-gray-700 pb-3 pt-4">
-        <div className="flex items-center px-5">
-            <div className="flex-shrink-0">
-                <img className="h-10 w-10 rounded-full" src={user && user?.image && user?.image?.url || pics} alt="" />
-            </div>
-            <div className="ml-3">
-                <div className="text-base font-medium leading-none text-gray-900">{user?.fullName || 'name'}</div>
-                <div className="text-sm font-medium leading-none text-gray-900">{user?.email || 'email'}</div>
-            </div>
-            <button
-                onClick={handleWishList}
-                type="button"
-                className="relative ml-auto flex-shrink-0 rounded-full p-1 text-gray-900 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-            >
-                <HeartIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
-            <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-3 ml-0 px-1.5 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-            {wishlist.length}
-            </span>
+              <Disclosure.Panel className="md:hidden">
+                <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                  {navigation.map((item) => (
+                    <Disclosure.Button
+                      key={item.name}
+                      as="a"
+                      href={item.href}
+                      className={`block rounded-md px-3 py-2 text-base font-medium ${
+                        item.current
+                          ? "bg-white text-gray-900 hover:bg-gray-900 hover:text-white"
+                          : "text-gray-900 bg-white hover:bg-gray-900 hover:text-white"
+                      }`}
+                      aria-current={item.current ? "page" : undefined}
+                    >
+                      {item.name}
+                    </Disclosure.Button>
+                  ))}
+                </div>
+                <div className="border-t border-gray-700 pb-3 pt-4">
+                  <div className="flex items-center px-5">
+                    <div className="flex-shrink-0">
+                      <img
+                        className="h-10 w-10 rounded-full"
+                        src={(user && user?.image && user?.image?.url) || pics}
+                        alt=""
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <div className="text-base font-medium leading-none text-gray-900">
+                        {user?.fullName || "name"}
+                      </div>
+                      <div className="text-sm font-medium leading-none text-gray-900">
+                        {user?.email || "email"}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleWishList}
+                      type="button"
+                      className="relative ml-auto flex-shrink-0 rounded-full p-1 text-gray-900 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    >
+                      <HeartIcon className="h-6 w-6" aria-hidden="true" />
+                    </button>
+                    <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-3 ml-0 px-1.5 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+                      {wishlist.length}
+                    </span>
 
-            <button
-                onClick={handleCart}
-                type="button"
-                className="relative ml-auto flex-shrink-0 rounded-full p-1 text-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-            >
-                <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
-            <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-3 ml-0 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                {checkCart ? checkCart.length : 0 }
-            </span>
-        </div>
-        <div className="mt-3 space-y-1 px-2">
-            {userNavigation.map((item) => (
-                <Disclosure.Button
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-700 hover:text-white"
-                >
-                    {item.name}
-                </Disclosure.Button>
-            ))}
-        </div>
-    </div>
-</Disclosure.Panel>
-
+                    <button
+                      onClick={handleCart}
+                      type="button"
+                      className="relative ml-auto flex-shrink-0 rounded-full p-1 text-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    >
+                      <ShoppingCartIcon
+                        className="h-6 w-6"
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <span className="inline-flex items-center rounded-md z-10 bg-red-50 mb-3 ml-0 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+                      {checkCart ? checkCart.length : 0}
+                    </span>
+                  </div>
+                  <div className="mt-3 space-y-1 px-2">
+                    {userNavigation.map((item) => (
+                      <Disclosure.Button
+                        key={item.name}
+                        as="a"
+                        href={item.href}
+                        className="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-700 hover:text-white"
+                      >
+                        {item.name}
+                      </Disclosure.Button>
+                    ))}
+                  </div>
+                </div>
+              </Disclosure.Panel>
             </>
           )}
         </Disclosure>
@@ -336,7 +401,7 @@ const NavBar: React.FC<Child> = ({ children, isOpen }) => {
             </h1>
           </div>
         </header> */}
-        <main style={{ background: hexcode}}>
+        <main style={{ background: hexcode }}>
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             {children}
           </div>

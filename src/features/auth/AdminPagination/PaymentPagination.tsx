@@ -7,7 +7,7 @@ import { getPagination } from "../../ProductList/ProductSlice";
 import { getpaymentPagination } from "../../checkout/checkoutSlice";
 
 interface ChildComponentProp {
-  totalCount: number
+  totalCount: number;
 }
 const PaymentPagination: React.FC<ChildComponentProp> = ({ totalCount }) => {
   const dispatch = useDispatch();
@@ -22,10 +22,9 @@ const PaymentPagination: React.FC<ChildComponentProp> = ({ totalCount }) => {
     const limit = iTemLimitPerPage;
     const currentPage = num;
     const item = { limit, currentPage };
-    const data = {item, token}
+    const data = { item, token };
     dispatch(getpaymentPagination(data) as any);
   };
- 
 
   const handlePrevious = (num: number) => {
     setPage(num);
@@ -53,8 +52,10 @@ const PaymentPagination: React.FC<ChildComponentProp> = ({ totalCount }) => {
           Previous
         </div>
         <div
-              onClick={() => handleNext(page >= totalItem - 1 ? totalItem :  page + 1)}
-              className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          onClick={() =>
+            handleNext(page >= totalItem - 1 ? totalItem : page + 1)
+          }
+          className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Next
         </div>
@@ -82,7 +83,7 @@ const PaymentPagination: React.FC<ChildComponentProp> = ({ totalCount }) => {
               <span className="sr-only">Previous</span>
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </div>
-           
+
             {Array.from({
               length: Math.ceil(totalItem / iTemLimitPerPage),
             }).map((el: any, index: number) => (
@@ -100,7 +101,9 @@ const PaymentPagination: React.FC<ChildComponentProp> = ({ totalCount }) => {
             ))}
 
             <div
-              onClick={() => handleNext(page >= totalItem - 1 ? totalItem  :  page + 1)}
+              onClick={() =>
+                handleNext(page >= totalItem - 1 ? totalItem : page + 1)
+              }
               className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
             >
               <span className="sr-only">Next</span>

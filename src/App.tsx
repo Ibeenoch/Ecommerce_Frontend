@@ -82,7 +82,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/product/review/form/:id",
-    element: (<ProtectedRoute child={<ProductReviewFormPage />} />),
+    element: <ProtectedRoute child={<ProductReviewFormPage />} />,
   },
   {
     path: "/product/details/:id",
@@ -90,11 +90,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/product/create",
-    element: (<AdminProtectedRoute child={<ProductFormPage />}/>),
+    element: <AdminProtectedRoute child={<ProductFormPage />} />,
   },
   {
     path: "/product/update/:id",
-    element: (<AdminProtectedRoute child={<ProductFormPage />}/>),
+    element: <AdminProtectedRoute child={<ProductFormPage />} />,
   },
   {
     path: "/products",
@@ -109,39 +109,31 @@ const router = createBrowserRouter([
   },
   {
     path: "/checkout/:id",
-    element: (<ProtectedRoute child={<CheckOutPage />}/>),
+    element: <ProtectedRoute child={<CheckOutPage />} />,
   },
   {
     path: "/payment/:id",
-    element: (<ProtectedRoute child={<PaymentPage />}/>) ,
+    element: <ProtectedRoute child={<PaymentPage />} />,
   },
   {
     path: "/order/success/:id",
-    element: (<ProtectedRoute child={<SuccessOrderPage />}/>),
+    element: <ProtectedRoute child={<SuccessOrderPage />} />,
   },
   {
     path: "/payment",
-    element: (<ProtectedRoute child={<PaymentPage />}/>),
+    element: <ProtectedRoute child={<PaymentPage />} />,
   },
   {
     path: "/profile/:id",
-    element: (
-      <ProtectedRoute child={<ProfilePage />} />
-    ),
+    element: <ProtectedRoute child={<ProfilePage />} />,
   },
   {
     path: "/admin/:id",
-    element: (
-      <AdminProtectedRoute child={<AdminPanel />} />
-    ),
+    element: <AdminProtectedRoute child={<AdminPanel />} />,
   },
 ]);
 
-
-
 function App() {
-
-
   return (
     <ToastProvider>
       <div className="App">

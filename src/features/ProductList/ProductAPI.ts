@@ -61,7 +61,10 @@ export const getSimilarProduct = async (data: any) => {
         "Content-Type": "application/json",
       },
     };
-    const res = await axios.get(API + `/similar/product?q=${category}&m=${brand}`, option);
+    const res = await axios.get(
+      API + `/similar/product?q=${category}&m=${brand}`,
+      option
+    );
     return res;
   } catch (error) {
     console.log(error);
@@ -253,8 +256,8 @@ export const getABrand = async (name: any) => {
 export const updateproductReview = async (data: any) => {
   try {
     const id = data.id;
-    const updatedRating = { updatedRating: data.updatedRating};
-    
+    const updatedRating = { updatedRating: data.updatedRating };
+
     const res = await axios.put(API + `/similar/product/${id}`, updatedRating);
     return res;
   } catch (error) {

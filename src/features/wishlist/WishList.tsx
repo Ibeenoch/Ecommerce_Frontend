@@ -1,6 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { MinusIcon, PlusIcon, ShoppingBagIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  MinusIcon,
+  PlusIcon,
+  ShoppingBagIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
@@ -14,7 +19,7 @@ const WishList = () => {
   const { wishlist } = useAppSelector(selectAllWishList);
   const { user } = useAppSelector(selectUser);
   const { addToast } = useToasts();
-  
+
   const navigate = useNavigate();
 
   const subTotal = () => {
@@ -30,7 +35,6 @@ const WishList = () => {
   useEffect(() => {
     dispatch(fetchAllUsersWishListAsync());
   }, []);
-
 
   const handleAddCart = (productId: any) => {
     const quantity = 1;
@@ -76,7 +80,6 @@ const WishList = () => {
     }
   };
 
-  
   return (
     <>
       <div>
@@ -106,10 +109,12 @@ const WishList = () => {
                           <p className="mt-1 text-sm text-gray-500"></p>
                         </div>
                         <div className="flex flex-1 items-end justify-between text-sm">
-                          <div 
-                          onClick={() => handleAddCart(wish.id)}
-                          className="flex cursor-pointer rounded-full bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2">
-                           <ShoppingBagIcon width={30} height={20} />  <div>Add To Cart</div>
+                          <div
+                            onClick={() => handleAddCart(wish.id)}
+                            className="flex cursor-pointer rounded-full bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2"
+                          >
+                            <ShoppingBagIcon width={30} height={20} />{" "}
+                            <div>Add To Cart</div>
                           </div>
 
                           <div className="flex">
@@ -134,18 +139,16 @@ const WishList = () => {
               <p>Subtotal</p>
               <p>${wishlist && subTotal && subTotal()} </p>
             </div>
-          
-           
+
             <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
               <p>
-               
                 <Link to="/">
                   <button
                     type="button"
-                          className="flex cursor-pointer rounded-full bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2"
+                    className="flex cursor-pointer rounded-full bg-red-800 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:opacity-50 hover:text-white dark:hover:bg-red-700 px-4 py-2"
                     onClick={() => setOpen(false)}
                   >
-                  <strong> Continue Shopping</strong> 
+                    <strong> Continue Shopping</strong>
                     <span aria-hidden="true"> &rarr;</span>
                   </button>
                 </Link>

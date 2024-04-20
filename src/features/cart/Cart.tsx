@@ -10,9 +10,9 @@ import { selectUser } from "../auth/authSlice";
 const Cart = () => {
   const [open, setOpen] = useState(true);
   const { carts } = useAppSelector(selectAllCart);
-  const user = JSON.parse(localStorage.getItem('user') as any)
+  const user = JSON.parse(localStorage.getItem("user") as any);
   const { addToast } = useToasts();
-  
+
   const navigate = useNavigate();
 
   const subTotal = () => {
@@ -29,13 +29,12 @@ const Cart = () => {
     dispatch(fetchAllUsersCartAsync());
   }, []);
 
-
   const handleAdd = (id: number): void => {
     const checkItem = JSON.parse(localStorage.getItem("cart") as any);
     if (checkItem.length === 1) {
-       console.log('types ', typeof checkItem)
+      console.log("types ", typeof checkItem);
       checkItem[0].quantity++;
-      console.log('updated ', checkItem)
+      console.log("updated ", checkItem);
       localStorage.setItem("cart", JSON.stringify(checkItem));
       dispatch(fetchAllUsersCartAsync());
     } else {
@@ -51,13 +50,13 @@ const Cart = () => {
     const checkItem = JSON.parse(localStorage.getItem("cart") as any);
 
     if (checkItem.length === 1) {
-      if(checkItem[0].quantity === 1){
+      if (checkItem[0].quantity === 1) {
         return;
-      }else{
+      } else {
         checkItem[0].quantity--;
-        console.log('updated minus', checkItem)
-      localStorage.setItem("cart", JSON.stringify(checkItem));
-      dispatch(fetchAllUsersCartAsync());
+        console.log("updated minus", checkItem);
+        localStorage.setItem("cart", JSON.stringify(checkItem));
+        dispatch(fetchAllUsersCartAsync());
       }
     } else {
       if (checkItem && Array.isArray(checkItem)) {
@@ -88,7 +87,6 @@ const Cart = () => {
     }
   };
 
-  
   return (
     <>
       <div>
@@ -171,19 +169,19 @@ const Cart = () => {
               Shipping and taxes calculated at checkout.
             </p>
             <div className="mt-6">
-             { user ? (
-               <Link to={`/checkout/${user.id}`}>
-               <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
-                 Checkout
-               </div>
-             </Link>
-             ) : (
-              <Link to='/login'>
-              <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
-                Checkout
-              </div>
-            </Link>
-             )}
+              {user ? (
+                <Link to={`/checkout/${user.id}`}>
+                  <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
+                    Checkout
+                  </div>
+                </Link>
+              ) : (
+                <Link to="/login">
+                  <div className="flex items-center justify-center rounded-md border border-transparent bg-red-800 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-red-700">
+                    Checkout
+                  </div>
+                </Link>
+              )}
             </div>
             <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
               <p>
