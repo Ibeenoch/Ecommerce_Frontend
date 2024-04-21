@@ -16,7 +16,6 @@ import {
   sortproductNewest,
   sortproductRated,
 } from "../ProductSlice";
-import ReactImageMagnify from "react-image-magnify";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import pics from "../../../images/Apple 2022 MacBook Air Laptop 1.jpg";
 import { XMarkIcon } from "@heroicons/react/24/outline";
