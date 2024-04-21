@@ -3,8 +3,8 @@ import companylogo from "../../images/images-9.png";
 import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { emailLink, selectUser, userVerification } from "./authSlice";
-import { CircularProgress } from "@material-ui/core";
 import { useToasts } from "react-toast-notifications";
+import Spinner from 'react-bootstrap/Spinner'
 
 const PasswordRecovery = () => {
   const [email, setEmail] = useState<string>("");
@@ -83,8 +83,8 @@ const PasswordRecovery = () => {
               className="flex w-full justify-center rounded-md bg-red-800 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {status === "loading" ? (
-                <CircularProgress size={25} style={{ color: "white" }} />
-              ) : (
+                "Loading..."
+                ) : (
                 "Continue"
               )}
             </button>

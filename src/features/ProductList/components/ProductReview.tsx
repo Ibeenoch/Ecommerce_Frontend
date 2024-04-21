@@ -10,7 +10,6 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { selectUser } from "../../auth/authSlice";
 import { format } from "date-fns";
-import { LinearProgress } from "@material-ui/core";
 
 const ProductReview = () => {
   const { product, productReview } = useAppSelector(selectProduct);
