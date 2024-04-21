@@ -4,7 +4,6 @@ import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { emailLink, selectUser, userVerification } from "./authSlice";
 import { useToasts } from "react-toast-notifications";
-import Spinner from 'react-bootstrap/Spinner'
 
 const PasswordRecovery = () => {
   const [email, setEmail] = useState<string>("");
